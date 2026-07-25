@@ -212,14 +212,12 @@ class ProfilePage extends ConsumerWidget {
                   ),
                   Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
                 ],
-                if (kIsWeb) ...[
-                  _PremiumActionTile(
-                    icon: Icons.add_to_home_screen_rounded,
-                    title: 'Instalar App (Tela Inicial / iPhone)',
-                    onTap: () => _showInstallInstructions(context),
-                  ),
-                  Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
-                ],
+                _PremiumActionTile(
+                  icon: Icons.add_to_home_screen_rounded,
+                  title: 'Instalar App',
+                  onTap: () => _showInstallInstructions(context),
+                ),
+                Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
                 _ThemeToggleTile(ref: ref),
               ],
             ),
@@ -353,7 +351,7 @@ class ProfilePage extends ConsumerWidget {
                       Icon(Icons.apple, color: cs.primary, size: 22),
                       const Gap(8),
                       Text(
-                        'No iPhone ou iPad (Safari)',
+                        'No iPhone ou iPad (Safari / Chrome)',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w800,
                           color: cs.primary,
@@ -362,7 +360,7 @@ class ProfilePage extends ConsumerWidget {
                     ],
                   ),
                   const Gap(12),
-                  _buildStepItem(context, '1', 'Toque no ícone de Compartilhar 📤 no rodapé ou topo da tela (quadrado com seta para cima).'),
+                  _buildStepItem(context, '1', 'No Safari ou Chrome, toque no ícone de Compartilhar 📤 no rodapé ou topo da tela (quadrado com seta para cima).'),
                   const Gap(10),
                   _buildStepItem(context, '2', 'Role as opções para cima e toque em "Adicionar à Tela de Início" ➕.'),
                   const Gap(10),

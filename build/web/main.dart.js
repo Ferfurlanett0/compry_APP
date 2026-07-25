@@ -101418,9 +101418,10 @@ m=A.b([new A.b0(0,B.C,d?B.m:e,B.bU,8)],m)
 e=A.b([],g)
 if(k){if(h){k=a6.p
 if(k==null)k=a6.k3}else k=i
-B.b.P(e,A.b([new A.Mz(B.qn,"Gerenciar Funcion\xe1rios",new A.arp(a7),a0),A.aQ0(k.ap(0.5),1)],g))}if(h){k=a6.p
+B.b.P(e,A.b([new A.Mz(B.qn,"Gerenciar Funcion\xe1rios",new A.arp(a7),a0),A.aQ0(k.ap(0.5),1)],g))}e.push(new A.Mz(B.ql,"Instalar App",new A.arq(this,a7),a0))
+if(h){k=a6.p
 if(k==null)k=a6.k3}else k=i
-B.b.P(e,A.b([new A.Mz(B.ql,"Instalar App (Tela Inicial / iPhone)",new A.arq(this,a7),a0),A.aQ0(k.ap(0.5),1)],g))
+e.push(A.aQ0(k.ap(0.5),1))
 e.push(new A.a6F(a8,a0))
 m=A.f5(A.dw(A.cY(A.bK(a0,A.cQ(e,B.D,B.x,B.A),B.l,a0,a0,new A.bf(s,a0,f,o,m,a0,B.E),a0,a0,a0,a0,a0,a0,a0),a0,a0,a0),a0,A.b7(6e5,0),a0),0.1,a0,a0)
 o=A.f5(A.dw(A.cY(A.Dd(!0,B.L_,"btn-logout",!1,"Sair da Conta",a4 instanceof A.tu?a0:new A.arr(a7,a6,a8),!0),a0,a0,a0),a0,A.b7(7e5,0),a0),0.1,a0,a0)
@@ -101505,7 +101506,7 @@ r=r.w
 j=r==null
 i=g.a
 h=g.d
-q=A.bK(f,A.cQ(A.b([A.cw(A.b([k,B.c1,A.aP("No iPhone ou iPad (Safari)",f,f,f,j?f:r.e0(p,B.b8),f,f)],m),B.D,B.x,B.A),B.bJ,i.uW(h,"1","Toque no \xedcone de Compartilhar \ud83d\udce4 no rodap\xe9 ou topo da tela (quadrado com seta para cima)."),B.hZ,i.uW(h,"2",'Role as op\xe7\xf5es para cima e toque em "Adicionar \xe0 Tela de In\xedcio" \u2795.'),B.hZ,i.uW(h,"3",'Toque em "Adicionar" no canto superior direito. Pronto! O \xedcone ficar\xe1 na sua tela inicial.')],m),B.aj,B.x,B.A),B.l,f,f,new A.bf(o,f,l,q,f,f,B.E),f,f,f,B.bA,f,f,f)
+q=A.bK(f,A.cQ(A.b([A.cw(A.b([k,B.c1,A.aP("No iPhone ou iPad (Safari / Chrome)",f,f,f,j?f:r.e0(p,B.b8),f,f)],m),B.D,B.x,B.A),B.bJ,i.uW(h,"1","No Safari ou Chrome, toque no \xedcone de Compartilhar \ud83d\udce4 no rodap\xe9 ou topo da tela (quadrado com seta para cima)."),B.hZ,i.uW(h,"2",'Role as op\xe7\xf5es para cima e toque em "Adicionar \xe0 Tela de In\xedcio" \u2795.'),B.hZ,i.uW(h,"3",'Toque em "Adicionar" no canto superior direito. Pronto! O \xedcone ficar\xe1 na sua tela inicial.')],m),B.aj,B.x,B.A),B.l,f,f,new A.bf(o,f,l,q,f,f,B.E),f,f,f,B.bA,f,f,f)
 l=d.RG
 p=(l==null?d.k2:l).ap(0.4)
 o=A.aR(16)
