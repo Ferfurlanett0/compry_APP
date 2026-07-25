@@ -1,0 +1,450 @@
+Product Requirements Document (PRD)
+ListaPro
+Parte 5 — Casos de Uso, Fluxos, Critérios de
+Aceite, Roadmap e Plano de Testes
+46. Casos de Uso
+UC-001 — Login
+Objetivo
+Permitir que um usuário autenticado acesse o sistema.
+Atores
+Funcionário
+Administrador
+Pré-condições
+Usuário ativo.
+Usuário cadastrado.
+Senha válida.
+Fluxo Principal
+Usuário abre o aplicativo.
+Informa usuário e senha.
+Sistema valida as credenciais.
+Sistema cria a sessão.
+Usuário é direcionado para a Home.
+Fluxos Alternativos
+Senha incorreta.
+Usuário inexistente.
+Usuário inativo.
+Erro de conexão.
+• 
+• 
+• 
+• 
+• 
+1. 
+2. 
+3. 
+4. 
+5. 
+• 
+• 
+• 
+• 
+1
+UC-002 — Criar Lista
+Ator
+Funcionário
+Fluxo
+Abrir Home.
+Selecionar "Nova Lista".
+Informar título.
+Definir prioridade.
+Inserir observações (opcional).
+Adicionar itens.
+Salvar como rascunho ou enviar.
+Resultado:
+Lista criada.
+UC-003 — Adicionar Item
+Fluxo
+Funcionário:
+↓
+Adicionar Item
+↓
+Preencher informações
+↓
+Salvar
+↓
+Item aparece imediatamente na lista
+UC-004 — Editar Lista
+Permitido somente enquanto:
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+2
+Status = Rascunho
+Após envio:
+Lista bloqueada.
+UC-005 — Enviar Lista
+Fluxo
+Funcionário
+↓
+Enviar
+↓
+Firestore
+↓
+Push Notification
+↓
+Administrador recebe
+↓
+Status = Pendente
+UC-006 — Comprar Produtos
+Administrador
+↓
+Recebe lista
+↓
+Abre lista
+↓
+3
+Marca produtos
+↓
+Funcionário acompanha
+↓
+Administrador finaliza
+UC-007 — Finalizar Compra
+Pré-condição
+Lista em andamento.
+Fluxo
+Administrador
+↓
+Seleciona Finalizar
+↓
+Confirma
+↓
+Sistema registra:
+data;
+hora;
+usuário;
+status.
+↓
+Funcionário recebe notificação.
+UC-008 — Histórico
+Usuário
+• 
+• 
+• 
+• 
+4
+↓
+Histórico
+↓
+Seleciona período
+↓
+Visualiza listas anteriores
+UC-009 — Funcionamento Offline
+Sem internet
+↓
+Abrir lista
+↓
+Marcar produtos
+↓
+Salvar localmente
+↓
+Internet retorna
+↓
+Sincronizar
+UC-010 — Logout
+Usuário
+↓
+Perfil
+↓
+5
+Sair
+↓
+Remover sessão
+↓
+Tela Login
+47. Fluxos do Sistema
+Fluxo Geral
+flowchart TD
+A(Login)
+B(Home)
+C(Nova Lista)
+D(Adicionar Itens)
+E(Enviar)
+F(Administrador)
+G(Compra)
+H(Checklist)
+I(Finalizar)
+J(Histórico)
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
+F --> G
+6
+G --> H
+H --> I
+I --> J
+Fluxo Offline
+flowchart TD
+A(Sem Internet)
+B(Hive)
+C(Fila Local)
+D(Internet)
+E(Sincronizar)
+F(Firestore)
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
+Fluxo de Notificações
+flowchart TD
+Funcionario --> Firestore
+Firestore --> CloudMessaging
+CloudMessaging --> Administrador
+Administrador --> Firestore
+7
+Firestore --> CloudMessaging
+CloudMessaging --> Funcionario
+48. Máquina de Estados da Lista
+stateDiagram-v2
+[*] --> Rascunho
+Rascunho --> Pendente
+Pendente --> EmAndamento
+EmAndamento --> Finalizada
+Rascunho --> Cancelada
+49. Critérios de Aceite
+Login
+Critérios
+autenticar corretamente;
+manter sessão;
+bloquear usuário inválido;
+impedir campos vazios.
+Lista
+Critérios
+salvar corretamente;
+possuir título;
+possuir pelo menos um item.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+8
+Item
+Critérios
+permitir edição;
+permitir exclusão antes do envio;
+validar quantidade.
+Checklist
+Critérios
+marcar instantaneamente;
+sincronizar automaticamente;
+atualizar barra de progresso.
+Offline
+Critérios
+continuar funcionando;
+sincronizar automaticamente.
+Histórico
+Critérios
+armazenar todas as listas;
+permitir filtros.
+Notificações
+Critérios
+Administrador
+Receber nova lista.
+Funcionário
+Receber compra finalizada.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+9
+50. Roadmap
+MVP
+Login
+Usuários
+Criar lista
+Adicionar itens
+Checklist
+Tempo real
+Offline
+Histórico
+Tema claro
+Tema escuro
+Push Notification
+Versão 1.1
+Duplicar lista
+Favoritos
+Pesquisa avançada
+Filtros
+Categorias personalizadas
+Itens recorrentes
+Exportar PDF
+Versão 1.2
+Scanner código de barras
+10
+Imagem do produto
+Valor pago
+Mercado favorito
+Pesquisa por voz
+Versão 2.0
+Dashboard
+Controle financeiro
+Estoque
+Integração ERP
+IA
+Relatórios
+Widgets Android
+Wear OS
+51. Plano de Testes
+Testes Unitários
+Cobertura mínima
+80%
+Testar
+Repositories
+UseCases
+ViewModels
+Helpers
+Validators
+11
+Testes de Integração
+Firebase
+Firestore
+Hive
+Push
+Login
+Sincronização
+Testes de Interface
+Login
+Home
+Criar Lista
+Checklist
+Histórico
+Perfil
+Testes Offline
+Sem internet
+Criar lista
+Editar
+Marcar item
+Sincronizar
+Resolver conflitos
+12
+Testes de Performance
+Login
+<2 segundos
+Home
+<2 segundos
+Lista
+<1 segundo
+Marcar Item
+<300ms
+Testes de Segurança
+Permissões
+Firestore Rules
+Sessão
+Tokens
+Role
+52. Publicação
+Play Store
+Nome
+ListaPro
+Categoria
+Produtividade
+Classificação
+Livre
+13
+Idioma inicial
+Português Brasil
+Versão Inicial
+1.0.0
+53. Monitoramento
+Firebase Analytics
+Eventos
+Login
+Logout
+Nova Lista
+Lista Enviada
+Item Marcado
+Lista Finalizada
+Erro
+Sincronização
+54. Métricas de Sucesso
+Tempo médio para criar uma lista.
+Tempo médio para finalizar uma compra.
+Quantidade média de itens por lista.
+Percentual de sincronizações bem-sucedidas.
+Tempo médio de carregamento.
+Quantidade de listas concluídas.
+Falhas de sincronização.
+14
+Erros críticos.
+55. Boas Práticas Obrigatórias
+Todo código deverá seguir SOLID.
+Todo código deverá possuir tipagem forte.
+Nenhuma regra de negócio poderá ficar na camada de interface.
+Todos os Models deverão possuir métodos de serialização.
+Toda tela deverá possuir ViewModel próprio.
+Nenhuma tela poderá acessar diretamente o Firestore.
+Todas as Strings deverão ser internacionalizáveis (i18n), mesmo que inicialmente apenas o idioma
+português seja disponibilizado.
+Toda alteração importante deverá gerar um log de auditoria.
+56. Critérios de Qualidade
+O projeto deverá priorizar:
+Código limpo (Clean Code)
+Alta legibilidade
+Componentização
+Reutilização
+Escalabilidade
+Facilidade de manutenção
+Performance
+Consistência visual
+Acessibilidade
+Segurança
+57. Visão para Evolução do Produto
+Embora o MVP seja direcionado para uma churrascaria, toda a arquitetura foi planejada para permitir a
+evolução do sistema para qualquer empresa que necessite de gestão de listas de compras.
+Exemplos:
+Restaurantes
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+15
+Padarias
+Mercados
+Hotéis
+Farmácias
+Condomínios
+Empresas de limpeza
+Escritórios
+Pequenos comércios
+Com pequenas adaptações de interface e regras de negócio, o aplicativo poderá tornar-se um produto
+comercial SaaS.
+58. Conclusão
+O ListaPro foi especificado para oferecer uma solução simples, rápida e confiável para a gestão de listas
+de compras entre funcionários e administradores.
+A combinação de Flutter, Firebase, Clean Architecture, Material Design 3 e sincronização em tempo real
+garante uma base sólida para crescimento futuro, mantendo excelente experiência de uso, alta
+performance e facilidade de manutenção.
+Este documento deverá servir como referência única para design, desenvolvimento, testes e futuras
+evoluções do produto.
+Fim do Documento
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+16

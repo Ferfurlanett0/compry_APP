@@ -1,0 +1,415 @@
+Product Requirements Document (PRD)
+ListaPro
+Parte 2 — Requisitos Funcionais
+13. Requisitos Funcionais
+Introdução
+Todos os requisitos descritos abaixo são obrigatórios para o MVP do aplicativo.
+Cada requisito deve ser implementado conforme especificado, respeitando as regras de negócio e
+mantendo consistência entre dispositivos, funcionamento offline e sincronização em tempo real.
+RF-001 — Login
+Objetivo
+Permitir que usuários autorizados acessem o sistema.
+Regras
+O usuário deverá informar:
+Nome de usuário
+Senha
+Não existirá botão "Criar Conta".
+Não existirá login social (Google, Apple etc.).
+Não existirá recuperação de senha pelo aplicativo no MVP.
+Todas as contas serão criadas manualmente pelo administrador do sistema.
+Validações
+Usuário obrigatório.
+Senha obrigatória.
+Campos vazios não poderão ser enviados.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+1
+Estados
+Carregando
+Login realizado
+Usuário inexistente
+Senha incorreta
+Sem conexão (caso nunca tenha autenticado anteriormente)
+RF-002 — Persistência da Sessão
+Após autenticar com sucesso:
+manter usuário logado;
+não solicitar login novamente ao abrir o aplicativo;
+somente solicitar login após logout.
+RF-003 — Logout
+O usuário poderá sair da conta.
+Ao realizar logout:
+apagar cache da sessão;
+remover credenciais locais;
+retornar para Login.
+RF-004 — Tela Inicial
+Após o login o sistema deverá abrir a Home.
+Funcionário:
+botão Nova Lista;
+listas pendentes;
+listas finalizadas;
+pesquisa;
+filtro.
+Administrador:
+todas as listas recebidas;
+listas em andamento;
+listas finalizadas;
+pesquisa;
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+2
+filtro.
+RF-005 — Dashboard da Home
+Cada lista deverá exibir:
+título;
+criador;
+quantidade de itens;
+progresso;
+prioridade;
+data;
+status;
+categoria principal.
+Exemplo:
+Compras Mercado
+12 itens
+8 concluídos
+Prioridade Alta
+Criado hoje às 09:30
+Status: Em andamento
+RF-006 — Criar Lista
+Somente Funcionários poderão criar listas.
+Campos obrigatórios:
+Título
+Campos opcionais:
+Descrição
+Observações
+Prioridade
+Categoria
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+3
+Data limite
+Tags
+RF-007 — Prioridade
+A lista poderá possuir prioridade.
+Valores:
+Baixa
+Média
+Alta
+Urgente
+Cada prioridade possuirá uma cor.
+Baixa
+Verde
+Média
+Azul
+Alta
+Laranja
+Urgente
+Vermelho
+RF-008 — Categorias
+Categorias padrão:
+Açougue
+Hortifruti
+Padaria
+Bebidas
+• 
+• 
+• 
+• 
+4
+Limpeza
+Descartáveis
+Congelados
+Temperos
+Laticínios
+Mercearia
+Outros
+RF-009 — Adicionar Item
+Cada lista poderá possuir quantidade ilimitada de itens.
+Cada item conterá:
+Nome
+Quantidade
+Unidade
+Marca
+Categoria
+Preço esperado
+Observação
+RF-010 — Unidade de Medida
+As unidades disponíveis serão:
+Unidade
+Kg
+g
+L
+5
+ml
+Caixa
+Pacote
+Fardo
+Bandeja
+Saco
+Outro
+RF-011 — Quantidade
+Quantidade poderá aceitar:
+inteiros
+decimais
+Exemplos
+2
+0.5
+1.250
+3.75
+RF-012 — Marca
+Campo opcional.
+Exemplo
+Marca:
+Tio João
+Caso fique vazio significa:
+Qualquer marca.
+6
+RF-013 — Preço Esperado
+Campo opcional.
+Objetivo:
+Auxiliar o comprador.
+Formato:
+R$
+Exemplo
+24,90
+RF-014 — Observação do Item
+Campo livre.
+Exemplos
+"Sem açúcar"
+"Integral"
+"Se estiver em promoção comprar 2"
+RF-015 — Editar Item
+Enquanto a lista não for enviada:
+Funcionário poderá:
+editar;
+excluir;
+duplicar;
+reordenar itens.
+7
+RF-016 — Ordenação
+Itens poderão ser organizados automaticamente por:
+Categoria
+Nome
+Prioridade
+Ordem manual
+RF-017 — Pesquisa
+A pesquisa deverá localizar:
+Nome do item
+Marca
+Categoria
+Título da lista
+Observações
+Resultado instantâneo.
+RF-018 — Enviar Lista
+Ao concluir:
+Funcionário pressiona:
+Enviar Lista.
+O sistema deverá:
+salvar;
+sincronizar;
+enviar notificação;
+8
+alterar status para:
+Pendente.
+RF-019 — Cancelar Lista
+Antes da visualização pelo administrador.
+Funcionário poderá cancelar.
+Após visualização:
+Não poderá cancelar.
+RF-020 — Recebimento
+Administrador receberá Push Notification.
+Mensagem:
+Nova lista recebida.
+Ao abrir:
+lista muda para
+Em andamento.
+RF-021 — Visualização da Lista
+Administrador visualizará:
+Título
+Criador
+Data
+Prioridade
+Descrição
+Observações
+9
+Lista completa
+Barra de progresso
+Botão Finalizar
+RF-022 — Checklist
+Cada item possuirá:
+Checkbox
+Nome
+Quantidade
+Marca
+Categoria
+Preço esperado
+Observação
+RF-023 — Marcação
+Ao tocar no checkbox.
+Sistema deverá:
+marcar comprado;
+registrar horário;
+sincronizar;
+atualizar progresso.
+RF-024 — Desmarcação
+Enquanto lista não estiver finalizada.
+Administrador poderá:
+10
+desmarcar item.
+RF-025 — Barra de Progresso
+Exemplo
+0%
+25%
+50%
+75%
+100%
+Atualização em tempo real.
+RF-026 — Tempo Real
+Sempre que um item for marcado.
+Funcionário visualizará instantaneamente.
+Sem necessidade de atualizar manualmente.
+RF-027 — Histórico
+Todas as listas permanecerão armazenadas.
+Nunca serão apagadas automaticamente.
+RF-028 — Pesquisa no Histórico
+Filtros:
+Período
+Funcionário
+Categoria
+11
+Status
+Título
+RF-029 — Status
+Lista poderá assumir:
+Rascunho
+Pendente
+Em andamento
+Finalizada
+Cancelada
+RF-030 — Finalização
+Somente administrador.
+Ao finalizar:
+todos os itens bloqueados;
+edição proibida;
+registrar horário;
+registrar usuário;
+enviar Push Notification.
+RF-031 — Funcionamento Offline
+Durante ausência de internet.
+Administrador poderá:
+abrir lista;
+marcar itens;
+12
+desmarcar itens.
+Todas alterações serão armazenadas localmente.
+RF-032 — Sincronização
+Ao recuperar conexão.
+Sistema deverá:
+comparar alterações;
+resolver conflitos;
+enviar somente alterações pendentes.
+RF-033 — Indicador Offline
+Quando sem internet.
+Exibir banner:
+Modo Offline
+Cor:
+Amarelo.
+RF-034 — Conflitos
+Caso dois dispositivos alterem simultaneamente.
+Regra:
+Última alteração válida vence.
+Registrar log.
+RF-035 — Atualização Automática
+Sempre que ocorrer alteração.
+13
+Todas telas abertas deverão atualizar automaticamente.
+Sem necessidade de recarregar.
+RF-036 — Notificações
+Funcionário receberá:
+Lista recebida.
+Compra iniciada.
+Compra finalizada.
+Administrador receberá:
+Nova lista.
+RF-037 — Performance
+Lista deverá abrir em menos de:
+2 segundos.
+Mesmo contendo:
+500 itens.
+RF-038 — Acessibilidade
+Suporte a:
+Fonte grande.
+TalkBack.
+Alto contraste.
+Tema claro.
+Tema escuro.
+14
+RF-039 — Auditoria
+Registrar:
+Usuário.
+Data.
+Hora.
+Evento.
+Dispositivo.
+RF-040 — Logs
+Eventos registrados:
+Login
+Logout
+Criação
+Edição
+Envio
+Marcação
+Desmarcação
+Finalização
+Sincronização
+Erros
+Critérios Gerais de Aceite
+Será considerado concluído quando:
+✓ Login funcionar.
+15
+✓ Funcionário conseguir criar listas.
+✓ Administrador receber notificação.
+✓ Checklist funcionar.
+✓ Atualização em tempo real.
+✓ Offline funcionar.
+✓ Sincronização automática.
+✓ Histórico disponível.
+✓ Tema claro.
+✓ Tema escuro.
+✓ Interface Material Design 3.
+✓ Performance dentro dos limites definidos.
+Fim da Parte 2
+16

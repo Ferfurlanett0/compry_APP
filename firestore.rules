@@ -1,0 +1,135 @@
+/// ListaPro — Firestore Security Rules
+/// PRD Part 3, Section 21
+/// Deploy com: firebase deploy --only firestore:rules
+///
+/// Estrutura de permissões:
+///   - ADMIN: acesso completo a todas as listas
+///   - EMPLOYEE: somente suas próprias listas
+///   - Audit logs: somente escrita automática, nunca editáveis
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper functions ─────────────────────────────────────────────────────
+
+    /// Verifica se usuário está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    /// Verifica role do usuário autenticado
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    /// Verifica se é administrador
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'ADMIN';
+    }
+
+    /// Verifica se é funcionário
+    function isEmployee() {
+      return isAuthenticated() && getUserRole() == 'EMPLOYEE';
+    }
+
+    /// Verifica se usuário está ativo
+    function isActiveUser() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.active == true;
+    }
+
+    // ─── Users collection ─────────────────────────────────────────────────────
+
+    match /users/{userId} {
+      // Usuário pode ler seu próprio perfil; admin lê todos
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      // Somente admin pode criar/editar usuários (RG-002)
+      allow create, update: if isAdmin();
+      // Nunca deletar usuários
+      allow delete: if false;
+    }
+
+    // ─── Shopping Lists collection ─────────────────────────────────────────────
+
+    match /shopping_lists/{listId} {
+      // Admin lê todas; funcionário lê apenas as suas (RF-004)
+      allow read: if isAuthenticated() && (
+        isAdmin() ||
+        resource.data.createdBy == request.auth.uid
+      );
+
+      // Somente funcionário pode criar listas (RF-006)
+      allow create: if isEmployee() && isActiveUser() &&
+        request.resource.data.title != null &&
+        request.resource.data.title.size() > 0 &&
+        request.resource.data.createdBy == request.auth.uid;
+
+      // Funcionário edita somente seus rascunhos; admin edita qualquer lista (UC-004)
+      allow update: if isAuthenticated() && isActiveUser() && (
+        isAdmin() ||
+        (resource.data.createdBy == request.auth.uid &&
+         resource.data.status == 'DRAFT')
+      );
+
+      // Nunca deletar listas finalizadas (RG-009)
+      allow delete: if isAuthenticated() && (
+        isAdmin() ||
+        (resource.data.createdBy == request.auth.uid &&
+         resource.data.status == 'DRAFT')
+      ) && resource.data.status != 'FINISHED';
+
+      // ─── Items subcollection ────────────────────────────────────────────────
+
+      match /items/{itemId} {
+        // Admin lê todos; funcionário lê itens das suas listas
+        allow read: if isAuthenticated() && (
+          isAdmin() ||
+          get(/databases/$(database)/documents/shopping_lists/$(listId)).data.createdBy == request.auth.uid
+        );
+
+        // Funcionário adiciona itens somente em rascunhos (RF-009, RF-015)
+        allow create: if isEmployee() && isActiveUser() &&
+          get(/databases/$(database)/documents/shopping_lists/$(listId)).data.status == 'DRAFT' &&
+          get(/databases/$(database)/documents/shopping_lists/$(listId)).data.createdBy == request.auth.uid;
+
+        // Funcionário edita antes do envio; admin marca/desmarca (RF-023, RF-024)
+        allow update: if isAuthenticated() && isActiveUser() && (
+          isAdmin() ||
+          (get(/databases/$(database)/documents/shopping_lists/$(listId)).data.createdBy == request.auth.uid &&
+           get(/databases/$(database)/documents/shopping_lists/$(listId)).data.status == 'DRAFT')
+        );
+
+        // Funcionário deleta antes do envio (RF-015)
+        allow delete: if isEmployee() && isActiveUser() &&
+          get(/databases/$(database)/documents/shopping_lists/$(listId)).data.status == 'DRAFT' &&
+          get(/databases/$(database)/documents/shopping_lists/$(listId)).data.createdBy == request.auth.uid;
+      }
+    }
+
+    // ─── Notifications ────────────────────────────────────────────────────────
+
+    match /notifications/{notificationId} {
+      // Usuário lê apenas suas notificações
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // Sistema cria notificações (via Cloud Functions ou admin)
+      allow create: if isAuthenticated();
+      // Usuário pode marcar como lida
+      allow update: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow delete: if false;
+    }
+
+    // ─── Audit Logs ───────────────────────────────────────────────────────────
+
+    match /audit_logs/{logId} {
+      // Admin lê todos os logs
+      allow read: if isAdmin();
+      // Somente escrita automática — nunca editáveis (RF-039)
+      allow create: if isAuthenticated() && isActiveUser();
+      allow update, delete: if false;
+    }
+  }
+}

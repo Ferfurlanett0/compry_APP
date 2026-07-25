@@ -1,0 +1,382 @@
+Product Requirements Document (PRD)
+ListaPro
+Sistema Inteligente de Gestão de Listas de Compras
+Versão: 1.0.0
+Status: Em Desenvolvimento (MVP)
+Data: Julho de 2026
+Índice
+Visão Geral
+Problema Atual
+Objetivos
+Escopo do MVP
+Escopo Futuro
+Stakeholders
+Personas
+Fluxo Geral
+Arquitetura da Solução
+Tecnologias
+Regras Gerais do Sistema
+Glossário
+1. Visão Geral
+1.1 Objetivo do Produto
+O ListaPro é um aplicativo Android desenvolvido para facilitar a comunicação entre funcionários e o
+responsável pelas compras de um estabelecimento.
+Atualmente, os pedidos de compras são enviados via WhatsApp em mensagens de texto, o que gera
+diversos problemas:
+mensagens perdidas;
+itens esquecidos;
+ausência de confirmação em tempo real;
+dificuldade para localizar pedidos antigos;
+impossibilidade de acompanhar o andamento da compra;
+falta de padronização das solicitações.
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. 
+• 
+• 
+• 
+• 
+• 
+• 
+1
+O objetivo do ListaPro é centralizar todo esse fluxo em um único aplicativo, proporcionando
+organização, rastreabilidade, histórico e acompanhamento em tempo real.
+1.2 Contexto
+O primeiro cliente será uma churrascaria.
+O funcionamento atual ocorre da seguinte maneira:
+A cozinheira cria uma lista de compras.
+O churrasqueiro também pode criar listas.
+Ambos enviam essas listas pelo WhatsApp.
+O proprietário visualiza as mensagens.
+Durante a compra ele tenta lembrar quais itens já pegou.
+Não existe confirmação em tempo real.
+Não existe histórico organizado.
+Esse processo gera retrabalho e aumenta a chance de esquecer produtos importantes.
+2. Problema Atual
+Principais dores
+Organização
+As listas ficam espalhadas em diversas conversas.
+Controle
+Não existe um checklist durante a compra.
+Comunicação
+Não é possível saber se um item já foi comprado.
+Histórico
+Não há um banco de dados de pedidos anteriores.
+Padronização
+Cada funcionário escreve a lista de uma forma diferente.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+2
+3. Objetivos do Produto
+Objetivos principais
+Eliminar o uso do WhatsApp para envio das listas.
+Organizar todos os pedidos em um único ambiente.
+Permitir acompanhamento em tempo real.
+Melhorar a produtividade.
+Reduzir esquecimentos.
+Criar um histórico permanente.
+Permitir funcionamento offline.
+Criar uma arquitetura preparada para crescimento.
+Objetivos secundários
+Interface extremamente simples.
+Curva de aprendizado praticamente inexistente.
+Aplicativo rápido.
+Sincronização automática.
+Alta confiabilidade.
+4. Escopo do MVP
+O MVP deverá conter apenas as funcionalidades essenciais.
+Autenticação
+Login com usuário e senha.
+Não haverá cadastro pelo aplicativo.
+Todas as contas serão cadastradas manualmente pelo administrador.
+O aplicativo nunca exibirá botão "Criar Conta".
+Perfis
+Existirão duas permissões.
+Administrador
+Responsável pelas compras.
+Pode:
+visualizar todas as listas;
+acompanhar listas em tempo real;
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+3
+marcar itens;
+finalizar compras;
+consultar histórico;
+receber notificações;
+visualizar estatísticas futuras.
+Funcionário
+Pode:
+criar listas;
+editar listas antes do envio;
+enviar listas;
+acompanhar andamento;
+visualizar histórico das próprias listas.
+5. Escopo Futuro
+Funcionalidades previstas para versões posteriores.
+Versão 1.1
+Favoritos.
+Duplicar listas.
+Pesquisa de listas.
+Pesquisa de itens.
+Itens recorrentes.
+Categorias personalizadas.
+Compartilhamento de PDF.
+Versão 2.0
+Scanner de código de barras.
+Leitura de nota fiscal.
+IA para sugerir compras.
+Controle financeiro.
+Dashboard.
+Widgets Android.
+Integração com estoque.
+Múltiplos compradores.
+Aprovação de substituições.
+Relatórios.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+4
+6. Stakeholders
+Primário
+Proprietário da churrascaria.
+É o usuário responsável pelas compras.
+Secundários
+Funcionários responsáveis por solicitar produtos.
+Exemplos:
+Cozinheira
+Churrasqueiro
+7. Personas
+Persona 1
+Proprietário
+Objetivo:
+Comprar todos os produtos rapidamente sem esquecer nenhum item.
+Necessidades:
+Checklist simples.
+Funcionar offline.
+Receber notificações.
+Histórico.
+Frustrações atuais:
+WhatsApp desorganizado.
+Mensagens perdidas.
+Esquecimento de produtos.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+5
+Persona 2
+Funcionário
+Objetivo:
+Solicitar produtos rapidamente.
+Necessidades:
+Interface simples.
+Poucos cliques.
+Saber quando o pedido foi atendido.
+Frustrações:
+Precisar escrever mensagens longas.
+Não saber se o proprietário viu.
+Não saber se o item foi comprado.
+8. Fluxo Geral
+Funcionário
+↓
+Login
+↓
+Criar Lista
+↓
+Adicionar Itens
+↓
+Enviar
+↓
+Administrador recebe notificação
+↓
+Administrador abre lista
+• 
+• 
+• 
+• 
+• 
+• 
+6
+↓
+Vai ao mercado
+↓
+Marca itens
+↓
+Funcionário acompanha em tempo real
+↓
+Administrador finaliza compra
+↓
+Lista vai para histórico
+9. Arquitetura da Solução
+O aplicativo seguirá uma arquitetura moderna, escalável e desacoplada.
+Front-end
+Flutter
+Linguagem
+Dart
+Arquitetura
+Clean Architecture
+Padrão
+MVVM
+Gerenciamento de Estado
+Riverpod
+7
+Navegação
+GoRouter
+Injeção de Dependência
+Riverpod Providers
+Banco Offline
+Hive
+Banco Online
+Cloud Firestore
+Autenticação
+Firebase Authentication
+Push Notifications
+Firebase Cloud Messaging (FCM)
+Armazenamento
+Firebase Storage (preparado para futuras funcionalidades)
+10. Tecnologias
+Camada
+Tecnologia
+UI
+Flutter
+Linguagem
+Dart
+Estado
+Riverpod
+Arquitetura
+Clean Architecture
+Banco Online
+Firestore
+Banco Offline
+Hive
+Login
+Firebase Authentication
+Push
+Firebase Cloud Messaging
+Analytics
+Firebase Analytics
+8
+Camada
+Tecnologia
+Crash Reports
+Firebase Crashlytics
+Versionamento
+Git
+CI/CD
+GitHub Actions
+11. Regras Gerais do Sistema
+RG-001
+O aplicativo não permitirá criação de contas pelo usuário.
+RG-002
+Todos os usuários serão cadastrados manualmente pelo administrador do sistema.
+RG-003
+Toda lista deverá possuir obrigatoriamente um título.
+RG-004
+Toda lista deverá conter pelo menos um item.
+RG-005
+Somente o administrador poderá finalizar uma lista.
+RG-006
+Os funcionários poderão acompanhar a compra em tempo real.
+RG-007
+As alterações deverão ser sincronizadas automaticamente quando houver internet.
+9
+RG-008
+Caso o dispositivo esteja offline, todas as alterações deverão ser armazenadas localmente e
+sincronizadas assim que a conexão for restabelecida.
+RG-009
+Nenhum item poderá ser excluído após a finalização da lista.
+RG-010
+Todo evento relevante deverá possuir registro de data e hora.
+Exemplos:
+criação da lista;
+envio;
+início da compra;
+marcação de item;
+conclusão.
+12. Glossário
+Termo
+Definição
+Lista
+Conjunto de itens solicitados por um funcionário.
+Item
+Produto individual pertencente a uma lista.
+Funcionário
+Usuário responsável por criar listas.
+Administrador
+Usuário responsável por realizar as compras.
+Categoria
+Agrupamento de itens semelhantes.
+Checklist
+Marcação de produtos já comprados.
+Offline
+Funcionamento sem conexão com a internet.
+Sincronização
+Envio automático das alterações ao Firestore quando houver conexão.
+Fim da Parte 1
+• 
+• 
+• 
+• 
+• 
+10

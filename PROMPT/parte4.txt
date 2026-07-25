@@ -1,0 +1,391 @@
+Product Requirements Document (PRD)
+ListaPro
+Parte 4 — Design System, UX e Wireframes
+25. Filosofia de Design
+Objetivo
+O ListaPro deverá transmitir organização, rapidez e simplicidade.
+A interface deve permitir que qualquer funcionário consiga utilizar o aplicativo em menos de cinco
+minutos, sem necessidade de treinamento.
+O design seguirá os princípios do Material Design 3, utilizando componentes modernos, animações
+suaves e feedback visual constante.
+Princípios
+Interface limpa.
+Poucos cliques.
+Grandes áreas de toque.
+Alto contraste.
+Ícones intuitivos.
+Feedback imediato.
+Navegação previsível.
+Componentes reutilizáveis.
+Performance visual.
+Inspirações
+O design deverá combinar características dos seguintes aplicativos:
+Todoist
+Google Keep
+Google Tasks
+Material Design 3
+A aparência deverá ser minimalista, porém profissional.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+1
+26. Paleta de Cores
+Tema Claro
+Primary
+#2E7D32
+Verde principal.
+Secondary
+#43A047
+Surface
+#FFFFFF
+Background
+#F6F7F9
+Success
+#4CAF50
+Warning
+#FB8C00
+Error
+2
+#D32F2F
+Info
+#1976D2
+Texto Primário
+#212121
+Texto Secundário
+#616161
+Tema Escuro
+Background
+#121212
+Surface
+#1E1E1E
+Primary
+#66BB6A
+Secondary
+3
+#81C784
+Texto
+#FFFFFF
+Texto Secundário
+#BDBDBD
+27. Tipografia
+Fonte
+Roboto
+Fallback
+Noto Sans
+Títulos
+24
+Peso
+Bold
+Subtítulos
+18
+SemiBold
+Texto
+16
+4
+Regular
+Descrição
+14
+Regular
+Legenda
+12
+Medium
+28. Ícones
+Biblioteca
+Material Symbols Rounded
+Todos os ícones deverão seguir o mesmo estilo.
+Exemplos
+Adicionar
+shopping_cart
+Checklist
+check_circle
+Lista
+list_alt
+Pesquisar
+search
+Perfil
+person
+5
+Notificações
+notifications
+Configurações
+settings
+Histórico
+history
+Prioridade
+priority_high
+Categoria
+category
+Calendário
+calendar_month
+29. Espaçamentos
+Margem externa
+16dp
+Espaço entre Cards
+12dp
+Padding interno
+16dp
+Altura mínima dos botões
+56dp
+6
+Bordas
+16dp
+Cards
+Elevation baixa.
+Sombras discretas.
+30. Componentes
+Botão Primário
+Cor
+Primary
+Altura
+56dp
+Largura
+100%
+Borda
+16dp
+Botão Secundário
+Outlined
+Botão Terciário
+Text Button
+Campos de Texto
+Outlined
+7
+Label flutuante.
+Ícone opcional.
+Validação instantânea.
+Checkbox
+Material Design 3.
+Animado.
+Switch
+Material Design 3.
+Snackbars
+Utilizar para:
+Sucesso
+Erro
+Aviso
+Offline
+Dialogs
+Confirmar:
+Excluir
+Cancelar
+Finalizar
+Logout
+Bottom Sheet
+Utilizar para:
+8
+Filtros
+Categorias
+Ordenação
+Prioridade
+31. Navegação
+Estrutura
+Login
+↓
+Home
+↓
+Lista
+↓
+Itens
+↓
+Finalização
+Bottom Navigation
+Administrador
+Home
+Histórico
+Notificações
+Perfil
+Funcionário
+9
+Home
+Nova Lista
+Histórico
+Perfil
+32. Wireframe — Login
+┌───────────────────────────┐
+│                           │
+│        ListaPro           │
+│                           │
+│  Usuário                  │
+│ [____________________]    │
+│                           │
+│  Senha                    │
+│ [____________________]    │
+│                           │
+│   Entrar                  │
+│                           │
+└───────────────────────────┘
+33. Wireframe — Home Funcionário
+┌───────────────────────────┐
+│ Bom dia, João             │
+│                           │
+│ [+ Nova Lista]            │
+│                           │
+│ Pesquisar                 │
+│ [______________]          │
+│                           │
+│ Minhas Listas             │
+│                           │
+│ ○ Mercado                 │
+│ ○ Açougue                 │
+│ ○ Limpeza                 │
+│                           │
+└───────────────────────────┘
+10
+34. Wireframe — Nova Lista
+┌───────────────────────────┐
+│ Nova Lista                │
+│                           │
+│ Título                    │
+│ [______________]          │
+│                           │
+│ Prioridade                │
+│ [Alta ▼]                  │
+│                           │
+│ Categoria                 │
+│ [Mercearia ▼]             │
+│                           │
+│ Observações               │
+│ [______________]          │
+│                           │
+│ + Adicionar Item          │
+│                           │
+└───────────────────────────┘
+35. Wireframe — Item
+┌───────────────────────────┐
+│ Nome                      │
+│ [______________]          │
+│                           │
+│ Quantidade                │
+│ [2]                       │
+│                           │
+│ Unidade                   │
+│ [KG ▼]                    │
+│                           │
+│ Marca                     │
+│ [______________]          │
+│                           │
+│ Categoria                 │
+│ [Mercearia ▼]             │
+│                           │
+│ Preço Esperado            │
+│ [R$ 0,00]                 │
+│                           │
+│ Observação                │
+11
+│ [______________]          │
+└───────────────────────────┘
+36. Wireframe — Lista do Administrador
+┌───────────────────────────┐
+│ Compras Mercado           │
+│                           │
+│ ███████░░░ 70%            │
+│                           │
+│ ☑ Arroz                   │
+│ ☑ Feijão                  │
+│ ☐ Café                    │
+│ ☐ Óleo                    │
+│ ☑ Sal                     │
+│                           │
+│ Finalizar                 │
+└───────────────────────────┘
+37. Cards
+Cada lista utilizará Card Material.
+Conteúdo
+Título
+Criador
+Quantidade
+Status
+Prioridade
+Barra de progresso
+Data
+12
+38. Barra de Progresso
+Mostrar
+Itens comprados
+/
+Itens totais
+Exemplo
+8 / 12
+66%
+39. Feedback Visual
+Ao marcar item.
+Executar:
+Animação
+Vibração leve
+Fade
+Checkbox animado
+Atualização da barra
+40. Estados da Interface
+Loading
+Skeleton Loader.
+Sem Dados
+Ilustração.
+Mensagem amigável.
+13
+Botão Criar Lista.
+Erro
+Ícone.
+Mensagem.
+Botão Tentar Novamente.
+Offline
+Banner amarelo.
+Mensagem
+Você está offline.
+As alterações serão sincronizadas automaticamente.
+Sincronizando
+Indicador discreto no topo.
+41. Responsividade
+O aplicativo deverá adaptar-se automaticamente para:
+Telefones pequenos
+Telefones grandes
+Tablets Android
+Dobráveis
+Mudança de orientação
+42. Microinterações
+Todos os botões deverão possuir efeito Ripple.
+14
+Cards deverão possuir animação de elevação.
+Checkbox deverá possuir animação Material.
+Mudanças de tela deverão utilizar transições suaves.
+43. Acessibilidade
+Suporte para:
+TalkBack
+Fonte ampliada
+Modo alto contraste
+Navegação por teclado
+Leitores de tela
+Áreas mínimas de toque de 48dp.
+44. Experiência do Usuário
+Objetivos
+Criar uma lista em menos de 60 segundos.
+Marcar um item em menos de 1 segundo.
+Encontrar uma lista em menos de 5 segundos.
+Nenhuma ação importante deverá exigir mais de três toques.
+45. Checklist de Consistência Visual
+Todos os componentes deverão seguir o mesmo padrão de:
+Bordas
+Espaçamentos
+Tipografia
+15
+Ícones
+Cores
+Animações
+Feedback
+Estados
+Não será permitido criar componentes com estilos diferentes do Design System.
+Considerações de UX
+A prioridade absoluta do aplicativo é velocidade.
+Sempre que existir a possibilidade de reduzir um toque do usuário, essa solução deverá ser priorizada.
+O sistema deverá privilegiar simplicidade em vez de excesso de funcionalidades, mantendo uma
+interface limpa e intuitiva para funcionários e administrador.
+Fim da Parte 4
+16

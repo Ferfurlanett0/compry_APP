@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "335695394633",
+    "project_id": "listapro-prod",
+    "storage_bucket": "listapro-prod.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335695394633:android:a6bf24135243e6e510cc98",
+        "android_client_info": {
+          "package_name": "com.listapro.lista_pro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjazDrSc0LgTiD7a3uHdH0QUh5sAGOAW4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
