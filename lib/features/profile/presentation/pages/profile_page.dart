@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/config/providers.dart';
@@ -211,6 +212,14 @@ class ProfilePage extends ConsumerWidget {
                   ),
                   Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
                 ],
+                if (kIsWeb) ...[
+                  _PremiumActionTile(
+                    icon: Icons.add_to_home_screen_rounded,
+                    title: 'Instalar App (Tela Inicial / iPhone)',
+                    onTap: () => _showInstallInstructions(context),
+                  ),
+                  Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
+                ],
                 _ThemeToggleTile(ref: ref),
               ],
             ),
@@ -268,6 +277,177 @@ class ProfilePage extends ConsumerWidget {
           ).animate().fadeIn(delay: 800.ms),
         ],
       ),
+    );
+  }
+
+  void _showInstallInstructions(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: cs.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(24, 20, 24, MediaQuery.of(ctx).padding.bottom + 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: cs.outlineVariant,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const Gap(20),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: cs.primaryContainer,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(Icons.add_to_home_screen_rounded, color: cs.primary, size: 28),
+                ),
+                const Gap(16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Instalar o Compry',
+                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                      ),
+                      Text(
+                        'Acesso rápido como aplicativo nativo',
+                        style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const Gap(24),
+            // ─── iOS Section ──────────────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cs.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: cs.primary.withValues(alpha: 0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.apple, color: cs.primary, size: 22),
+                      const Gap(8),
+                      Text(
+                        'No iPhone ou iPad (Safari)',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: cs.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Gap(12),
+                  _buildStepItem(context, '1', 'Toque no ícone de Compartilhar 📤 no rodapé ou topo da tela (quadrado com seta para cima).'),
+                  const Gap(10),
+                  _buildStepItem(context, '2', 'Role as opções para cima e toque em "Adicionar à Tela de Início" ➕.'),
+                  const Gap(10),
+                  _buildStepItem(context, '3', 'Toque em "Adicionar" no canto superior direito. Pronto! O ícone ficará na sua tela inicial.'),
+                ],
+              ),
+            ),
+            const Gap(16),
+            // ─── Android / PC Section ─────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerHighest.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.android, color: cs.onSurfaceVariant, size: 20),
+                      const Gap(6),
+                      Icon(Icons.computer, color: cs.onSurfaceVariant, size: 20),
+                      const Gap(8),
+                      Text(
+                        'No Android ou Computador (Chrome/Edge)',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: cs.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Gap(12),
+                  _buildStepItem(context, '•', 'Toque no menu de 3 pontos (⋮) do navegador e selecione "Instalar Compry..." ou "Adicionar à tela inicial".'),
+                  const Gap(10),
+                  _buildStepItem(context, '•', 'No PC, clique no ícone de instalar 💻 no lado direito da barra de endereços.'),
+                ],
+              ),
+            ),
+            const Gap(24),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Entendi', style: TextStyle(fontWeight: FontWeight.w700)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStepItem(BuildContext context, String step, String text) {
+    final cs = Theme.of(context).colorScheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 22,
+          height: 22,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: cs.primary,
+            shape: BoxShape.circle,
+          ),
+          child: Text(
+            step,
+            style: TextStyle(color: cs.onPrimary, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+        ),
+        const Gap(10),
+        Expanded(
+          child: Text(
+            text,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.3),
+          ),
+        ),
+      ],
     );
   }
 }
