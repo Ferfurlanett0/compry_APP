@@ -29,8 +29,26 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>Compry</title>
-  <link rel="manifest" href="manifest.json">
+  <script>
+    window.deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      window.deferredPrompt = e;
+      console.log('beforeinstallprompt captured by Compry');
+    });
+
+    window.triggerPwaInstall = function() {
+      if (window.deferredPrompt) {
+        window.deferredPrompt.prompt();
+        window.deferredPrompt.userChoice.then(function(choiceResult) {
+          console.log('User choice: ' + choiceResult.outcome);
+          window.deferredPrompt = null;
+        });
+        return true;
+      }
+      return false;
+    };
+  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

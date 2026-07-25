@@ -14,6 +14,7 @@ import '../../../../core/config/providers.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../../../authentication/presentation/viewmodels/auth_viewmodel.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../core/services/pwa_install_service.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -215,7 +216,12 @@ class ProfilePage extends ConsumerWidget {
                 _PremiumActionTile(
                   icon: Icons.add_to_home_screen_rounded,
                   title: 'Instalar App',
-                  onTap: () => _showInstallInstructions(context),
+                  onTap: () {
+                    final installedInstantly = PwaInstallService.tryInstall();
+                    if (!installedInstantly) {
+                      _showInstallInstructions(context);
+                    }
+                  },
                 ),
                 Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
                 _ThemeToggleTile(ref: ref),
