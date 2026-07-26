@@ -20,7 +20,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "01d412f7da32a9590b52e8787d1e5694
 "assets/assets/images/administrador.png": "be74906e64c7520496cc1443b49d1e81",
 "assets/assets/images/funcionario.png": "71b00a48ecd0fba3eab8a8858d0b7713",
 "assets/FontManifest.json": "e83983dce1b86afb382d68dd3d139de5",
-"assets/fonts/MaterialIcons-Regular.otf": "d20384d2f353e74644993aecf08dbcd8",
+"assets/fonts/MaterialIcons-Regular.otf": "e20eaf354ca06d8585ad0326f3c08d44",
 "assets/NOTICES": "2b13b9958cede1af0082c7b8895e14cf",
 "assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8cb9b6ce",
 "canvaskit/canvaskit.js": "728b2d477d9b8c14593d4f9b82b484f3",
@@ -35,7 +35,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "01d412f7da32a9590b52e8787d1e5694
 "favicon.png": "978c8d98fad5a5c7fe3e0ef22b5b66c8",
 "firebase-messaging-sw.js": "19b8046d4c9572a90a7565c2386e2633",
 "flutter.js": "83d881c1dbb6d6bcd6b42e274605b69c",
-"flutter_bootstrap.js": "b1d4c42a9653d996b0e9cc0cf7215f8f",
+"flutter_bootstrap.js": "b4296f45e3db92bbd5fe58d0ab27f310",
 "icons/compry%20logo%20com%20texto.svg": "65396b531c8af8f33a61197c49d39bff",
 "icons/Icon-192.png": "978c8d98fad5a5c7fe3e0ef22b5b66c8",
 "icons/Icon-512.png": "978c8d98fad5a5c7fe3e0ef22b5b66c8",
@@ -45,8 +45,8 @@ const RESOURCES = {"assets/AssetManifest.bin": "01d412f7da32a9590b52e8787d1e5694
 "icons/icone_compry.svg": "91ea918914c70fd5254e77fdbf4eea53",
 "index.html": "bad2908d104bf65dde378ffa29921e0f",
 "/": "bad2908d104bf65dde378ffa29921e0f",
-"main.dart.js": "a0ab4fc99a667326ec6ef8cd39354053",
-"manifest.json": "f6b7f4c35852a3ed383e7bfd663da5f4",
+"main.dart.js": "a7ed2915505c317928ff3dcc63f4d1e8",
+"manifest.json": "ccd843b95f3aa71e59c2e74082a4d12c",
 "vercel.json": "d6b75ff95ef7100f9ff75e47eb367f2c",
 "version.json": "2f6721267d0ac66b2724ae8328192f0e"};
 // The application shell files that are downloaded before a service worker can
