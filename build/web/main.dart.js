@@ -101429,7 +101429,7 @@ o=A.f4(A.dw(A.cX(A.Dd(!0,B.KX,"btn-logout",!1,"Sair da Conta",a4 instanceof A.tu
 r=r.ax
 if(r==null)r=a0
 else{k=a6.rx
-r=r.e7((k==null?a6.k3:k).ar(0.7),B.ak)}return A.hY(q,s,A.al8(A.b([j,B.fo,n,B.cf,l,B.ds,p,B.cf,m,B.fo,o,B.dt,A.dw(A.cX(A.dB(A.aQ("Compry v1.0.0",a0,a0,a0,r,a0,a0),a0,a0),a0,a0,a0),a0,A.b7(8e5,0),a0)],g),B.pD,a0,!1),a0,a0,a0)},
+r=r.e7((k==null?a6.k3:k).ar(0.7),B.ak)}return A.hY(q,s,A.al8(A.b([j,B.fo,n,B.cf,l,B.ds,p,B.cf,m,B.fo,o,B.dt,A.dw(A.cX(A.dB(A.aQ("Compry v1.1.0",a0,a0,a0,r,a0,a0),a0,a0),a0,a0,a0),a0,A.b7(8e5,0),a0)],g),B.pD,a0,!1),a0,a0,a0)},
 anD(a){var s,r,q,p,o,n,m,l,k,j,i=null,h=A.M(a),g=h.ax,f=A.jn(a,!1)
 A.h8(a,B.b3,t.F).toString
 s=f.c

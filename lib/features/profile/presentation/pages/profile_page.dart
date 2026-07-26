@@ -272,7 +272,7 @@ class ProfilePage extends ConsumerWidget {
 
           Center(
             child: Text(
-              'Compry v1.0.0',
+              'Compry v1.1.0',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: cs.onSurfaceVariant.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w600,

@@ -8,7 +8,7 @@
   ],
   "headers": [
     {
-      "source": "/flutter_service_worker.js",
+      "source": "/",
       "headers": [
         {
           "key": "Cache-Control",
@@ -17,7 +17,25 @@
       ]
     },
     {
-      "source": "/main.dart.js",
+      "source": "/(.*\\.html)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.js)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.json)",
       "headers": [
         {
           "key": "Cache-Control",
