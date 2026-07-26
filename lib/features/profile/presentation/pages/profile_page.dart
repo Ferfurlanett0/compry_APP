@@ -217,7 +217,10 @@ class ProfilePage extends ConsumerWidget {
                   icon: Icons.add_to_home_screen_rounded,
                   title: 'Instalar App',
                   onTap: () {
-                    PwaInstallService.tryInstall();
+                    final installed = PwaInstallService.tryInstall();
+                    if (!installed) {
+                      _showQuickInstallGuide(context);
+                    }
                   },
                 ),
                 Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
@@ -277,6 +280,93 @@ class ProfilePage extends ConsumerWidget {
             ),
           ).animate().fadeIn(delay: 800.ms),
         ],
+      ),
+    );
+  }
+
+  void _showQuickInstallGuide(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: cs.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(24, 20, 24, MediaQuery.of(ctx).padding.bottom + 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: cs.outlineVariant,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const Gap(20),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: cs.primaryContainer,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(Icons.add_to_home_screen_rounded, color: cs.primary, size: 28),
+                ),
+                const Gap(16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Adicionar à Tela de Início',
+                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                      ),
+                      Text(
+                        'Instalação Direta no iOS / Safari',
+                        style: theme.textTheme.bodySmall?.copyWith(color: cs.primary, fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const Gap(20),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerHighest.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+              ),
+              child: Text(
+                'No iPhone ou iPad, a Apple bloqueia a instalação automática por código. Para instalar:\n\n'
+                '👉 Toque no ícone de Compartilhar 📤 na barra do navegador (abaixo ou acima) e selecione "Adicionar à Tela de Início" ➕.',
+                style: theme.textTheme.bodyMedium?.copyWith(height: 1.4, color: cs.onSurface),
+              ),
+            ),
+            const Gap(24),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Entendi, vou adicionar', style: TextStyle(fontWeight: FontWeight.w700)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
