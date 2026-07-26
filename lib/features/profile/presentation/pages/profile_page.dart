@@ -216,41 +216,8 @@ class ProfilePage extends ConsumerWidget {
                 _PremiumActionTile(
                   icon: Icons.add_to_home_screen_rounded,
                   title: 'Instalar App',
-                  onTap: () async {
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Instalar o Compry'),
-                        content: const Text('Deseja instalar o aplicativo na sua tela inicial para acesso rápido e em tela cheia?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx, false),
-                            child: const Text('Cancelar'),
-                          ),
-                          FilledButton(
-                            onPressed: () => Navigator.pop(ctx, true),
-                            child: const Text('Sim, Instalar'),
-                          ),
-                        ],
-                      ),
-                    );
-
-                    if (confirm == true && context.mounted) {
-                      final installedInstantly = PwaInstallService.tryInstall();
-                      if (!installedInstantly) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text(
-                              'No iPhone/iOS: Toque em Compartilhar 📤 e selecione "Adicionar à Tela de Início" ➕.',
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                            behavior: SnackBarBehavior.floating,
-                            backgroundColor: cs.primary,
-                            duration: const Duration(seconds: 6),
-                          ),
-                        );
-                      }
-                    }
+                  onTap: () {
+                    PwaInstallService.tryInstall();
                   },
                 ),
                 Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
