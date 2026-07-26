@@ -291,88 +291,192 @@ class ProfilePage extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: cs.surface,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(24, 20, 24, MediaQuery.of(ctx).padding.bottom + 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: cs.outlineVariant,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const Gap(20),
-            Row(
+      builder: (ctx) {
+        final bottomPadding = MediaQuery.of(ctx).viewInsets.bottom +
+            MediaQuery.of(ctx).padding.bottom +
+            24;
+
+        return SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(24, 20, 24, bottomPadding),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: cs.primaryContainer,
-                    borderRadius: BorderRadius.circular(16),
+                // ─── Handle ─────────────────────────────────────────────────
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: cs.outlineVariant,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
-                  child: Icon(Icons.add_to_home_screen_rounded, color: cs.primary, size: 28),
+                ),
+                const Gap(20),
+
+                // ─── Header ─────────────────────────────────────────────────
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: cs.primaryContainer,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(Icons.add_to_home_screen_rounded, color: cs.primary, size: 28),
+                    ),
+                    const Gap(16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Instalar no iPhone / iPad',
+                            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                          ),
+                          Text(
+                            'Safari, Chrome e outros navegadores',
+                            style: theme.textTheme.bodySmall?.copyWith(color: cs.primary, fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const Gap(16),
-                Expanded(
+
+                // ─── Instruções ─────────────────────────────────────────────
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerHighest.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Adicionar à Tela de Início',
-                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                        'A Apple não permite instalação automática no iPhone. Para instalar:',
+                        style: theme.textTheme.bodyMedium?.copyWith(height: 1.4, color: cs.onSurface),
                       ),
-                      Text(
-                        'Instalação Direta no iOS / Safari',
-                        style: theme.textTheme.bodySmall?.copyWith(color: cs.primary, fontWeight: FontWeight.w700),
+                      const Gap(12),
+                      _InstallStep(
+                        cs: cs,
+                        theme: theme,
+                        emoji: '📤',
+                        label: 'No Safari',
+                        instruction: 'Toque em Compartilhar na barra inferior',
+                      ),
+                      const Gap(8),
+                      _InstallStep(
+                        cs: cs,
+                        theme: theme,
+                        emoji: '⋯',
+                        label: 'No Chrome',
+                        instruction: 'Toque em Compartilhar (topo) ou menu (...)',
+                      ),
+                      const Gap(12),
+                      Row(
+                        children: [
+                          Icon(Icons.add_box_rounded, color: cs.primary, size: 18),
+                          const Gap(6),
+                          Expanded(
+                            child: Text(
+                              'Selecione "Adicionar à Tela de Início"',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: cs.primary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
+                const Gap(20),
+
+                // ─── Botão ──────────────────────────────────────────────────
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text('Entendi, vou adicionar', style: TextStyle(fontWeight: FontWeight.w700)),
+                  ),
+                ),
               ],
             ),
-            const Gap(20),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: cs.surfaceContainerHighest.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
-              ),
-              child: Text(
-                'No iPhone/iPad (Safari ou Chrome), a Apple não permite que sites instalem aplicativos automaticamente com 1 clique.\n\n'
-                'Para instalar agora no seu iOS:\n'
-                '👉 No Safari: Toque em Compartilhar 📤 na barra inferior e selecione "Adicionar à Tela de Início" ➕.\n'
-                '👉 No Chrome: Toque em Compartilhar (no topo) ou no menu (...) e selecione "Adicionar à Tela de Início" ➕.',
-                style: theme.textTheme.bodyMedium?.copyWith(height: 1.4, color: cs.onSurface),
-              ),
-            ),
-            const Gap(24),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () => Navigator.pop(ctx),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text('Entendi, vou adicionar', style: TextStyle(fontWeight: FontWeight.w700)),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
+
+// ─── Install Step Widget ───────────────────────────────────────────────────────
+
+class _InstallStep extends StatelessWidget {
+  final ColorScheme cs;
+  final ThemeData theme;
+  final String emoji;
+  final String label;
+  final String instruction;
+
+  const _InstallStep({
+    required this.cs,
+    required this.theme,
+    required this.emoji,
+    required this.label,
+    required this.instruction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: cs.primaryContainer,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(emoji, style: const TextStyle(fontSize: 14)),
+        ),
+        const Gap(10),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: theme.textTheme.bodyMedium?.copyWith(height: 1.4, color: cs.onSurface),
+              children: [
+                TextSpan(
+                  text: '$label: ',
+                  style: TextStyle(fontWeight: FontWeight.w700, color: cs.onSurface),
+                ),
+                TextSpan(text: instruction),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Premium Info Tile ────────────────────────────────────────────────────────
 
 class _PremiumInfoTile extends StatelessWidget {
   final IconData icon;
