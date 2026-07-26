@@ -348,8 +348,10 @@ class ProfilePage extends ConsumerWidget {
                 border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
               ),
               child: Text(
-                'No iPhone ou iPad, a Apple bloqueia a instalação automática por código. Para instalar:\n\n'
-                '👉 Toque no ícone de Compartilhar 📤 na barra do navegador (abaixo ou acima) e selecione "Adicionar à Tela de Início" ➕.',
+                'No iPhone/iPad (Safari ou Chrome), a Apple não permite que sites instalem aplicativos automaticamente com 1 clique.\n\n'
+                'Para instalar agora no seu iOS:\n'
+                '👉 No Safari: Toque em Compartilhar 📤 na barra inferior e selecione "Adicionar à Tela de Início" ➕.\n'
+                '👉 No Chrome: Toque em Compartilhar (no topo) ou no menu (...) e selecione "Adicionar à Tela de Início" ➕.',
                 style: theme.textTheme.bodyMedium?.copyWith(height: 1.4, color: cs.onSurface),
               ),
             ),

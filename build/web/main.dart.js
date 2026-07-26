@@ -101501,7 +101501,7 @@ o=A.aS(16)
 if(h){i=j.p
 if(i==null)i=j.k3}i=A.eS(i.ar(0.5),1)
 r=r.z
-return new A.bh(new A.ax(24,20,24,k.r.d+24),A.d3(A.b([s,B.hY,p,B.hY,A.bQ(l,A.aQ('No iPhone ou iPad, a Apple bloqueia a instala\xe7\xe3o autom\xe1tica por c\xf3digo. Para instalar:\n\n\ud83d\udc49 Toque no \xedcone de Compartilhar \ud83d\udce4 na barra do navegador (abaixo ou acima) e selecione "Adicionar \xe0 Tela de In\xedcio" \u2795.',l,l,l,r==null?l:r.Zc(j.k3,1.4),l,l),B.m,l,l,new A.bk(q,l,i,o,l,l,B.E),l,l,l,B.bH,l,l,l),B.ds,A.dH(A.aQa(!1,B.a07,B.m,l,l,l,l,l,new A.arj(a),l,A.SW(l,l,l,B.px,new A.c7(A.aS(12),B.p),l)),l,1/0)],m),B.aq,B.y,B.b2),l)},
+return new A.bh(new A.ax(24,20,24,k.r.d+24),A.d3(A.b([s,B.hY,p,B.hY,A.bQ(l,A.aQ('No iPhone/iPad (Safari ou Chrome), a Apple n\xe3o permite que sites instalem aplicativos automaticamente com 1 clique.\n\nPara instalar agora no seu iOS:\n\ud83d\udc49 No Safari: Toque em Compartilhar \ud83d\udce4 na barra inferior e selecione "Adicionar \xe0 Tela de In\xedcio" \u2795.\n\ud83d\udc49 No Chrome: Toque em Compartilhar (no topo) ou no menu (...) e selecione "Adicionar \xe0 Tela de In\xedcio" \u2795.',l,l,l,r==null?l:r.Zc(j.k3,1.4),l,l),B.m,l,l,new A.bk(q,l,i,o,l,l,B.E),l,l,l,B.bH,l,l,l),B.ds,A.dH(A.aQa(!1,B.a07,B.m,l,l,l,l,l,new A.arj(a),l,A.SW(l,l,l,B.px,new A.c7(A.aS(12),B.p),l)),l,1/0)],m),B.aq,B.y,B.b2),l)},
 $S:184}
 A.arj.prototype={
 $0(){A.jn(this.a,!1).iu(null)
