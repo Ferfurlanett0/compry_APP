@@ -23,6 +23,7 @@ class MainScaffold extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      extendBody: true,
       body: Column(
         children: [
           const OfflineBanner(),

@@ -1,11 +1,13 @@
 import 'dart:js_util' as js_util;
-import 'dart:html' as html;
 
 /// Detecta se o usuário está em um dispositivo iOS (iPhone/iPad/iPod)
-/// independente do navegador (Safari, Chrome, Firefox, Edge, etc.)
+/// usando js_util para acessar navigator.userAgent — funciona em todos
+/// os navegadores iOS (Safari, Chrome, Firefox, Edge, etc.)
 bool _isIOSDevice() {
   try {
-    final ua = html.window.navigator.userAgent.toLowerCase();
+    final navigator = js_util.getProperty<Object>(js_util.globalThis, 'navigator');
+    final rawUA = js_util.getProperty<Object>(navigator, 'userAgent');
+    final ua = rawUA.toString().toLowerCase();
     return ua.contains('iphone') ||
         ua.contains('ipad') ||
         ua.contains('ipod');

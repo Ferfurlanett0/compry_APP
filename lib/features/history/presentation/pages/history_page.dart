@@ -56,6 +56,9 @@ class HistoryPage extends ConsumerWidget {
                     'Listas finalizadas aparecerão aqui.',
               )
             : ListView.builder(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).padding.bottom + 76 + 12,
+                ),
                 itemCount: lists.length,
                 itemBuilder: (context, index) => ListCard(
                   list: lists[index],
