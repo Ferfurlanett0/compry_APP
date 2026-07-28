@@ -35,7 +35,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "01d412f7da32a9590b52e8787d1e5694
 "favicon.png": "978c8d98fad5a5c7fe3e0ef22b5b66c8",
 "firebase-messaging-sw.js": "19b8046d4c9572a90a7565c2386e2633",
 "flutter.js": "83d881c1dbb6d6bcd6b42e274605b69c",
-"flutter_bootstrap.js": "09849269b5667801436a1b8d44937bf9",
+"flutter_bootstrap.js": "0f4f3f8f50f2cbfbe1ec1987694219ae",
 "icons/compry%20logo%20com%20texto.svg": "65396b531c8af8f33a61197c49d39bff",
 "icons/Icon-192.png": "978c8d98fad5a5c7fe3e0ef22b5b66c8",
 "icons/Icon-512.png": "978c8d98fad5a5c7fe3e0ef22b5b66c8",
