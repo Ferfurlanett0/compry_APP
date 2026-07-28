@@ -9,6 +9,9 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../authentication/data/models/user_model.dart';
 import '../../../../core/config/providers.dart';
 
+import '../../../authentication/presentation/viewmodels/auth_viewmodel.dart';
+import '../widgets/create_user_dialog.dart';
+
 // 1. Definição do StreamProvider que busca os usuários que não são admin
 final employeesStreamProvider = StreamProvider.autoDispose<List<UserModel>>((ref) {
   final firestore = ref.watch(firestoreProvider);
@@ -31,11 +34,22 @@ class EmployeeListPage extends ConsumerWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final employeesAsync = ref.watch(employeesStreamProvider);
+    final currentUser = ref.watch(currentUserProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Funcionários'),
       ),
+      floatingActionButton: currentUser?.isAdmin == true ? FloatingActionButton.extended(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (_) => const CreateUserDialog(),
+          );
+        },
+        icon: const Icon(Icons.person_add),
+        label: const Text('Novo Usuário'),
+      ) : null,
       body: employeesAsync.when(
         data: (employees) {
           if (employees.isEmpty) {

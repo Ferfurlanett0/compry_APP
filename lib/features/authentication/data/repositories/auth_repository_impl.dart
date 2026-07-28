@@ -101,4 +101,18 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> updateFcmToken(String userId, String token) async {
     await _remote.updateFcmToken(userId, token);
   }
+
+  @override
+  Future<void> createUserAsAdmin({
+    required String username,
+    required String password,
+    required String name,
+    required String role,
+  }) async {
+    final hasConnection = await _connectivity.hasConnection;
+    if (!hasConnection) {
+      throw const NetworkFailure(message: 'Sem conexão. Conecte-se à internet para criar um usuário.');
+    }
+    await _remote.createUserAsAdmin(username, password, name, role);
+  }
 }

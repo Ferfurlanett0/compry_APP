@@ -26,4 +26,12 @@ abstract interface class AuthRepository {
 
   /// Atualiza o token FCM do usuário
   Future<void> updateFcmToken(String userId, String token);
+
+  /// Cria um novo usuário pelo Administrador
+  Future<void> createUserAsAdmin({
+    required String username,
+    required String password,
+    required String name,
+    required String role,
+  });
 }

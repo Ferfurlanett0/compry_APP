@@ -4,6 +4,7 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:logger/logger.dart';
 
 import '../models/user_model.dart';
@@ -17,6 +18,7 @@ abstract interface class AuthRemoteDataSource {
   Stream<UserModel?> get authStateChanges;
   Future<void> logout();
   Future<void> updateFcmToken(String userId, String token);
+  Future<void> createUserAsAdmin(String username, String password, String name, String role);
 }
 
 /// Implementação com Firebase Auth + Firestore
@@ -224,6 +226,55 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           .update({'fcmToken': token, 'updatedAt': FieldValue.serverTimestamp()});
     } catch (e) {
       _logger.w('Falha ao atualizar FCM token: $e');
+    }
+  }
+  @override
+  Future<void> createUserAsAdmin(String username, String password, String name, String role) async {
+    try {
+      final email = '$username@compry.com.br'.toLowerCase();
+
+      // Cria um app temporário do Firebase para não deslogar o admin atual
+      final tempApp = await Firebase.initializeApp(
+        name: 'temp_create_user',
+        options: Firebase.app().options,
+      );
+
+      try {
+        final tempAuth = FirebaseAuth.instanceFor(app: tempApp);
+        final credential = await tempAuth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        final uid = credential.user!.uid;
+
+        // Adiciona ao Firestore
+        await _firestore.collection(AppConstants.colUsers).doc(uid).set({
+          'username': username.toLowerCase(),
+          'name': name,
+          'email': email,
+          'role': role,
+          'active': true,
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      } finally {
+        await tempApp.delete();
+      }
+
+      _logger.i('Usuário $username criado com sucesso pelo Administrador.');
+    } on FirebaseAuthException catch (e) {
+      _logger.e('Erro ao criar usuário (FirebaseAuth): ${e.code}');
+      if (e.code == 'email-already-in-use') {
+        throw AuthFailure(message: 'Este nome de usuário já está em uso.');
+      } else if (e.code == 'weak-password') {
+        throw AuthFailure(message: 'A senha é muito fraca. Escolha uma senha mais forte.');
+      } else {
+        throw AuthFailure(message: 'Erro ao criar conta de usuário. Código: ${e.code}');
+      }
+    } catch (e) {
+      _logger.e('Erro inesperado ao criar usuário: $e');
+      throw AuthFailure(message: 'Ocorreu um erro inesperado ao criar o usuário.');
     }
   }
 }

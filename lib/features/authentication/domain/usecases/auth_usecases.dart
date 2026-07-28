@@ -97,3 +97,40 @@ class WatchAuthStateUseCase implements StreamUseCaseNoParams<UserEntity?> {
   @override
   Stream<UserEntity?> call() => _repository.authStateChanges;
 }
+
+// ─── Create User As Admin Use Case ───────────────────────────────────────────
+
+class CreateUserAsAdminParams {
+  final String username;
+  final String password;
+  final String name;
+  final String role;
+
+  const CreateUserAsAdminParams({
+    required this.username,
+    required this.password,
+    required this.name,
+    required this.role,
+  });
+}
+
+/// Cria um novo usuário pelo Administrador
+class CreateUserAsAdminUseCase implements UseCase<void, CreateUserAsAdminParams> {
+  final AuthRepository _repository;
+
+  const CreateUserAsAdminUseCase(this._repository);
+
+  @override
+  Future<void> call(CreateUserAsAdminParams params) async {
+    if (params.username.trim().isEmpty) throw ArgumentError('Usuário é obrigatório.');
+    if (params.password.isEmpty) throw ArgumentError('Senha é obrigatória.');
+    if (params.name.trim().isEmpty) throw ArgumentError('Nome é obrigatório.');
+
+    await _repository.createUserAsAdmin(
+      username: params.username.trim(),
+      password: params.password,
+      name: params.name.trim(),
+      role: params.role,
+    );
+  }
+}
