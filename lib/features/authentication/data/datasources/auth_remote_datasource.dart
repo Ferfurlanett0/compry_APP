@@ -76,7 +76,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
         if (credential != null && credential.user != null) {
           // O usuário existe no Auth e a senha está correta! Vamos criá-lo no Firestore.
-          final isAdmin = cleanUsername.contains('admin');
+          final isAdmin = cleanUsername.contains('admin') || cleanUsername == 'edemar';
           final capName = cleanUsername.isNotEmpty 
               ? cleanUsername[0].toUpperCase() + cleanUsername.substring(1) 
               : 'Usuário';
@@ -102,6 +102,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       final userDoc = query.docs.first;
       final userData = userDoc.data();
+
+      // Força permissão de Admin para o Edemar ou usuários com "admin" no nome
+      if (cleanUsername == 'edemar' || cleanUsername.contains('admin')) {
+        if (userData['isAdmin'] != true) {
+          await _firestore.collection(AppConstants.colUsers).doc(cleanUsername).update({
+            'isAdmin': true,
+          });
+          userData['isAdmin'] = true;
+        }
+      }
 
       // Já autenticamos ao criar o doc? Se não (usuário já existia), autenticamos agora
       if (credential == null || credential.user == null) {
