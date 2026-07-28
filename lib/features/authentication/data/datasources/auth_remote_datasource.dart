@@ -75,26 +75,33 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         }
 
         if (credential != null && credential.user != null) {
-          // O usuário existe no Auth e a senha está correta! Vamos criá-lo no Firestore.
-          final isAdmin = cleanUsername.contains('admin') || cleanUsername == 'edemar';
-          final capName = cleanUsername.isNotEmpty 
-              ? cleanUsername[0].toUpperCase() + cleanUsername.substring(1) 
-              : 'Usuário';
+          try {
+            // O usuário existe no Auth e a senha está correta! Vamos criá-lo no Firestore.
+            final isAdmin = cleanUsername.contains('admin') || cleanUsername == 'edemar';
+            final capName = cleanUsername.isNotEmpty 
+                ? cleanUsername[0].toUpperCase() + cleanUsername.substring(1) 
+                : 'Usuário';
 
-          await _firestore.collection(AppConstants.colUsers).doc(cleanUsername).set({
-            'username': cleanUsername,
-            'name': capName,
-            'email': credential.user!.email ?? '$cleanUsername@compry.com.br',
-            'isAdmin': isAdmin,
-            'active': true,
-          });
+            final uid = credential.user!.uid;
 
-          // Busca novamente o documento que acabou de ser criado
-          query = await _firestore
-              .collection(AppConstants.colUsers)
-              .where('username', isEqualTo: cleanUsername)
-              .limit(1)
-              .get();
+            await _firestore.collection(AppConstants.colUsers).doc(uid).set({
+              'username': cleanUsername,
+              'name': capName,
+              'email': credential.user!.email ?? '$cleanUsername@compry.com.br',
+              'isAdmin': isAdmin,
+              'active': true,
+            });
+
+            // Busca novamente o documento que acabou de ser criado
+            query = await _firestore
+                .collection(AppConstants.colUsers)
+                .where('username', isEqualTo: cleanUsername)
+                .limit(1)
+                .get();
+          } catch (e) {
+             _logger.e('Erro ao criar documento do usuário no Firestore: $e');
+             throw AuthFailure('Erro de permissão no Firestore. Contate o suporte.');
+          }
         } else {
           throw const UserNotFoundFailure();
         }
