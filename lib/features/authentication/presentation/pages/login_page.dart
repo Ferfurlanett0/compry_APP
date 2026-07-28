@@ -25,8 +25,8 @@ class LoginPage extends ConsumerStatefulWidget {
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController(text: 'edemar');
+  final _passwordController = TextEditingController(text: 'admin123');
   bool _obscurePassword = true;
 
   @override
