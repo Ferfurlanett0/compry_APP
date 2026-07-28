@@ -33,5 +33,6 @@ abstract interface class AuthRepository {
     required String password,
     required String name,
     required String role,
+    String? avatar,
   });
 }

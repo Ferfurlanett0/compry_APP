@@ -1,6 +1,10 @@
-﻿// GENERATED CODE - DO NOT MODIFY BY HAND
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'shopping_list_model.dart';
+
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
 
 class ShoppingListModelAdapter extends TypeAdapter<ShoppingListModel> {
   @override

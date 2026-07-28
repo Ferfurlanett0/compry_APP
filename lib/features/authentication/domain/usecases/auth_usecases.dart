@@ -105,12 +105,14 @@ class CreateUserAsAdminParams {
   final String password;
   final String name;
   final String role;
+  final String? avatar;
 
   const CreateUserAsAdminParams({
     required this.username,
     required this.password,
     required this.name,
     required this.role,
+    this.avatar,
   });
 }
 
@@ -131,6 +133,7 @@ class CreateUserAsAdminUseCase implements UseCase<void, CreateUserAsAdminParams>
       password: params.password,
       name: params.name.trim(),
       role: params.role,
+      avatar: params.avatar,
     );
   }
 }

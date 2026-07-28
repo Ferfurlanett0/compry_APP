@@ -23,7 +23,15 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
   final _passwordController = TextEditingController();
   
   UserRole _selectedRole = UserRole.employee;
+  String _selectedAvatar = 'Perfil churrasqueiro';
   bool _obscurePassword = true;
+
+  final List<String> _availableAvatars = [
+    'Perfil administrador',
+    'Perfil churrasqueiro',
+    'Perfil cozinheira',
+    'Perfil garconete',
+  ];
 
   @override
   void dispose() {
@@ -41,6 +49,7 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
       username: _usernameController.text.trim().toLowerCase(),
       password: _passwordController.text,
       role: _selectedRole.value,
+      avatar: _selectedAvatar,
     );
   }
 
@@ -70,10 +79,6 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
       }
     });
 
-    final avatarPath = _selectedRole == UserRole.admin 
-        ? 'assets/images/administrador.png' 
-        : 'assets/images/funcionario.png';
-
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLG)),
       child: Container(
@@ -101,29 +106,39 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                 ),
                 const Gap(AppDimensions.spaceLG),
                 
-                // Avatar Preview
-                Center(
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: cs.primary.withValues(alpha: 0.2), width: 2),
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        avatarPath,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Icon(Icons.person, size: 40, color: cs.primary),
-                      ),
-                    ),
-                  ),
-                ),
-                const Gap(AppDimensions.spaceMD),
-                Center(
-                  child: Text(
-                    'Avatar selecionado automaticamente',
-                    style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                // Avatar Picker
+                SizedBox(
+                  height: 80,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _availableAvatars.length,
+                    separatorBuilder: (_, __) => const Gap(AppDimensions.spaceMD),
+                    itemBuilder: (context, index) {
+                      final avatar = _availableAvatars[index];
+                      final isSelected = avatar == _selectedAvatar;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selectedAvatar = avatar),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected ? cs.primary : Colors.transparent,
+                              width: 3,
+                            ),
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/$avatar.png',
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Icon(Icons.person, size: 40, color: cs.primary),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const Gap(AppDimensions.spaceLG),

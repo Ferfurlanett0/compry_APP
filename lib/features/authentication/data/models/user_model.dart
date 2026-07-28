@@ -34,11 +34,15 @@ class UserModel extends HiveObject {
   @HiveField(6)
   final DateTime updatedAt;
 
+  @HiveField(7)
+  final String? avatar;
+
   UserModel({
     required this.id,
     required this.name,
     required this.username,
     required this.role,
+    this.avatar,
     required this.active,
     required this.createdAt,
     required this.updatedAt,
@@ -53,6 +57,7 @@ class UserModel extends HiveObject {
       name: data['name'] as String? ?? '',
       username: data['username'] as String? ?? '',
       role: data['role'] as String? ?? AppRoles.employee,
+      avatar: data['avatar'] as String?,
       active: data['active'] as bool? ?? true,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
@@ -65,6 +70,7 @@ class UserModel extends HiveObject {
       name: data['name'] as String? ?? '',
       username: data['username'] as String? ?? '',
       role: data['role'] as String? ?? AppRoles.employee,
+      avatar: data['avatar'] as String?,
       active: data['active'] as bool? ?? true,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
@@ -75,6 +81,7 @@ class UserModel extends HiveObject {
         'name': name,
         'username': username,
         'role': role,
+        if (avatar != null) 'avatar': avatar,
         'active': active,
         'createdAt': Timestamp.fromDate(createdAt),
         'updatedAt': Timestamp.fromDate(updatedAt),
@@ -87,6 +94,7 @@ class UserModel extends HiveObject {
         name: name,
         username: username,
         role: UserRole.fromString(role),
+        avatar: avatar,
         active: active,
         createdAt: createdAt,
         updatedAt: updatedAt,
@@ -97,6 +105,7 @@ class UserModel extends HiveObject {
         name: entity.name,
         username: entity.username,
         role: entity.role.value,
+        avatar: entity.avatar,
         active: entity.active,
         createdAt: entity.createdAt,
         updatedAt: entity.updatedAt,

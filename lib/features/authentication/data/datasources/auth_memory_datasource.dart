@@ -122,8 +122,14 @@ class AuthMemoryDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> createUserAsAdmin(String username, String password, String name, String role) async {
-    _logger.i('[DEMO] createUserAsAdmin($username, $role)');
+  Future<void> createUserAsAdmin({
+    required String username,
+    required String password,
+    required String name,
+    required String role,
+    String? avatar,
+  }) async {
+    _logger.i('[DEMO] createUserAsAdmin($username, $role, $avatar)');
   }
 
   void dispose() {

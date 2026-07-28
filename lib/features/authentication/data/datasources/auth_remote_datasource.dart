@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:logger/logger.dart';
+import 'package:dio/dio.dart';
 
 import '../models/user_model.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -18,7 +19,13 @@ abstract interface class AuthRemoteDataSource {
   Stream<UserModel?> get authStateChanges;
   Future<void> logout();
   Future<void> updateFcmToken(String userId, String token);
-  Future<void> createUserAsAdmin(String username, String password, String name, String role);
+  Future<void> createUserAsAdmin({
+    required String username,
+    required String password,
+    required String name,
+    required String role,
+    String? avatar,
+  });
 }
 
 /// Implementação com Firebase Auth + Firestore
@@ -229,48 +236,53 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
   @override
-  Future<void> createUserAsAdmin(String username, String password, String name, String role) async {
+  Future<void> createUserAsAdmin({
+    required String username,
+    required String password,
+    required String name,
+    required String role,
+    String? avatar,
+  }) async {
     try {
       final email = '$username@compry.com.br'.toLowerCase();
 
-      // Cria um app temporário do Firebase para não deslogar o admin atual
-      final tempApp = await Firebase.initializeApp(
-        name: 'temp_create_user',
-        options: Firebase.app().options,
+      // Uses Firebase REST API to create user without signing out the current Admin
+      final apiKey = Firebase.app().options.apiKey;
+      final url = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey';
+
+      final response = await Dio().post(
+        url,
+        data: {
+          'email': email,
+          'password': password,
+          'returnSecureToken': false,
+        },
       );
 
-      try {
-        final tempAuth = FirebaseAuth.instanceFor(app: tempApp);
-        final credential = await tempAuth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+      final uid = response.data['localId'] as String;
 
-        final uid = credential.user!.uid;
+      // Adiciona ao Firestore
+      await _firestore.collection(AppConstants.colUsers).doc(uid).set({
+        'username': username.toLowerCase(),
+        'name': name,
+        'email': email,
+        'role': role,
+        if (avatar != null) 'avatar': avatar,
+        'active': true,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
 
-        // Adiciona ao Firestore
-        await _firestore.collection(AppConstants.colUsers).doc(uid).set({
-          'username': username.toLowerCase(),
-          'name': name,
-          'email': email,
-          'role': role,
-          'active': true,
-          'createdAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
-      } finally {
-        await tempApp.delete();
-      }
-
-      _logger.i('Usuário $username criado com sucesso pelo Administrador.');
-    } on FirebaseAuthException catch (e) {
-      _logger.e('Erro ao criar usuário (FirebaseAuth): ${e.code}');
-      if (e.code == 'email-already-in-use') {
+      _logger.i('Usuário $username criado com sucesso pelo Administrador via REST API.');
+    } on DioException catch (e) {
+      _logger.e('Erro ao criar usuário (REST API): ${e.response?.data}');
+      final message = e.response?.data?['error']?['message'] ?? '';
+      if (message.contains('EMAIL_EXISTS')) {
         throw AuthFailure(message: 'Este nome de usuário já está em uso.');
-      } else if (e.code == 'weak-password') {
+      } else if (message.contains('WEAK_PASSWORD')) {
         throw AuthFailure(message: 'A senha é muito fraca. Escolha uma senha mais forte.');
       } else {
-        throw AuthFailure(message: 'Erro ao criar conta de usuário. Código: ${e.code}');
+        throw AuthFailure(message: 'Erro ao criar conta de usuário.');
       }
     } catch (e) {
       _logger.e('Erro inesperado ao criar usuário: $e');

@@ -31,6 +31,7 @@ class UserEntity extends Equatable {
   final String name;
   final String username;
   final UserRole role;
+  final String? avatar;
   final bool active;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -40,6 +41,7 @@ class UserEntity extends Equatable {
     required this.name,
     required this.username,
     required this.role,
+    this.avatar,
     required this.active,
     required this.createdAt,
     required this.updatedAt,
@@ -62,8 +64,11 @@ class UserEntity extends Equatable {
 
   /// Caminho do avatar local (imagem)
   String get avatarPath {
-    if (isAdmin) return 'assets/images/administrador.png';
-    return 'assets/images/funcionario.png';
+    if (avatar != null && avatar!.isNotEmpty) {
+      return 'assets/images/$avatar.png';
+    }
+    if (isAdmin) return 'assets/images/Perfil administrador.png';
+    return 'assets/images/Perfil churrasqueiro.png';
   }
 
   UserEntity copyWith({
@@ -71,6 +76,7 @@ class UserEntity extends Equatable {
     String? name,
     String? username,
     UserRole? role,
+    String? avatar,
     bool? active,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -80,6 +86,7 @@ class UserEntity extends Equatable {
       name: name ?? this.name,
       username: username ?? this.username,
       role: role ?? this.role,
+      avatar: avatar ?? this.avatar,
       active: active ?? this.active,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -87,7 +94,7 @@ class UserEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, username, role, active, createdAt, updatedAt];
+  List<Object?> get props => [id, name, username, role, avatar, active, createdAt, updatedAt];
 
   @override
   String toString() => 'UserEntity(id: $id, name: $name, role: $role)';

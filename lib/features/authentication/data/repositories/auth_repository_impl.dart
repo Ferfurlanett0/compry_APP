@@ -108,11 +108,18 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     required String name,
     required String role,
+    String? avatar,
   }) async {
     final hasConnection = await _connectivity.hasConnection;
     if (!hasConnection) {
       throw const NetworkFailure(message: 'Sem conexão. Conecte-se à internet para criar um usuário.');
     }
-    await _remote.createUserAsAdmin(username, password, name, role);
+    await _remote.createUserAsAdmin(
+      username: username,
+      password: password,
+      name: name,
+      role: role,
+      avatar: avatar,
+    );
   }
 }

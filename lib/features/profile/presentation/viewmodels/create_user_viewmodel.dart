@@ -41,6 +41,7 @@ class CreateUserViewModel extends StateNotifier<CreateUserState> {
     required String password,
     required String name,
     required String role,
+    String? avatar,
   }) async {
     state = const CreateUserLoading();
     try {
@@ -50,6 +51,7 @@ class CreateUserViewModel extends StateNotifier<CreateUserState> {
           password: password,
           name: name,
           role: role,
+          avatar: avatar,
         ),
       );
       state = const CreateUserSuccess();

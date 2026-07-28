@@ -1,6 +1,10 @@
-﻿// GENERATED CODE - DO NOT MODIFY BY HAND
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'offline_operation_model.dart';
+
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
 
 class OfflineOperationModelAdapter extends TypeAdapter<OfflineOperationModel> {
   @override
