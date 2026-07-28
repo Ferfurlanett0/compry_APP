@@ -118,7 +118,12 @@ class AuthMemoryDataSource implements AuthRemoteDataSource {
 
   @override
   Future<void> updateFcmToken(String userId, String token) async {
-    // No-op in demo mode
+    _logger.i('[DEMO] updateFcmToken($userId, $token)');
+  }
+
+  @override
+  Future<void> createUserAsAdmin(String username, String password, String name, String role) async {
+    _logger.i('[DEMO] createUserAsAdmin($username, $role)');
   }
 
   void dispose() {

@@ -129,6 +129,7 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                 const Gap(AppDimensions.spaceLG),
 
                 AppTextField(
+                  id: 'name',
                   controller: _nameController,
                   label: 'Nome Completo',
                   prefixIcon: Icons.person_outline,
@@ -142,12 +143,19 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                 const Gap(AppDimensions.spaceMD),
 
                 AppTextField(
+                  id: 'username',
                   controller: _usernameController,
                   label: 'Nome de Usuário (Login)',
                   prefixIcon: Icons.alternate_email,
                   enabled: !isLoading,
                   textInputAction: TextInputAction.next,
-                  suffixText: '@compry.com.br',
+                  suffixIcon: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [Text('@compry.com.br', style: TextStyle(color: cs.onSurfaceVariant))],
+                    ),
+                  ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) return 'Campo obrigatório';
                     if (value.contains(' ')) return 'Não pode conter espaços';
@@ -157,6 +165,7 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                 const Gap(AppDimensions.spaceMD),
 
                 AppTextField(
+                  id: 'password',
                   controller: _passwordController,
                   label: 'Senha Inicial',
                   prefixIcon: Icons.lock_outline,
@@ -195,7 +204,8 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                 const Gap(AppDimensions.spaceXL),
 
                 AppButton(
-                  text: 'Criar Usuário',
+                  id: 'submit_btn',
+                  label: 'Criar Usuário',
                   onPressed: isLoading ? null : _handleSubmit,
                   isLoading: isLoading,
                 ),
