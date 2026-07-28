@@ -121,6 +121,39 @@ class CancelListUseCase implements UseCase<ShoppingListEntity, String> {
   }
 }
 
+// ─── Delete List ─────────────────────────────────────────────────────────────
+
+class DeleteListParams {
+  final String listId;
+  final bool isAdmin;
+  
+  const DeleteListParams({
+    required this.listId,
+    required this.isAdmin,
+  });
+}
+
+/// Exclui lista definitivamente do sistema
+/// Regras:
+/// - Admin pode apagar qualquer lista
+/// - Funcionário só pode apagar lista em rascunho (draft)
+class DeleteListUseCase implements UseCase<void, DeleteListParams> {
+  final ShoppingListRepository _repository;
+
+  const DeleteListUseCase(this._repository);
+
+  @override
+  Future<void> call(DeleteListParams params) async {
+    final list = await _repository.getListById(params.listId);
+
+    if (!params.isAdmin && !list.status.isDraft) {
+      throw const PermissionFailure(message: 'Funcionários só podem apagar listas não enviadas.');
+    }
+
+    return _repository.deleteList(params.listId);
+  }
+}
+
 // ─── Finalize List ───────────────────────────────────────────────────────────
 
 class FinalizeListParams {

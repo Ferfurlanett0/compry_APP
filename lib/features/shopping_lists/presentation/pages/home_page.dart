@@ -543,15 +543,76 @@ Widget _buildListContent(BuildContext context, HomeState state, {required bool i
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 final list = lists[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceXXS),
-                  child: ListCard(
-                    list: list,
-                    index: index,
-                    onTap: () => context.push(
-                      AppRoutes.listDetailPath(list.id),
-                    ),
-                  ),
+                
+                return Consumer(
+                  builder: (context, ref, child) {
+                    final currentUser = ref.read(currentUserProvider);
+                    final isAdmin = currentUser?.isAdmin ?? false;
+                    
+                    // Admin can always delete. Employee can delete if list is draft.
+                    final canDelete = isAdmin || list.status.isDraft;
+
+                    final card = Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceXXS),
+                      child: ListCard(
+                        list: list,
+                        index: index,
+                        onTap: () => context.push(
+                          AppRoutes.listDetailPath(list.id),
+                        ),
+                      ),
+                    );
+
+                    if (!canDelete) return card;
+
+                    return Dismissible(
+                      key: ValueKey(list.id),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.error,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 24),
+                        child: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 28),
+                      ),
+                      confirmDismiss: (_) async {
+                        return await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('Excluir Lista'),
+                            content: const Text('Tem certeza que deseja excluir esta lista? Esta ação não pode ser desfeita.'),
+                            actions: [
+                              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+                              FilledButton(
+                                onPressed: () => Navigator.pop(ctx, true), 
+                                style: FilledButton.styleFrom(backgroundColor: Theme.of(ctx).colorScheme.error),
+                                child: const Text('Excluir'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      onDismissed: (_) async {
+                        try {
+                          final repository = ref.read(shoppingListRepositoryProvider);
+                          await DeleteListUseCase(repository).call(
+                            DeleteListParams(listId: list.id, isAdmin: isAdmin),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('🗑️ Lista excluída com sucesso!')),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Erro: $e')),
+                          );
+                        }
+                      },
+                      child: card,
+                    );
+                  }
                 );
               },
               childCount: lists.length,

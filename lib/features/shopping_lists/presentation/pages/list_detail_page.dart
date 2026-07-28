@@ -147,6 +147,56 @@ class _ListBodyState extends ConsumerState<_ListBody> {
         false;
   }
 
+  bool _isDeleting = false;
+
+  Future<void> _deleteList() async {
+    final confirmed = await _showDeleteDialog();
+    if (!confirmed || !mounted) return;
+
+    setState(() => _isDeleting = true);
+    try {
+      final repository = ref.read(shoppingListRepositoryProvider);
+      final isAdmin = widget.currentUser?.isAdmin ?? false;
+      
+      await DeleteListUseCase(repository).call(DeleteListParams(
+        listId: widget.list.id,
+        isAdmin: isAdmin,
+      ));
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('🗑️ Lista excluída com sucesso!')),
+        );
+        context.pop(); // Voltar para a tela anterior
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro: $e'), backgroundColor: Theme.of(context).colorScheme.error));
+      }
+    } finally {
+      if (mounted) setState(() => _isDeleting = false);
+    }
+  }
+
+  Future<bool> _showDeleteDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Excluir Lista'),
+            content: const Text('Tem certeza que deseja excluir esta lista? Esta ação não pode ser desfeita.'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, true), 
+                style: FilledButton.styleFrom(backgroundColor: Theme.of(ctx).colorScheme.error),
+                child: const Text('Excluir'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final list = widget.list;
@@ -179,6 +229,17 @@ class _ListBodyState extends ConsumerState<_ListBody> {
               ),
             ),
             actions: [
+              if (isAdmin || list.status.isDraft)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: IconButton(
+                    icon: _isDeleting
+                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.delete_outline_rounded),
+                    color: cs.error,
+                    onPressed: _isDeleting ? null : _deleteList,
+                  ),
+                ),
               if (!isAdmin && list.status.isDraft)
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
