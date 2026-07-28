@@ -15,6 +15,7 @@ import '../../../authentication/presentation/viewmodels/auth_viewmodel.dart';
 import '../../../../core/config/providers.dart';
 import '../../domain/entities/shopping_list_entity.dart';
 import '../../domain/usecases/shopping_list_usecases.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../viewmodels/home_viewmodel.dart';
 import '../widgets/list_card.dart';
 import '../../../../shared/widgets/empty_state.dart';
@@ -288,6 +289,35 @@ class _PremiumAppBar extends StatelessWidget {
           ],
         ),
       ),
+      actions: [
+        if (user.isAdmin)
+          IconButton(
+            icon: const Icon(Icons.person_add_alt_1_rounded),
+            tooltip: 'Adicionar Usuários Faltantes',
+            onPressed: () async {
+              try {
+                final firestore = FirebaseFirestore.instance;
+                final users = ['paula', 'bruno', 'lu', 'edemar'];
+                for (final u in users) {
+                  await firestore.collection('users').doc(u).set({
+                    'username': u,
+                    'name': u[0].toUpperCase() + u.substring(1),
+                    'email': '$u@compry.com.br',
+                    'isAdmin': false,
+                    'active': true,
+                  });
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('✅ Usuários adicionados com sucesso ao Firestore!')),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
+                );
+              }
+            },
+          ),
+      ],
     );
   }
 

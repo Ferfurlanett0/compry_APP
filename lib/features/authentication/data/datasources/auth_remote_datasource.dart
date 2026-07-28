@@ -41,22 +41,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final cleanUsername = username.trim().toLowerCase();
     final cleanPassword = password.trim();
     try {
-      // Busca o usuário pelo username no Firestore
-      final query = await _firestore
+      var query = await _firestore
           .collection(AppConstants.colUsers)
           .where('username', isEqualTo: cleanUsername)
           .limit(1)
           .get();
 
-      if (query.docs.isEmpty) {
-        throw const UserNotFoundFailure();
-      }
-
-      final userDoc = query.docs.first;
-      final userData = userDoc.data();
-
-      // Obtém o email do usuário para autenticar no Firebase Auth
-      // Tenta o domínio novo (Compry) e os domínios antigos (ListaPro)
       final emailsToTry = [
         '$cleanUsername@compry.com.br',
         '$cleanUsername@compry.app',
@@ -69,18 +59,64 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       UserCredential? credential;
       FirebaseAuthException? lastAuthError;
 
-      for (final email in emailsToTry) {
-        try {
-          credential = await _firebaseAuth.signInWithEmailAndPassword(
-            email: email,
-            password: cleanPassword,
-          );
-          break; // Login bem sucedido!
-        } on FirebaseAuthException catch (e) {
-          lastAuthError = e;
-          // Se o erro for de credencial inválida, continua o loop e tenta o próximo email
-          if (e.code != 'invalid-credential' && e.code != 'user-not-found' && e.code != 'wrong-password') {
-            rethrow; // Lança outros erros (ex: bloqueio, sem rede) imediatamente
+      // Se o usuário não existe no Firestore, vamos tentar autenticar no Firebase Auth primeiro.
+      // Se a senha estiver correta, criamos o usuário no Firestore automaticamente!
+      if (query.docs.isEmpty) {
+        for (final email in emailsToTry) {
+          try {
+            credential = await _firebaseAuth.signInWithEmailAndPassword(
+              email: email,
+              password: cleanPassword,
+            );
+            break; // Login bem sucedido!
+          } on FirebaseAuthException catch (e) {
+            lastAuthError = e;
+          }
+        }
+
+        if (credential != null && credential.user != null) {
+          // O usuário existe no Auth e a senha está correta! Vamos criá-lo no Firestore.
+          final isAdmin = cleanUsername.contains('admin');
+          final capName = cleanUsername.isNotEmpty 
+              ? cleanUsername[0].toUpperCase() + cleanUsername.substring(1) 
+              : 'Usuário';
+
+          await _firestore.collection(AppConstants.colUsers).doc(cleanUsername).set({
+            'username': cleanUsername,
+            'name': capName,
+            'email': credential.user!.email ?? '$cleanUsername@compry.com.br',
+            'isAdmin': isAdmin,
+            'active': true,
+          });
+
+          // Busca novamente o documento que acabou de ser criado
+          query = await _firestore
+              .collection(AppConstants.colUsers)
+              .where('username', isEqualTo: cleanUsername)
+              .limit(1)
+              .get();
+        } else {
+          throw const UserNotFoundFailure();
+        }
+      }
+
+      final userDoc = query.docs.first;
+      final userData = userDoc.data();
+
+      // Já autenticamos ao criar o doc? Se não (usuário já existia), autenticamos agora
+      if (credential == null || credential.user == null) {
+        for (final email in emailsToTry) {
+          try {
+            credential = await _firebaseAuth.signInWithEmailAndPassword(
+              email: email,
+              password: cleanPassword,
+            );
+            break; // Login bem sucedido!
+          } on FirebaseAuthException catch (e) {
+            lastAuthError = e;
+            if (e.code != 'invalid-credential' && e.code != 'user-not-found' && e.code != 'wrong-password') {
+              rethrow;
+            }
           }
         }
       }
