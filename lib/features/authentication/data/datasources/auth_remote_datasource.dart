@@ -113,10 +113,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // Força permissão de Admin para o Edemar ou usuários com "admin" no nome
       if (cleanUsername == 'edemar' || cleanUsername.contains('admin')) {
         if (userData['isAdmin'] != true) {
-          await _firestore.collection(AppConstants.colUsers).doc(cleanUsername).update({
-            'isAdmin': true,
-          });
-          userData['isAdmin'] = true;
+          try {
+            await _firestore.collection(AppConstants.colUsers).doc(userDoc.id).update({
+              'isAdmin': true,
+            });
+            userData['isAdmin'] = true;
+          } catch (e) {
+            _logger.e('Erro ao atualizar permissão de admin: $e');
+          }
         }
       }
 
