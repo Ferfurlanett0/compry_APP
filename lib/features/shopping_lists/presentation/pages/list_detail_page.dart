@@ -153,27 +153,29 @@ class _ListBodyState extends ConsumerState<_ListBody> {
     final confirmed = await _showDeleteDialog();
     if (!confirmed || !mounted) return;
 
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
     setState(() => _isDeleting = true);
+    
     try {
       final repository = ref.read(shoppingListRepositoryProvider);
       final isAdmin = widget.currentUser?.isAdmin ?? false;
+      
+      // Voltar para a tela anterior imediatamente para evitar erro de "Lista não encontrada" 
+      // quando o provider for atualizado pela exclusão.
+      navigator.pop();
       
       await DeleteListUseCase(repository).call(DeleteListParams(
         listId: widget.list.id,
         isAdmin: isAdmin,
       ));
       
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('🗑️ Lista excluída com sucesso!')),
-        );
-        context.pop(); // Voltar para a tela anterior
-      }
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text('🗑️ Lista excluída com sucesso!')),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro: $e'), backgroundColor: Theme.of(context).colorScheme.error));
-      }
-    } finally {
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red));
       if (mounted) setState(() => _isDeleting = false);
     }
   }
