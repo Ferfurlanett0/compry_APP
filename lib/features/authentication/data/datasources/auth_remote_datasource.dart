@@ -58,6 +58,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // Obtém o email do usuário para autenticar no Firebase Auth
       // Tenta o domínio novo (Compry) e os domínios antigos (ListaPro)
       final emailsToTry = [
+        '$cleanUsername@compry.com.br',
+        '$cleanUsername@compry.app',
         '$cleanUsername@Compry.app',
         '$cleanUsername@listapro.com.br',
         '$cleanUsername@listapro.app',

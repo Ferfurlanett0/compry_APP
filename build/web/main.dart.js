@@ -100638,7 +100638,7 @@ c=l
 c=J.kH(c).zB(c)
 c.toString
 k=c
-j=A.b([A.m(a3)+"@Compry.app",A.m(a3)+"@listapro.com.br",A.m(a3)+"@listapro.app",A.m(a3)+"@listapro.com"],t.s)
+j=A.b([A.m(a3)+"@compry.com.br",A.m(a3)+"@compry.app",A.m(a3)+"@Compry.app",A.m(a3)+"@listapro.com.br",A.m(a3)+"@listapro.app",A.m(a3)+"@listapro.com"],t.s)
 i=null
 h=null
 c=j,b=c.length,a=n.a,a0=0
