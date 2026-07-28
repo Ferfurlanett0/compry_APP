@@ -100,7 +100,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
                 .get();
           } catch (e) {
              _logger.e('Erro ao criar documento do usuário no Firestore: $e');
-             throw AuthFailure('Erro de permissão no Firestore. Contate o suporte.');
+             throw AuthFailure(message: 'Erro de permissão no Firestore. Contate o suporte.');
           }
         } else {
           throw const UserNotFoundFailure();
