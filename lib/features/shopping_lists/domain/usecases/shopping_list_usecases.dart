@@ -147,7 +147,7 @@ class DeleteListUseCase implements UseCase<void, DeleteListParams> {
     final list = await _repository.getListById(params.listId);
 
     if (!params.isAdmin && !list.status.isDraft) {
-      throw const PermissionFailure(message: 'Funcionários só podem apagar listas não enviadas.');
+      throw const PermissionFailure();
     }
 
     return _repository.deleteList(params.listId);
