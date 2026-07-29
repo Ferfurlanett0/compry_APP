@@ -11,9 +11,9 @@ import '../../features/authentication/presentation/viewmodels/auth_viewmodel.dar
 import 'offline_banner.dart';
 
 class MainScaffold extends ConsumerWidget {
-  final Widget child;
+  final StatefulNavigationShell navigationShell;
 
-  const MainScaffold({super.key, required this.child});
+  const MainScaffold({super.key, required this.navigationShell});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,10 +27,14 @@ class MainScaffold extends ConsumerWidget {
       body: Column(
         children: [
           const OfflineBanner(),
-          Expanded(child: child),
+          Expanded(child: navigationShell),
         ],
       ),
-      bottomNavigationBar: _PremiumBottomNav(isAdmin: isAdmin, isDark: isDark),
+      bottomNavigationBar: _PremiumBottomNav(
+        navigationShell: navigationShell,
+        isAdmin: isAdmin,
+        isDark: isDark,
+      ),
     );
   }
 }
@@ -38,23 +42,26 @@ class MainScaffold extends ConsumerWidget {
 // ─── Premium Bottom Navigation ────────────────────────────────────────────────
 
 class _PremiumBottomNav extends StatelessWidget {
+  final StatefulNavigationShell navigationShell;
   final bool isAdmin;
   final bool isDark;
 
-  const _PremiumBottomNav({required this.isAdmin, required this.isDark});
+  const _PremiumBottomNav({
+    required this.navigationShell,
+    required this.isAdmin,
+    required this.isDark,
+  });
 
-  int _currentIndex(BuildContext context) {
-    final location = GoRouterState.of(context).matchedLocation;
-    if (location.startsWith(AppRoutes.home)) return 0;
-    if (location.startsWith(AppRoutes.history)) return 1;
-    if (location.startsWith(AppRoutes.notifications) && isAdmin) return 2;
-    if (location.startsWith(AppRoutes.profile)) return isAdmin ? 3 : 2;
-    return 0;
+  int _currentIndex() {
+    final branch = navigationShell.currentIndex;
+    if (isAdmin) return branch;
+    if (branch == 3) return 2; // Map profile branch (3) to tab index (2) for non-admin
+    return branch;
   }
 
   @override
   Widget build(BuildContext context) {
-    final index = _currentIndex(context);
+    final index = _currentIndex();
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
@@ -73,18 +80,10 @@ class _PremiumBottomNav extends StatelessWidget {
 
     void onTap(int idx) {
       if (isAdmin) {
-        switch (idx) {
-          case 0: context.go(AppRoutes.home);
-          case 1: context.go(AppRoutes.history);
-          case 2: context.go(AppRoutes.notifications);
-          case 3: context.go(AppRoutes.profile);
-        }
+        navigationShell.goBranch(idx, initialLocation: idx == navigationShell.currentIndex);
       } else {
-        switch (idx) {
-          case 0: context.go(AppRoutes.home);
-          case 1: context.go(AppRoutes.history);
-          case 2: context.go(AppRoutes.profile);
-        }
+        final targetBranch = idx == 2 ? 3 : idx;
+        navigationShell.goBranch(targetBranch, initialLocation: targetBranch == navigationShell.currentIndex);
       }
     }
 
@@ -98,24 +97,28 @@ class _PremiumBottomNav extends StatelessWidget {
           ),
         ),
       ),
-      child: NavigationBar(
-        selectedIndex: index,
-        onDestinationSelected: onTap,
-        destinations: destinations,
-        animationDuration: const Duration(milliseconds: 350),
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        height: AppDimensions.bottomNavHeight,
-        elevation: 0,
+      child: SafeArea(
+        child: Container(
+          height: 64,
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceSM),
+          child: NavigationBar(
+            selectedIndex: index,
+            onDestinationSelected: onTap,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            indicatorColor: cs.primaryContainer,
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            destinations: destinations,
+          ),
+        ),
       ),
     );
   }
 
-  NavigationDestination _navDest(IconData icon, IconData selectedIcon, String label) {
+  NavigationDestination _navDest(IconData icon, IconData activeIcon, String label) {
     return NavigationDestination(
       icon: Icon(icon),
-      selectedIcon: Icon(selectedIcon),
+      selectedIcon: Icon(activeIcon),
       label: label,
     );
   }

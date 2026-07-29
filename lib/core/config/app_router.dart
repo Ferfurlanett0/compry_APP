@@ -20,13 +20,30 @@ import '../../features/profile/presentation/pages/employee_list_page.dart';
 import '../../features/authentication/presentation/pages/change_password_page.dart';
 import '../../shared/widgets/main_scaffold.dart';
 
+class RouterNotifier extends ChangeNotifier {
+  final Ref _ref;
+
+  RouterNotifier(this._ref) {
+    _ref.listen<AuthState>(
+      authViewModelProvider,
+      (_, __) => notifyListeners(),
+    );
+  }
+}
+
+final routerNotifierProvider = Provider<RouterNotifier>((ref) {
+  return RouterNotifier(ref);
+});
+
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authViewModelProvider);
+  final notifier = ref.watch(routerNotifierProvider);
 
   return GoRouter(
     initialLocation: AppRoutes.login,
     debugLogDiagnostics: false,
+    refreshListenable: notifier,
     redirect: (context, state) {
+      final authState = ref.read(authViewModelProvider);
       final isAuthenticated = authState is AuthAuthenticated;
       final requiresPasswordChange = authState is AuthRequiresPasswordChange;
       final isLoading = authState is AuthLoading || authState is AuthInitial;
@@ -65,44 +82,58 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ChangePasswordPage(),
       ),
 
-      // Employees List (Outside ShellRoute so it can be full screen, or inside if preferred)
-      // We will place it outside shell route so it has its own back button navigation
+      // Employees List
       GoRoute(
         path: AppRoutes.employees,
         name: 'employees',
         builder: (context, state) => const EmployeeListPage(),
       ),
 
-      // Main scaffold with bottom navigation
-      ShellRoute(
-        builder: (context, state, child) => MainScaffold(child: child),
-        routes: [
-          // Home
-          GoRoute(
-            path: AppRoutes.home,
-            name: 'home',
-            pageBuilder: (context, state) => const NoTransitionPage(child: HomePage()),
+      // Main scaffold with bottom navigation using StatefulShellRoute for instant zero-latency tab switching
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return MainScaffold(navigationShell: navigationShell);
+        },
+        branches: [
+          // Home Branch
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.home,
+                name: 'home',
+                builder: (context, state) => const HomePage(),
+              ),
+            ],
           ),
-
-          // History
-          GoRoute(
-            path: AppRoutes.history,
-            name: 'history',
-            pageBuilder: (context, state) => const NoTransitionPage(child: HistoryPage()),
+          // History Branch
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.history,
+                name: 'history',
+                builder: (context, state) => const HistoryPage(),
+              ),
+            ],
           ),
-
-          // Notifications
-          GoRoute(
-            path: AppRoutes.notifications,
-            name: 'notifications',
-            pageBuilder: (context, state) => const NoTransitionPage(child: NotificationsPage()),
+          // Notifications Branch
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.notifications,
+                name: 'notifications',
+                builder: (context, state) => const NotificationsPage(),
+              ),
+            ],
           ),
-
-          // Profile
-          GoRoute(
-            path: AppRoutes.profile,
-            name: 'profile',
-            pageBuilder: (context, state) => const NoTransitionPage(child: ProfilePage()),
+          // Profile Branch
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.profile,
+                name: 'profile',
+                builder: (context, state) => const ProfilePage(),
+              ),
+            ],
           ),
         ],
       ),
