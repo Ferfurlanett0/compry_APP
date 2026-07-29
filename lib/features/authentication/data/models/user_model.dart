@@ -111,6 +111,14 @@ class UserModel extends HiveObject {
         updatedAt: entity.updatedAt,
       );
 
+  String get avatarPath {
+    if (avatar != null && avatar!.isNotEmpty) {
+      return 'assets/images/$avatar.png';
+    }
+    if (role == AppRoles.admin || role == 'ADMIN') return 'assets/images/Perfil administrador.png';
+    return 'assets/images/Perfil churrasqueiro.png';
+  }
+
   // ─── Copy with ──────────────────────────────────────────────────────────────
 
   UserModel copyWith({

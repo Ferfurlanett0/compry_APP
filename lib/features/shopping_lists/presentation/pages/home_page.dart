@@ -271,7 +271,7 @@ class _PremiumAppBar extends StatelessWidget {
               ),
               child: ClipOval(
                 child: Image.asset(
-                  user.isAdmin ? 'assets/images/administrador.png' : 'assets/images/funcionario.png',
+                  user.avatarPath,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
                     color: cs.primary.withValues(alpha: 0.1),
@@ -289,35 +289,6 @@ class _PremiumAppBar extends StatelessWidget {
           ],
         ),
       ),
-      actions: [
-        if (user.isAdmin)
-          IconButton(
-            icon: const Icon(Icons.person_add_alt_1_rounded),
-            tooltip: 'Adicionar Usuários Faltantes',
-            onPressed: () async {
-              try {
-                final firestore = FirebaseFirestore.instance;
-                final users = ['paula', 'bruno', 'lu', 'edemar'];
-                for (final u in users) {
-                  await firestore.collection('users').doc(u).set({
-                    'username': u,
-                    'name': u[0].toUpperCase() + u.substring(1),
-                    'email': '$u@compry.com.br',
-                    'isAdmin': false,
-                    'active': true,
-                  });
-                }
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('✅ Usuários adicionados com sucesso ao Firestore!')),
-                );
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
-                );
-              }
-            },
-          ),
-      ],
     );
   }
 

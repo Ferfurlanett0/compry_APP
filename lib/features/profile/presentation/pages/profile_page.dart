@@ -12,12 +12,89 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/config/providers.dart';
 import '../../../../core/theme/app_dimensions.dart';
+import '../../../authentication/domain/entities/user_entity.dart';
 import '../../../authentication/presentation/viewmodels/auth_viewmodel.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../core/services/pwa_install_service.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
+
+  void _showAvatarPicker(BuildContext context, WidgetRef ref, UserEntity user) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final availableAvatars = [
+      'Perfil administrador',
+      'Perfil churrasqueiro',
+      'Perfil cozinheira',
+      'Perfil garconete',
+    ];
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        String selected = user.avatar ?? (user.isAdmin ? 'Perfil administrador' : 'Perfil churrasqueiro');
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Escolha sua Foto de Perfil'),
+              content: SizedBox(
+                height: 90,
+                width: double.maxFinite,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: availableAvatars.length,
+                  separatorBuilder: (_, __) => const Gap(AppDimensions.spaceMD),
+                  itemBuilder: (context, index) {
+                    final avatar = availableAvatars[index];
+                    final isSelected = avatar == selected;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() => selected = avatar);
+                      },
+                      child: Container(
+                        width: 70,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected ? cs.primary : Colors.transparent,
+                            width: 3,
+                          ),
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/images/$avatar.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.read(authViewModelProvider.notifier).updateAvatar(selected);
+                    Navigator.of(dialogContext).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Foto de perfil atualizada com sucesso!')),
+                    );
+                  },
+                  child: const Text('Salvar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,47 +128,71 @@ class ProfilePage extends ConsumerWidget {
           Center(
             child: Column(
               children: [
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        cs.primary.withValues(alpha: 0.15),
-                        cs.primary.withValues(alpha: 0.02),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                    border: Border.all(
-                      color: cs.primary.withValues(alpha: 0.4),
-                      width: 2.0,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          currentUser.isAdmin ? 'assets/images/administrador.png' : 'assets/images/funcionario.png',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: cs.primary.withValues(alpha: 0.1),
-                            child: Center(
-                              child: Icon(
-                                currentUser.isAdmin ? Icons.admin_panel_settings_rounded : Icons.person_rounded,
-                                color: cs.primary,
-                                size: 60,
+                GestureDetector(
+                  onTap: () => _showAvatarPicker(context, ref, currentUser),
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              cs.primary.withValues(alpha: 0.15),
+                              cs.primary.withValues(alpha: 0.02),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          border: Border.all(
+                            color: cs.primary.withValues(alpha: 0.4),
+                            width: 2.0,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 15,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            currentUser.avatarPath,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              color: cs.primary.withValues(alpha: 0.1),
+                              child: Center(
+                                child: Icon(
+                                  currentUser.isAdmin ? Icons.admin_panel_settings_rounded : Icons.person_rounded,
+                                  color: cs.primary,
+                                  size: 60,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: cs.primary,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: cs.surface, width: 2),
+                          ),
+                          child: Icon(
+                            Icons.camera_alt_rounded,
+                            size: 16,
+                            color: cs.onPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
                 
                 const Gap(AppDimensions.spaceLG),

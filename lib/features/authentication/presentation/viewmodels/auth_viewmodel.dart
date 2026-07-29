@@ -6,7 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
 import '../../domain/entities/user_entity.dart';
-import '../../domain/usecases/auth_usecases.dart';
+import '../../../authentication/domain/usecases/auth_usecases.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../../../../core/config/providers.dart';
 import '../../../../core/errors/failures.dart';
 
@@ -49,16 +50,19 @@ class AuthViewModel extends StateNotifier<AuthState> {
   final LoginUseCase _loginUseCase;
   final LogoutUseCase _logoutUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
+  final AuthRepository _repository;
   final Logger _logger;
 
   AuthViewModel({
     required LoginUseCase loginUseCase,
     required LogoutUseCase logoutUseCase,
     required GetCurrentUserUseCase getCurrentUserUseCase,
+    required AuthRepository repository,
     required Logger logger,
   })  : _loginUseCase = loginUseCase,
         _logoutUseCase = logoutUseCase,
         _getCurrentUserUseCase = getCurrentUserUseCase,
+        _repository = repository,
         _logger = logger,
         super(const AuthInitial()) {
     _checkCurrentUser();
@@ -147,6 +151,21 @@ class AuthViewModel extends StateNotifier<AuthState> {
       state = const AuthUnauthenticated();
     }
   }
+
+  /// Atualiza o avatar do usuário logado
+  Future<void> updateAvatar(String avatar) async {
+    if (state is AuthAuthenticated) {
+      final user = (state as AuthAuthenticated).user;
+      final updatedUser = user.copyWith(avatar: avatar);
+      try {
+        await _repository.updateAvatar(userId: user.id, avatar: avatar);
+        state = AuthAuthenticated(updatedUser);
+        _logger.i('Avatar atualizado no AuthViewModel para: $avatar');
+      } catch (e) {
+        _logger.e('Erro ao atualizar avatar no AuthViewModel: $e');
+      }
+    }
+  }
 }
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
@@ -160,6 +179,7 @@ final authViewModelProvider =
     loginUseCase: LoginUseCase(repository),
     logoutUseCase: LogoutUseCase(repository),
     getCurrentUserUseCase: GetCurrentUserUseCase(repository),
+    repository: repository,
     logger: logger,
   );
 });

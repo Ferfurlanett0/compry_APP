@@ -122,4 +122,9 @@ class AuthRepositoryImpl implements AuthRepository {
       avatar: avatar,
     );
   }
+
+  @override
+  Future<void> updateAvatar({required String userId, required String avatar}) async {
+    return await _remote.updateAvatar(userId: userId, avatar: avatar);
+  }
 }

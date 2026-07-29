@@ -147,7 +147,7 @@ class _EmployeeCard extends StatelessWidget {
             ),
             child: ClipOval(
               child: Image.asset(
-                'assets/images/funcionario.png',
+                employee.avatarPath,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Icon(Icons.person, color: cs.primary),
               ),
@@ -178,31 +178,102 @@ class _EmployeeCard extends StatelessWidget {
             ),
           ),
           
-          // Action Button
-          Tooltip(
-            message: 'Resetar Senha',
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: () => _sendResetEmail(context),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: cs.primaryContainer,
+          // Action Buttons
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Tooltip(
+                message: 'Resetar Senha',
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
                     borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.vpn_key_rounded,
-                    color: cs.onPrimaryContainer,
-                    size: 20,
+                    onTap: () => _sendResetEmail(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: cs.primaryContainer,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.vpn_key_rounded,
+                        color: cs.onPrimaryContainer,
+                        size: 20,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              const Gap(AppDimensions.spaceXS),
+              Tooltip(
+                message: 'Excluir Usuário',
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () => _deleteEmployee(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: cs.errorContainer,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.delete_outline_rounded,
+                        color: cs.onErrorContainer,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _deleteEmployee(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Excluir Usuário'),
+        content: Text('Tem certeza que deseja excluir o perfil de ${employee.name} (@${employee.username})?\n\nEsta ação removerá o usuário do gerenciamento.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Excluir'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      try {
+        await FirebaseFirestore.instance.collection('users').doc(employee.id).delete();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Usuário ${employee.name} excluído com sucesso.'),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao excluir usuário: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 }

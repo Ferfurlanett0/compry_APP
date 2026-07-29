@@ -26,6 +26,7 @@ abstract interface class AuthRemoteDataSource {
     required String role,
     String? avatar,
   });
+  Future<void> updateAvatar({required String userId, required String avatar});
 }
 
 /// Implementação com Firebase Auth + Firestore
@@ -287,6 +288,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e) {
       _logger.e('Erro inesperado ao criar usuário: $e');
       throw AuthFailure(message: 'Ocorreu um erro inesperado ao criar o usuário.');
+    }
+  }
+
+  @override
+  Future<void> updateAvatar({required String userId, required String avatar}) async {
+    try {
+      await _firestore.collection(AppConstants.colUsers).doc(userId).update({
+        'avatar': avatar,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      _logger.i('Avatar do usuário $userId atualizado para $avatar.');
+    } catch (e) {
+      _logger.e('Erro ao atualizar avatar do usuário: $e');
+      throw const AuthFailure(message: 'Erro ao atualizar foto de perfil.');
     }
   }
 }
