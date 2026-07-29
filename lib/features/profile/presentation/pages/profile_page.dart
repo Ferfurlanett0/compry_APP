@@ -57,6 +57,7 @@ class ProfilePage extends ConsumerWidget {
                         height: 70,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
+                          color: cs.primaryContainer,
                           border: Border.all(
                             color: isSelected ? cs.primary : Colors.transparent,
                             width: 3,
@@ -137,10 +138,11 @@ class ProfilePage extends ConsumerWidget {
                         height: 100,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
+                          color: cs.primaryContainer,
                           gradient: LinearGradient(
                             colors: [
-                              cs.primary.withValues(alpha: 0.15),
-                              cs.primary.withValues(alpha: 0.02),
+                              cs.primary.withValues(alpha: 0.25),
+                              cs.primary.withValues(alpha: 0.1),
                             ],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,

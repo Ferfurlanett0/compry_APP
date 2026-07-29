@@ -124,6 +124,7 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                           height: 80,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
+                            color: cs.primaryContainer,
                             border: Border.all(
                               color: isSelected ? cs.primary : Colors.transparent,
                               width: 3,

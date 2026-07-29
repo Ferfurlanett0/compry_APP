@@ -249,10 +249,11 @@ class _PremiumAppBar extends StatelessWidget {
               height: AppDimensions.avatarMD,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
+                color: cs.primaryContainer,
                 gradient: LinearGradient(
                   colors: [
-                    cs.primary.withValues(alpha: 0.15),
-                    cs.primary.withValues(alpha: 0.02),
+                    cs.primary.withValues(alpha: 0.25),
+                    cs.primary.withValues(alpha: 0.1),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,

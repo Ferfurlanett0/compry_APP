@@ -143,6 +143,7 @@ class _EmployeeCard extends StatelessWidget {
             height: 48,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
+              color: cs.primaryContainer,
               border: Border.all(color: cs.primary.withValues(alpha: 0.2)),
             ),
             child: ClipOval(
