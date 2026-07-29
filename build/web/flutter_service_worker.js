@@ -37,7 +37,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "f56941647ca9c8baa41a3d23094eb12a
 "favicon.png": "978c8d98fad5a5c7fe3e0ef22b5b66c8",
 "firebase-messaging-sw.js": "19b8046d4c9572a90a7565c2386e2633",
 "flutter.js": "83d881c1dbb6d6bcd6b42e274605b69c",
-"flutter_bootstrap.js": "9b7f3afc59c2da5f3a6a8d71fe0b3178",
+"flutter_bootstrap.js": "9694a4dcfe716490c335257820e4c9a8",
 "icons/compry%20logo%20com%20texto.svg": "65396b531c8af8f33a61197c49d39bff",
 "icons/Icon-192.png": "978c8d98fad5a5c7fe3e0ef22b5b66c8",
 "icons/Icon-512.png": "978c8d98fad5a5c7fe3e0ef22b5b66c8",
@@ -47,7 +47,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "f56941647ca9c8baa41a3d23094eb12a
 "icons/icone_compry.svg": "91ea918914c70fd5254e77fdbf4eea53",
 "index.html": "bb0ac6533829aeb2958a4b9927400371",
 "/": "bb0ac6533829aeb2958a4b9927400371",
-"main.dart.js": "e8432b2fe1bc404abff6e3af5bfd4cb6",
+"main.dart.js": "3e18fb209d5fb1cfe974bc373b65324f",
 "manifest.json": "c6c1ee245d7201f2789c92ac9813ba02",
 "vercel.json": "d6b75ff95ef7100f9ff75e47eb367f2c",
 "version.json": "2f6721267d0ac66b2724ae8328192f0e"};

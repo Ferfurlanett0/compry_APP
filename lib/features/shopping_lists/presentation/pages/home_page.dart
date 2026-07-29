@@ -293,17 +293,19 @@ class _PremiumAppBar extends StatelessWidget {
     );
   }
 
+  DateTime get _brasiliaNow => DateTime.now().toUtc().subtract(const Duration(hours: 3));
+
   String _greeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return 'Bom dia';
-    if (hour < 18) return 'Boa tarde';
+    final hour = _brasiliaNow.hour;
+    if (hour >= 6 && hour < 12) return 'Bom dia';
+    if (hour >= 12 && hour < 18) return 'Boa tarde';
     return 'Boa noite';
   }
 
   String _greetingEmoji() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return '🌅';
-    if (hour < 18) return '☀️';
+    final hour = _brasiliaNow.hour;
+    if (hour >= 6 && hour < 12) return '🌅';
+    if (hour >= 12 && hour < 18) return '☀️';
     return '🌙';
   }
 }
