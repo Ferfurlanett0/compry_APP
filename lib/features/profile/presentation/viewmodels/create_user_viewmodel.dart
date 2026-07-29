@@ -3,6 +3,7 @@ import 'package:logger/logger.dart';
 
 import '../../../authentication/domain/usecases/auth_usecases.dart';
 import '../../../../core/config/providers.dart';
+import '../../../../core/errors/failures.dart';
 
 sealed class CreateUserState {
   const CreateUserState();
@@ -56,6 +57,9 @@ class CreateUserViewModel extends StateNotifier<CreateUserState> {
       );
       state = const CreateUserSuccess();
       _logger.i('CreateUserViewModel: User $username created successfully');
+    } on Failure catch (e) {
+      _logger.e('CreateUserViewModel Error: ${e.message}');
+      state = CreateUserError(e.message);
     } catch (e) {
       _logger.e('CreateUserViewModel Error: $e');
       state = CreateUserError(e.toString().replaceAll('Exception: ', '').replaceAll('ArgumentError: ', ''));
