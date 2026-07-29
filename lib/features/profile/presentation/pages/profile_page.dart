@@ -21,8 +21,6 @@ class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
   void _showAvatarPicker(BuildContext context, WidgetRef ref, UserEntity user) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
     final availableAvatars = [
       'Perfil administrador',
       'Perfil churrasqueiro',
@@ -30,66 +28,220 @@ class ProfilePage extends ConsumerWidget {
       'Perfil garconete',
     ];
 
+    final Map<String, String> avatarLabels = {
+      'Perfil administrador': 'Administrador',
+      'Perfil churrasqueiro': 'Churrasqueiro',
+      'Perfil cozinheira': 'Cozinheira',
+      'Perfil garconete': 'Garçonete',
+    };
+
     showDialog(
       context: context,
       builder: (dialogContext) {
         String selected = user.avatar ?? (user.isAdmin ? 'Perfil administrador' : 'Perfil churrasqueiro');
         return StatefulBuilder(
           builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Escolha sua Foto de Perfil'),
-              content: SizedBox(
-                height: 90,
-                width: double.maxFinite,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: availableAvatars.length,
-                  separatorBuilder: (_, __) => const Gap(AppDimensions.spaceMD),
-                  itemBuilder: (context, index) {
-                    final avatar = availableAvatars[index];
-                    final isSelected = avatar == selected;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() => selected = avatar);
-                      },
-                      child: Container(
-                        width: 70,
-                        height: 70,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: cs.primaryContainer,
-                          border: Border.all(
-                            color: isSelected ? cs.primary : Colors.transparent,
-                            width: 3,
+            final theme = Theme.of(dialogContext);
+            final cs = theme.colorScheme;
+
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 420),
+                padding: const EdgeInsets.all(AppDimensions.spaceXL),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
+                  border: Border.all(
+                    color: cs.outlineVariant.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.35),
+                      blurRadius: 30,
+                      offset: const Offset(0, 12),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Foto de Perfil',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            const Gap(2),
+                            Text(
+                              'Escolha seu personagem de perfil',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: cs.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded),
+                          onPressed: () => Navigator.of(dialogContext).pop(),
+                          style: IconButton.styleFrom(
+                            backgroundColor: cs.surfaceContainerHighest.withValues(alpha: 0.5),
                           ),
                         ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/images/$avatar.png',
-                            fit: BoxFit.cover,
+                      ],
+                    ),
+                    const Gap(AppDimensions.spaceXL),
+
+                    // Avatars Grid/Row
+                    Wrap(
+                      spacing: AppDimensions.spaceLG,
+                      runSpacing: AppDimensions.spaceLG,
+                      alignment: WrapAlignment.center,
+                      children: availableAvatars.map((avatar) {
+                        final isSelected = avatar == selected;
+                        final label = avatarLabels[avatar] ?? '';
+                        return GestureDetector(
+                          onTap: () => setState(() => selected = avatar),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 250),
+                                curve: Curves.easeOutCubic,
+                                width: 76,
+                                height: 76,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: cs.primaryContainer,
+                                  border: Border.all(
+                                    color: isSelected ? cs.primary : Colors.transparent,
+                                    width: isSelected ? 3.5 : 1,
+                                  ),
+                                  boxShadow: isSelected
+                                      ? [
+                                          BoxShadow(
+                                            color: cs.primary.withValues(alpha: 0.4),
+                                            blurRadius: 14,
+                                            spreadRadius: 2,
+                                          )
+                                        ]
+                                      : [],
+                                ),
+                                child: Stack(
+                                  children: [
+                                    ClipOval(
+                                      child: Image.asset(
+                                        'assets/images/$avatar.png',
+                                        fit: BoxFit.cover,
+                                        width: 76,
+                                        height: 76,
+                                      ),
+                                    ),
+                                    if (isSelected)
+                                      Positioned(
+                                        right: 2,
+                                        top: 2,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(3),
+                                          decoration: BoxDecoration(
+                                            color: cs.primary,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(color: cs.surface, width: 2),
+                                          ),
+                                          child: Icon(
+                                            Icons.check_rounded,
+                                            size: 14,
+                                            color: cs.onPrimary,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              const Gap(AppDimensions.spaceXS),
+                              Text(
+                                label,
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  color: isSelected ? cs.primary : cs.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+
+                    const Gap(AppDimensions.spaceXXL),
+
+                    // Action buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                              ),
+                              side: BorderSide(color: cs.outlineVariant),
+                            ),
+                            onPressed: () => Navigator.of(dialogContext).pop(),
+                            child: Text(
+                              'Cancelar',
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                color: cs.onSurface,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                        const Gap(AppDimensions.spaceMD),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: cs.primary,
+                              foregroundColor: cs.onPrimary,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              elevation: 2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                              ),
+                            ),
+                            onPressed: () {
+                              ref.read(authViewModelProvider.notifier).updateAvatar(selected);
+                              Navigator.of(dialogContext).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Foto de perfil atualizada com sucesso!'),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'Salvar',
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                color: cs.onPrimary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('Cancelar'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    ref.read(authViewModelProvider.notifier).updateAvatar(selected);
-                    Navigator.of(dialogContext).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Foto de perfil atualizada com sucesso!')),
-                    );
-                  },
-                  child: const Text('Salvar'),
-                ),
-              ],
             );
           },
         );
