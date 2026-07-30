@@ -50,116 +50,62 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     final cleanUsername = username.trim().toLowerCase();
     final cleanPassword = password.trim();
+    final emailsToTry = <String>{
+      '$cleanUsername@compry.com.br',
+      '$cleanUsername@compry.app',
+      '$cleanUsername@listapro.com.br',
+      '$cleanUsername@listapro.app',
+      '$cleanUsername@listapro.com',
+    };
+
+    UserCredential? credential;
+    FirebaseAuthException? lastAuthError;
+
     try {
-      var query = await _firestore
-          .collection(AppConstants.colUsers)
-          .where('username', isEqualTo: cleanUsername)
-          .limit(1)
-          .get();
-
-      final emailsToTry = [
-        '$cleanUsername@compry.com.br',
-        '$cleanUsername@compry.app',
-        '$cleanUsername@Compry.app',
-        '$cleanUsername@listapro.com.br',
-        '$cleanUsername@listapro.app',
-        '$cleanUsername@listapro.com'
-      ];
-
-      UserCredential? credential;
-      FirebaseAuthException? lastAuthError;
-
-      // Se o usuário não existe no Firestore, vamos tentar autenticar no Firebase Auth primeiro.
-      // Se a senha estiver correta, criamos o usuário no Firestore automaticamente!
-      if (query.docs.isEmpty) {
-        for (final email in emailsToTry) {
-          try {
-            credential = await _firebaseAuth.signInWithEmailAndPassword(
-              email: email,
-              password: cleanPassword,
-            );
-            break; // Login bem sucedido!
-          } on FirebaseAuthException catch (e) {
-            lastAuthError = e;
-          }
-        }
-
-        if (credential != null && credential.user != null) {
-          try {
-            // O usuário existe no Auth e a senha está correta! Vamos criá-lo no Firestore.
-            final isAdmin = cleanUsername.contains('admin') || cleanUsername == 'edemar';
-            final capName = cleanUsername.isNotEmpty 
-                ? cleanUsername[0].toUpperCase() + cleanUsername.substring(1) 
-                : 'Usuário';
-
-            final uid = credential.user!.uid;
-
-            await _firestore.collection(AppConstants.colUsers).doc(uid).set({
-              'username': cleanUsername,
-              'name': capName,
-              'email': credential.user!.email ?? '$cleanUsername@compry.com.br',
-              'role': isAdmin ? AppRoles.admin : AppRoles.employee,
-              'active': true,
-              'createdAt': FieldValue.serverTimestamp(),
-              'updatedAt': FieldValue.serverTimestamp(),
-            });
-
-            // Busca novamente o documento que acabou de ser criado
-            query = await _firestore
-                .collection(AppConstants.colUsers)
-                .where('username', isEqualTo: cleanUsername)
-                .limit(1)
-                .get();
-          } catch (e) {
-             _logger.e('Erro ao criar documento do usuário no Firestore: $e');
-             throw AuthFailure(message: 'Erro de permissão no Firestore. Contate o suporte.');
-          }
-        } else {
-          throw const UserNotFoundFailure();
-        }
-      }
-
-      final userDoc = query.docs.first;
-      final userData = userDoc.data();
-
-      // Força permissão de Admin para o Edemar ou usuários com "admin" no nome
-      if (cleanUsername == 'edemar' || cleanUsername.contains('admin')) {
-        if (userData['role'] != AppRoles.admin) {
-          try {
-            await _firestore.collection(AppConstants.colUsers).doc(userDoc.id).update({
-              'role': AppRoles.admin,
-            });
-            userData['role'] = AppRoles.admin;
-          } catch (e) {
-            _logger.e('Erro ao atualizar permissão de admin: $e');
+      // Firestore only allows authenticated users to read their own profile.
+      // Authenticate first and then load users/{uid}.
+      for (final email in emailsToTry) {
+        try {
+          credential = await _firebaseAuth.signInWithEmailAndPassword(
+            email: email,
+            password: cleanPassword,
+          );
+          break;
+        } on FirebaseAuthException catch (e) {
+          lastAuthError = e;
+          if (e.code != 'invalid-credential' &&
+              e.code != 'user-not-found' &&
+              e.code != 'wrong-password') {
+            rethrow;
           }
         }
       }
 
-      // Já autenticamos ao criar o doc? Se não (usuário já existia), autenticamos agora
-      if (credential == null || credential.user == null) {
-        for (final email in emailsToTry) {
-          try {
-            credential = await _firebaseAuth.signInWithEmailAndPassword(
-              email: email,
-              password: cleanPassword,
-            );
-            break; // Login bem sucedido!
-          } on FirebaseAuthException catch (e) {
-            lastAuthError = e;
-            if (e.code != 'invalid-credential' && e.code != 'user-not-found' && e.code != 'wrong-password') {
-              rethrow;
-            }
-          }
-        }
-      }
-
-      if (credential == null || credential.user == null) {
+      final firebaseUser = credential?.user;
+      if (firebaseUser == null) {
         if (lastAuthError != null) throw lastAuthError;
         throw const InvalidCredentialsFailure();
       }
 
-      final userModel = UserModel.fromMap(userData, userDoc.id);
+      final userDoc = await _firestore
+          .collection(AppConstants.colUsers)
+          .doc(firebaseUser.uid)
+          .get();
+
+      if (!userDoc.exists || userDoc.data() == null) {
+        await _firebaseAuth.signOut();
+        throw const AuthFailure(
+          message: 'Perfil do usuário não encontrado. Contate o administrador.',
+          code: 'profile-not-found',
+        );
+      }
+
+      final userModel = UserModel.fromMap(userDoc.data()!, userDoc.id);
+
+      if (userModel.username.toLowerCase() != cleanUsername) {
+        await _firebaseAuth.signOut();
+        throw const InvalidCredentialsFailure();
+      }
 
       if (!userModel.active) {
         await _firebaseAuth.signOut();
@@ -185,10 +131,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             code: 'too-many-requests',
           );
         default:
-          throw AuthFailure(message: e.message ?? 'Erro de autenticação.', code: e.code);
+          throw AuthFailure(
+              message: e.message ?? 'Erro de autenticação.', code: e.code);
       }
-    } on UserNotFoundFailure {
-      throw const InvalidCredentialsFailure();
+    } on FirebaseException catch (e) {
+      await _firebaseAuth.signOut();
+      _logger.e('FirebaseException ao carregar perfil: ${e.code}');
+      if (e.code == 'permission-denied') {
+        throw const AuthFailure(
+          message: 'Não foi possível acessar o perfil deste usuário.',
+          code: 'profile-permission-denied',
+        );
+      }
+      rethrow;
     }
   }
 
@@ -228,14 +183,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> updateFcmToken(String userId, String token) async {
     try {
-      await _firestore
-          .collection(AppConstants.colUsers)
-          .doc(userId)
-          .update({'fcmToken': token, 'updatedAt': FieldValue.serverTimestamp()});
+      await _firestore.collection(AppConstants.colUsers).doc(userId).update(
+          {'fcmToken': token, 'updatedAt': FieldValue.serverTimestamp()});
     } catch (e) {
       _logger.w('Falha ao atualizar FCM token: $e');
     }
   }
+
   @override
   Future<void> createUserAsAdmin({
     required String username,
@@ -249,7 +203,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       // Uses Firebase REST API to create user without signing out the current Admin
       final apiKey = Firebase.app().options.apiKey;
-      final url = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey';
+      final url =
+          'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey';
 
       final response = await Dio().post(
         url,
@@ -274,25 +229,29 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
-      _logger.i('Usuário $username criado com sucesso pelo Administrador via REST API.');
+      _logger.i(
+          'Usuário $username criado com sucesso pelo Administrador via REST API.');
     } on DioException catch (e) {
       _logger.e('Erro ao criar usuário (REST API): ${e.response?.data}');
       final message = e.response?.data?['error']?['message'] ?? '';
       if (message.contains('EMAIL_EXISTS')) {
         throw AuthFailure(message: 'Este nome de usuário já está em uso.');
       } else if (message.contains('WEAK_PASSWORD')) {
-        throw AuthFailure(message: 'A senha é muito fraca. Escolha uma senha mais forte.');
+        throw AuthFailure(
+            message: 'A senha é muito fraca. Escolha uma senha mais forte.');
       } else {
         throw AuthFailure(message: 'Erro ao criar conta de usuário.');
       }
     } catch (e) {
       _logger.e('Erro inesperado ao criar usuário: $e');
-      throw AuthFailure(message: 'Ocorreu um erro inesperado ao criar o usuário.');
+      throw AuthFailure(
+          message: 'Ocorreu um erro inesperado ao criar o usuário.');
     }
   }
 
   @override
-  Future<void> updateAvatar({required String userId, required String avatar}) async {
+  Future<void> updateAvatar(
+      {required String userId, required String avatar}) async {
     try {
       await _firestore.collection(AppConstants.colUsers).doc(userId).update({
         'avatar': avatar,
