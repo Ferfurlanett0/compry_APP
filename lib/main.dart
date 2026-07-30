@@ -3,6 +3,8 @@
 /// Para ativar Firebase: rodar `flutterfire configure` e atualizar firebase_options.dart
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +14,7 @@ import 'core/config/app_router.dart';
 import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/fcm_service.dart';
+import 'core/services/web_app_lifecycle_service.dart';
 import 'features/authentication/data/models/user_model.dart';
 import 'features/shopping_lists/data/models/shopping_item_model.dart';
 import 'features/shopping_lists/data/models/shopping_list_model.dart';
@@ -46,9 +49,12 @@ void main() async {
 
   // Register Hive adapters
   if (!Hive.isAdapterRegistered(0)) Hive.registerAdapter(UserModelAdapter());
-  if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(ShoppingListModelAdapter());
-  if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(ShoppingItemModelAdapter());
-  if (!Hive.isAdapterRegistered(3)) Hive.registerAdapter(OfflineOperationModelAdapter());
+  if (!Hive.isAdapterRegistered(1))
+    Hive.registerAdapter(ShoppingListModelAdapter());
+  if (!Hive.isAdapterRegistered(2))
+    Hive.registerAdapter(ShoppingItemModelAdapter());
+  if (!Hive.isAdapterRegistered(3))
+    Hive.registerAdapter(OfflineOperationModelAdapter());
 
   // Open Hive boxes
   await Hive.openBox<UserModel>(AppConstants.hiveBoxUsers);
@@ -67,14 +73,6 @@ void main() async {
   // ─── Provider Container ─────────────────────────────────────────────────────
   final container = ProviderContainer();
 
-  // Initialize FCM
-  try {
-    final fcmService = container.read(fcmServiceProvider);
-    await fcmService.initialize();
-  } catch (e) {
-    debugPrint('FCM initialization failed: $e');
-  }
-
   // ─── Run app ──────────────────────────────────────────────────────────────────
   runApp(
     UncontrolledProviderScope(
@@ -82,6 +80,22 @@ void main() async {
       child: const CompryApp(),
     ),
   );
+
+  // Expose the UI only after Flutter has painted its first frame. Background
+  // services are initialized afterwards and never block the initial UI.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    WebAppLifecycleService.recordEvent('flutter-first-frame');
+    WebAppLifecycleService.markAppReady();
+    unawaited(_initializeBackgroundServices(container));
+  });
+}
+
+Future<void> _initializeBackgroundServices(ProviderContainer container) async {
+  try {
+    await container.read(fcmServiceProvider).initialize();
+  } catch (e) {
+    debugPrint('FCM initialization failed: $e');
+  }
 }
 
 class CompryApp extends ConsumerWidget {

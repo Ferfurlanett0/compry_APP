@@ -79,7 +79,6 @@ class _EmployeeHomeState extends ConsumerState<_EmployeeHome> {
         controller: _scrollController,
         slivers: [
           _PremiumAppBar(user: widget.user, isScrolled: _isScrolled),
-          
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(
@@ -89,20 +88,20 @@ class _EmployeeHomeState extends ConsumerState<_EmployeeHome> {
                 AppDimensions.spaceLG,
               ),
               child: _PremiumNewListButton(),
-            ).animate(key: const ValueKey('home-new-list')).fadeIn(duration: 500.ms).slideY(begin: 0.2, curve: Curves.easeOutCubic),
+            )
+                .animate(key: const ValueKey('home-new-list'))
+                .fadeIn(duration: 500.ms)
+                .slideY(begin: 0.2, curve: Curves.easeOutCubic),
           ),
-
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.pagePadding),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.pagePadding),
               child: _PremiumSearchBar(ref: ref),
             ),
           ),
-
           const SliverToBoxAdapter(child: Gap(AppDimensions.spaceXL)),
-          
           _buildListContent(context, homeState, isAdmin: false),
-          
           const SliverToBoxAdapter(child: Gap(AppDimensions.spaceXXXL)),
         ],
       ),
@@ -151,28 +150,22 @@ class _AdminHomeState extends ConsumerState<_AdminHome> {
         controller: _scrollController,
         slivers: [
           _PremiumAppBar(user: widget.user, isScrolled: _isScrolled),
-          
           const SliverToBoxAdapter(child: Gap(AppDimensions.spaceLG)),
-
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.pagePadding),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.pagePadding),
               child: _PremiumSearchBar(ref: ref),
             ),
           ),
-
           const SliverToBoxAdapter(child: Gap(AppDimensions.spaceLG)),
-
           SliverToBoxAdapter(
             child: _PremiumStatusFilterChips(ref: ref)
                 .animate()
                 .fadeIn(delay: 100.ms, duration: 500.ms),
           ),
-
           const SliverToBoxAdapter(child: Gap(AppDimensions.spaceLG)),
-          
           _buildListContent(context, homeState, isAdmin: true),
-          
           const SliverToBoxAdapter(child: Gap(AppDimensions.spaceXXXL)),
         ],
       ),
@@ -231,8 +224,8 @@ class _PremiumAppBar extends StatelessWidget {
                   ),
                   const Gap(2),
                   Text(
-                    user.name.isNotEmpty 
-                        ? user.name.split(' ').first 
+                    user.name.isNotEmpty
+                        ? user.name.split(' ').first
                         : (user.isAdmin ? 'Administrador' : 'Funcionário'),
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: cs.onSurface,
@@ -278,7 +271,9 @@ class _PremiumAppBar extends StatelessWidget {
                     color: cs.primary.withValues(alpha: 0.1),
                     child: Center(
                       child: Icon(
-                        user.isAdmin ? Icons.admin_panel_settings_rounded : Icons.person_rounded,
+                        user.isAdmin
+                            ? Icons.admin_panel_settings_rounded
+                            : Icons.person_rounded,
                         color: cs.primary,
                         size: 28,
                       ),
@@ -293,7 +288,8 @@ class _PremiumAppBar extends StatelessWidget {
     );
   }
 
-  DateTime get _brasiliaNow => DateTime.now().toUtc().subtract(const Duration(hours: 3));
+  DateTime get _brasiliaNow =>
+      DateTime.now().toUtc().subtract(const Duration(hours: 3));
 
   String _greeting() {
     final hour = _brasiliaNow.hour;
@@ -315,14 +311,16 @@ class _PremiumNewListButton extends StatefulWidget {
   State<_PremiumNewListButton> createState() => _PremiumNewListButtonState();
 }
 
-class _PremiumNewListButtonState extends State<_PremiumNewListButton> with SingleTickerProviderStateMixin {
+class _PremiumNewListButtonState extends State<_PremiumNewListButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnim;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 150));
     _scaleAnim = Tween<double>(begin: 1.0, end: 0.96).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
@@ -341,10 +339,12 @@ class _PremiumNewListButtonState extends State<_PremiumNewListButton> with Singl
 
     return AnimatedBuilder(
       animation: _controller,
-      builder: (context, child) => Transform.scale(scale: _scaleAnim.value, child: child),
+      builder: (context, child) =>
+          Transform.scale(scale: _scaleAnim.value, child: child),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTapDown: (_) => _controller.forward(),
-        onTapUp: (_) {
+        onTap: () {
           _controller.reverse();
           context.push(AppRoutes.createList);
         },
@@ -369,15 +369,16 @@ class _PremiumNewListButtonState extends State<_PremiumNewListButton> with Singl
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 24),
+              const Icon(Icons.add_circle_outline_rounded,
+                  color: Colors.white, size: 24),
               const Gap(AppDimensions.spaceSM),
               Text(
                 'Criar Nova Lista',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.2,
-                ),
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                    ),
               ),
             ],
           ),
@@ -426,7 +427,9 @@ class _PremiumSearchBarState extends State<_PremiumSearchBar> {
         color: cs.surface,
         borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
         border: Border.all(
-          color: _isFocused ? cs.primary : cs.outlineVariant.withValues(alpha: 0.5),
+          color: _isFocused
+              ? cs.primary
+              : cs.outlineVariant.withValues(alpha: 0.5),
           width: _isFocused ? 2 : 1,
         ),
         boxShadow: _isFocused
@@ -447,19 +450,25 @@ class _PremiumSearchBarState extends State<_PremiumSearchBar> {
       ),
       child: TextField(
         focusNode: _focusNode,
-        onChanged: (value) => widget.ref.read(homeViewModelProvider.notifier).search(value),
+        onChanged: (value) =>
+            widget.ref.read(homeViewModelProvider.notifier).search(value),
         style: theme.textTheme.bodyLarge,
         decoration: InputDecoration(
           hintText: 'Pesquisar listas...',
-          hintStyle: theme.textTheme.bodyLarge?.copyWith(color: cs.onSurfaceVariant.withValues(alpha: 0.6)),
+          hintStyle: theme.textTheme.bodyLarge
+              ?.copyWith(color: cs.onSurfaceVariant.withValues(alpha: 0.6)),
           prefixIcon: Icon(
             Icons.search_rounded,
-            color: _isFocused ? cs.primary : cs.onSurfaceVariant.withValues(alpha: 0.6),
+            color: _isFocused
+                ? cs.primary
+                : cs.onSurfaceVariant.withValues(alpha: 0.6),
           ),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceMD, vertical: AppDimensions.spaceMD),
+          contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spaceMD,
+              vertical: AppDimensions.spaceMD),
           fillColor: Colors.transparent,
           filled: true,
         ),
@@ -488,7 +497,8 @@ class _PremiumStatusFilterChips extends StatelessWidget {
       height: 44,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.pagePadding),
+        padding:
+            const EdgeInsets.symmetric(horizontal: AppDimensions.pagePadding),
         itemCount: filters.length,
         separatorBuilder: (_, __) => const Gap(AppDimensions.spaceSM),
         itemBuilder: (context, index) {
@@ -500,22 +510,27 @@ class _PremiumStatusFilterChips extends StatelessWidget {
             child: FilterChip(
               label: Text(label),
               selected: isSelected,
-              onSelected: (_) => ref.read(homeViewModelProvider.notifier).filterByStatus(status),
+              onSelected: (_) => ref
+                  .read(homeViewModelProvider.notifier)
+                  .filterByStatus(status),
               showCheckmark: false,
               backgroundColor: cs.surface,
               selectedColor: cs.primary,
               labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              ),
+                    color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
                 side: BorderSide(
-                  color: isSelected ? Colors.transparent : cs.outlineVariant.withValues(alpha: 0.5),
+                  color: isSelected
+                      ? Colors.transparent
+                      : cs.outlineVariant.withValues(alpha: 0.5),
                   width: 1,
                 ),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceMD, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spaceMD, vertical: 8),
               elevation: isSelected ? 4 : 0,
               shadowColor: cs.primary.withValues(alpha: 0.4),
             ),
@@ -526,7 +541,8 @@ class _PremiumStatusFilterChips extends StatelessWidget {
   }
 }
 
-Widget _buildListContent(BuildContext context, HomeState state, {required bool isAdmin}) {
+Widget _buildListContent(BuildContext context, HomeState state,
+    {required bool isAdmin}) {
   return switch (state) {
     HomeLoading() || HomeInitial() => SliverToBoxAdapter(
         child: const ListCardSkeletonList(),
@@ -540,86 +556,93 @@ Widget _buildListContent(BuildContext context, HomeState state, {required bool i
     HomeLoaded(filteredLists: final lists) => lists.isEmpty
         ? SliverFillRemaining(
             child: NoListsEmptyState(
-              onCreateList: isAdmin
-                  ? null
-                  : () => context.push(AppRoutes.createList),
+              onCreateList:
+                  isAdmin ? null : () => context.push(AppRoutes.createList),
             ),
           )
         : SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 final list = lists[index];
-                
-                return Consumer(
-                  builder: (context, ref, child) {
-                    final currentUser = ref.read(currentUserProvider);
-                    final isAdmin = currentUser?.isAdmin ?? false;
-                    
-                    // Admin can always delete. Employee can delete if list is draft.
-                    final canDelete = isAdmin || list.status.isDraft;
 
-                    final card = Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceXXS),
-                      child: ListCard(
-                        list: list,
-                        index: index,
-                        onTap: () => context.push(
-                          AppRoutes.listDetailPath(list.id),
-                        ),
+                return Consumer(builder: (context, ref, child) {
+                  final currentUser = ref.read(currentUserProvider);
+                  final isAdmin = currentUser?.isAdmin ?? false;
+
+                  // Admin can always delete. Employee can delete if list is draft.
+                  final canDelete = isAdmin || list.status.isDraft;
+
+                  final card = Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimensions.spaceXXS),
+                    child: ListCard(
+                      list: list,
+                      index: index,
+                      onTap: () => context.push(
+                        AppRoutes.listDetailPath(list.id),
                       ),
-                    );
+                    ),
+                  );
 
-                    if (!canDelete) return card;
+                  if (!canDelete) return card;
 
-                    return Dismissible(
-                      key: ValueKey(list.id),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.error,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 24),
-                        child: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 28),
+                  return Dismissible(
+                    key: ValueKey(list.id),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.error,
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      confirmDismiss: (_) async {
-                        return await showDialog<bool>(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: const Text('Excluir Lista'),
-                            content: const Text('Tem certeza que deseja excluir esta lista? Esta ação não pode ser desfeita.'),
-                            actions: [
-                              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-                              FilledButton(
-                                onPressed: () => Navigator.pop(ctx, true), 
-                                style: FilledButton.styleFrom(backgroundColor: Theme.of(ctx).colorScheme.error),
-                                child: const Text('Excluir'),
-                              ),
-                            ],
-                          ),
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 24),
+                      child: const Icon(Icons.delete_outline_rounded,
+                          color: Colors.white, size: 28),
+                    ),
+                    confirmDismiss: (_) async {
+                      return await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Excluir Lista'),
+                          content: const Text(
+                              'Tem certeza que deseja excluir esta lista? Esta ação não pode ser desfeita.'),
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(ctx, false),
+                                child: const Text('Cancelar')),
+                            FilledButton(
+                              onPressed: () => Navigator.pop(ctx, true),
+                              style: FilledButton.styleFrom(
+                                  backgroundColor:
+                                      Theme.of(ctx).colorScheme.error),
+                              child: const Text('Excluir'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    onDismissed: (_) async {
+                      try {
+                        final repository =
+                            ref.read(shoppingListRepositoryProvider);
+                        await DeleteListUseCase(repository).call(
+                          DeleteListParams(listId: list.id, isAdmin: isAdmin),
                         );
-                      },
-                      onDismissed: (_) async {
-                        try {
-                          final repository = ref.read(shoppingListRepositoryProvider);
-                          await DeleteListUseCase(repository).call(
-                            DeleteListParams(listId: list.id, isAdmin: isAdmin),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('🗑️ Lista excluída com sucesso!')),
-                          );
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Erro: $e')),
-                          );
-                        }
-                      },
-                      child: card,
-                    );
-                  }
-                );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('🗑️ Lista excluída com sucesso!')),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Erro: $e')),
+                        );
+                      }
+                    },
+                    child: card,
+                  );
+                });
               },
               childCount: lists.length,
             ),

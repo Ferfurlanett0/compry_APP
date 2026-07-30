@@ -37,14 +37,16 @@ class AppButton extends StatefulWidget {
   State<AppButton> createState() => _AppButtonState();
 }
 
-class _AppButtonState extends State<AppButton> with SingleTickerProviderStateMixin {
+class _AppButtonState extends State<AppButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnim;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 150));
     _scaleAnim = Tween<double>(begin: 1.0, end: 0.96).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
@@ -62,9 +64,11 @@ class _AppButtonState extends State<AppButton> with SingleTickerProviderStateMix
     final cs = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    final effectiveBg = widget.danger ? cs.error : (widget.backgroundColor ?? cs.primary);
-    final effectiveFg = widget.danger ? cs.onError : (widget.foregroundColor ?? cs.onPrimary);
-    
+    final effectiveBg =
+        widget.danger ? cs.error : (widget.backgroundColor ?? cs.primary);
+    final effectiveFg =
+        widget.danger ? cs.onError : (widget.foregroundColor ?? cs.onPrimary);
+
     final isDisabled = widget.isLoading || widget.onPressed == null;
 
     final content = widget.isLoading
@@ -99,25 +103,30 @@ class _AppButtonState extends State<AppButton> with SingleTickerProviderStateMix
 
     return AnimatedBuilder(
       animation: _controller,
-      builder: (context, child) => Transform.scale(scale: _scaleAnim.value, child: child),
+      builder: (context, child) =>
+          Transform.scale(scale: _scaleAnim.value, child: child),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTapDown: isDisabled ? null : (_) => _controller.forward(),
-        onTapUp: isDisabled ? null : (_) {
-          _controller.reverse();
-          widget.onPressed!();
-        },
+        onTap: isDisabled
+            ? null
+            : () {
+                _controller.reverse();
+                widget.onPressed!();
+              },
         onTapCancel: isDisabled ? null : () => _controller.reverse(),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           width: widget.width ?? double.infinity,
           height: widget.height,
           decoration: BoxDecoration(
-            color: widget.outlined 
-                ? Colors.transparent 
+            color: widget.outlined
+                ? Colors.transparent
                 : (isDisabled ? cs.surfaceContainerHighest : effectiveBg),
             borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
             border: widget.outlined
-                ? Border.all(color: isDisabled ? cs.outline : effectiveBg, width: 2)
+                ? Border.all(
+                    color: isDisabled ? cs.outline : effectiveBg, width: 2)
                 : null,
             boxShadow: (!widget.outlined && !isDisabled)
                 ? [

@@ -16,7 +16,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../constants/app_constants.dart';
 import '../services/connectivity_service.dart';
-import '../services/fcm_service.dart';
 import '../sync/services/sync_service.dart';
 import '../../features/authentication/data/datasources/auth_local_datasource.dart';
 import '../../features/authentication/data/datasources/auth_memory_datasource.dart';

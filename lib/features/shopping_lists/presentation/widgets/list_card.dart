@@ -26,7 +26,8 @@ class ListCard extends StatefulWidget {
   State<ListCard> createState() => _ListCardState();
 }
 
-class _ListCardState extends State<ListCard> with SingleTickerProviderStateMixin {
+class _ListCardState extends State<ListCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _pressController;
   late Animation<double> _scaleAnim;
   late Animation<double> _elevationAnim;
@@ -59,7 +60,8 @@ class _ListCardState extends State<ListCard> with SingleTickerProviderStateMixin
     final isDark = theme.brightness == Brightness.dark;
     final list = widget.list;
 
-    final priorityColor = isDark ? list.priority.colorDark() : list.priority.colorLight();
+    final priorityColor =
+        isDark ? list.priority.colorDark() : list.priority.colorLight();
 
     return AnimatedBuilder(
       animation: _pressController,
@@ -70,8 +72,9 @@ class _ListCardState extends State<ListCard> with SingleTickerProviderStateMixin
         );
       },
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTapDown: (_) => _pressController.forward(),
-        onTapUp: (_) {
+        onTap: () {
           _pressController.reverse();
           widget.onTap();
         },
@@ -139,7 +142,8 @@ class _ListCardState extends State<ListCard> with SingleTickerProviderStateMixin
                                   children: [
                                     Text(
                                       list.title,
-                                      style: theme.textTheme.titleMedium?.copyWith(
+                                      style:
+                                          theme.textTheme.titleMedium?.copyWith(
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: -0.2,
                                       ),
@@ -153,13 +157,16 @@ class _ListCardState extends State<ListCard> with SingleTickerProviderStateMixin
                                           Icon(
                                             Icons.person_outline_rounded,
                                             size: 12,
-                                            color: cs.onSurfaceVariant.withValues(alpha: 0.7),
+                                            color: cs.onSurfaceVariant
+                                                .withValues(alpha: 0.7),
                                           ),
                                           const Gap(3),
                                           Text(
                                             list.createdByName!,
-                                            style: theme.textTheme.labelSmall?.copyWith(
-                                              color: cs.onSurfaceVariant.withValues(alpha: 0.8),
+                                            style: theme.textTheme.labelSmall
+                                                ?.copyWith(
+                                              color: cs.onSurfaceVariant
+                                                  .withValues(alpha: 0.8),
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -180,7 +187,9 @@ class _ListCardState extends State<ListCard> with SingleTickerProviderStateMixin
                           if (list.totalItems > 0) ...[
                             _PremiumProgressBar(
                               progress: list.progress,
-                              color: list.status.isFinished ? cs.primary : priorityColor,
+                              color: list.status.isFinished
+                                  ? cs.primary
+                                  : priorityColor,
                               isDark: isDark,
                             ),
                             const Gap(AppDimensions.spaceXS),
@@ -192,22 +201,26 @@ class _ListCardState extends State<ListCard> with SingleTickerProviderStateMixin
                               Icon(
                                 Icons.access_time_rounded,
                                 size: 12,
-                                color: cs.onSurfaceVariant.withValues(alpha: 0.6),
+                                color:
+                                    cs.onSurfaceVariant.withValues(alpha: 0.6),
                               ),
                               const Gap(3),
                               Text(
                                 _formatDate(list.createdAt),
                                 style: theme.textTheme.labelSmall?.copyWith(
-                                  color: cs.onSurfaceVariant.withValues(alpha: 0.7),
+                                  color: cs.onSurfaceVariant
+                                      .withValues(alpha: 0.7),
                                 ),
                               ),
                               if (list.totalItems > 0) ...[
                                 const Spacer(),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
                                     color: cs.surfaceContainerHighest,
-                                    borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+                                    borderRadius: BorderRadius.circular(
+                                        AppDimensions.radiusFull),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -220,7 +233,8 @@ class _ListCardState extends State<ListCard> with SingleTickerProviderStateMixin
                                       const Gap(3),
                                       Text(
                                         '${list.checkedItems}/${list.totalItems}',
-                                        style: theme.textTheme.labelSmall?.copyWith(
+                                        style: theme.textTheme.labelSmall
+                                            ?.copyWith(
                                           color: cs.onSurfaceVariant,
                                           fontWeight: FontWeight.w600,
                                         ),
