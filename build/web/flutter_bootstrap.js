@@ -41,7 +41,7 @@ window.compryPwaDiagnostic?.('bootstrap-start');
 
 _flutter.loader.load({
   serviceWorkerSettings: {
-    serviceWorkerVersion: "1163798170"
+    serviceWorkerVersion: "3976045536"
   },
   onEntrypointLoaded: async function(engineInitializer) {
     window.compryPwaDiagnostic?.('entrypoint-loaded');

@@ -38,7 +38,8 @@ class ProfilePage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) {
-        String selected = user.avatar ?? (user.isAdmin ? 'Perfil administrador' : 'Perfil churrasqueiro');
+        String selected = user.avatar ??
+            (user.isAdmin ? 'Perfil administrador' : 'Perfil churrasqueiro');
         return StatefulBuilder(
           builder: (context, setState) {
             final theme = Theme.of(dialogContext);
@@ -95,7 +96,8 @@ class ProfilePage extends ConsumerWidget {
                           icon: const Icon(Icons.close_rounded),
                           onPressed: () => Navigator.of(dialogContext).pop(),
                           style: IconButton.styleFrom(
-                            backgroundColor: cs.surfaceContainerHighest.withValues(alpha: 0.5),
+                            backgroundColor: cs.surfaceContainerHighest
+                                .withValues(alpha: 0.5),
                           ),
                         ),
                       ],
@@ -124,13 +126,16 @@ class ProfilePage extends ConsumerWidget {
                                   shape: BoxShape.circle,
                                   color: cs.primaryContainer,
                                   border: Border.all(
-                                    color: isSelected ? cs.primary : Colors.transparent,
+                                    color: isSelected
+                                        ? cs.primary
+                                        : Colors.transparent,
                                     width: isSelected ? 3.5 : 1,
                                   ),
                                   boxShadow: isSelected
                                       ? [
                                           BoxShadow(
-                                            color: cs.primary.withValues(alpha: 0.4),
+                                            color: cs.primary
+                                                .withValues(alpha: 0.4),
                                             blurRadius: 14,
                                             spreadRadius: 2,
                                           )
@@ -156,7 +161,8 @@ class ProfilePage extends ConsumerWidget {
                                           decoration: BoxDecoration(
                                             color: cs.primary,
                                             shape: BoxShape.circle,
-                                            border: Border.all(color: cs.surface, width: 2),
+                                            border: Border.all(
+                                                color: cs.surface, width: 2),
                                           ),
                                           child: Icon(
                                             Icons.check_rounded,
@@ -172,8 +178,12 @@ class ProfilePage extends ConsumerWidget {
                               Text(
                                 label,
                                 style: theme.textTheme.labelMedium?.copyWith(
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                  color: isSelected ? cs.primary : cs.onSurfaceVariant,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: isSelected
+                                      ? cs.primary
+                                      : cs.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -192,7 +202,8 @@ class ProfilePage extends ConsumerWidget {
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                                borderRadius: BorderRadius.circular(
+                                    AppDimensions.radiusMD),
                               ),
                               side: BorderSide(color: cs.outlineVariant),
                             ),
@@ -215,15 +226,19 @@ class ProfilePage extends ConsumerWidget {
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               elevation: 2,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                                borderRadius: BorderRadius.circular(
+                                    AppDimensions.radiusMD),
                               ),
                             ),
                             onPressed: () {
-                              ref.read(authViewModelProvider.notifier).updateAvatar(selected);
+                              ref
+                                  .read(authViewModelProvider.notifier)
+                                  .updateAvatar(selected);
                               Navigator.of(dialogContext).pop();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Foto de perfil atualizada com sucesso!'),
+                                  content: Text(
+                                      'Foto de perfil atualizada com sucesso!'),
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );
@@ -264,7 +279,8 @@ class ProfilePage extends ConsumerWidget {
       appBar: AppBar(
         title: Text(
           'Perfil',
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+          style:
+              theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
         ),
         centerTitle: false,
         backgroundColor: cs.surface,
@@ -315,11 +331,14 @@ class ProfilePage extends ConsumerWidget {
                           child: Image.asset(
                             currentUser.avatarPath,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Container(
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
                               color: cs.primary.withValues(alpha: 0.1),
                               child: Center(
                                 child: Icon(
-                                  currentUser.isAdmin ? Icons.admin_panel_settings_rounded : Icons.person_rounded,
+                                  currentUser.isAdmin
+                                      ? Icons.admin_panel_settings_rounded
+                                      : Icons.person_rounded,
                                   color: cs.primary,
                                   size: 60,
                                 ),
@@ -348,9 +367,7 @@ class ProfilePage extends ConsumerWidget {
                     ],
                   ),
                 ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
-                
                 const Gap(AppDimensions.spaceLG),
-                
                 Text(
                   currentUser.name,
                   style: theme.textTheme.headlineSmall?.copyWith(
@@ -358,21 +375,24 @@ class ProfilePage extends ConsumerWidget {
                     letterSpacing: -0.5,
                   ),
                 ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.2),
-                
                 const Gap(AppDimensions.spaceXXS),
-                
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   decoration: BoxDecoration(
                     color: cs.primaryContainer,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
-                    border: Border.all(color: cs.primary.withValues(alpha: 0.3)),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.radiusFull),
+                    border:
+                        Border.all(color: cs.primary.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        currentUser.isAdmin ? Icons.admin_panel_settings_rounded : Icons.badge_rounded,
+                        currentUser.isAdmin
+                            ? Icons.admin_panel_settings_rounded
+                            : Icons.badge_rounded,
                         size: 14,
                         color: cs.onPrimaryContainer,
                       ),
@@ -402,12 +422,13 @@ class ProfilePage extends ConsumerWidget {
             ),
           ).animate().fadeIn(delay: 300.ms),
           const Gap(AppDimensions.spaceSM),
-          
+
           Container(
             decoration: BoxDecoration(
               color: cs.surface,
               borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-              border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+              border:
+                  Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
               boxShadow: [
                 BoxShadow(
                   color: cs.shadow,
@@ -423,7 +444,8 @@ class ProfilePage extends ConsumerWidget {
                   title: 'Usuário',
                   value: currentUser.username,
                 ),
-                Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
+                Divider(
+                    height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
                 _PremiumInfoTile(
                   icon: Icons.badge_outlined,
                   title: 'Perfil',
@@ -449,7 +471,8 @@ class ProfilePage extends ConsumerWidget {
             decoration: BoxDecoration(
               color: cs.surface,
               borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-              border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+              border:
+                  Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
               boxShadow: [
                 BoxShadow(
                   color: cs.shadow,
@@ -466,7 +489,9 @@ class ProfilePage extends ConsumerWidget {
                     title: 'Gerenciar Funcionários',
                     onTap: () => context.push('/employees'),
                   ),
-                  Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
+                  Divider(
+                      height: 1,
+                      color: cs.outlineVariant.withValues(alpha: 0.5)),
                 ],
                 _PremiumActionTile(
                   icon: Icons.add_to_home_screen_rounded,
@@ -478,7 +503,8 @@ class ProfilePage extends ConsumerWidget {
                     }
                   },
                 ),
-                Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
+                Divider(
+                    height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
                 _ThemeToggleTile(ref: ref),
               ],
             ),
@@ -497,7 +523,8 @@ class ProfilePage extends ConsumerWidget {
                       context: context,
                       builder: (ctx) => AlertDialog(
                         title: const Text('Sair da conta'),
-                        content: const Text('Deseja realmente sair do aplicativo?'),
+                        content:
+                            const Text('Deseja realmente sair do aplicativo?'),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, false),
@@ -527,7 +554,7 @@ class ProfilePage extends ConsumerWidget {
 
           Center(
             child: Text(
-              'Compry v1.1.0',
+              'Compry v${AppConstants.appVersion}',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: cs.onSurfaceVariant.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w600,
@@ -584,7 +611,8 @@ class ProfilePage extends ConsumerWidget {
                         color: cs.primaryContainer,
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: Icon(Icons.add_to_home_screen_rounded, color: cs.primary, size: 28),
+                      child: Icon(Icons.add_to_home_screen_rounded,
+                          color: cs.primary, size: 28),
                     ),
                     const Gap(16),
                     Expanded(
@@ -593,11 +621,13 @@ class ProfilePage extends ConsumerWidget {
                         children: [
                           Text(
                             'Instalar no iPhone / iPad',
-                            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                            style: theme.textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.w800),
                           ),
                           Text(
                             'Safari, Chrome e outros navegadores',
-                            style: theme.textTheme.bodySmall?.copyWith(color: cs.primary, fontWeight: FontWeight.w700),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                                color: cs.primary, fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -612,14 +642,16 @@ class ProfilePage extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: cs.surfaceContainerHighest.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+                    border: Border.all(
+                        color: cs.outlineVariant.withValues(alpha: 0.5)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'A Apple não permite instalação automática no iPhone. Para instalar:',
-                        style: theme.textTheme.bodyMedium?.copyWith(height: 1.4, color: cs.onSurface),
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(height: 1.4, color: cs.onSurface),
                       ),
                       const Gap(12),
                       _InstallStep(
@@ -635,12 +667,14 @@ class ProfilePage extends ConsumerWidget {
                         theme: theme,
                         emoji: '⋯',
                         label: 'No Chrome',
-                        instruction: 'Toque em Compartilhar (topo) ou menu (...)',
+                        instruction:
+                            'Toque em Compartilhar (topo) ou menu (...)',
                       ),
                       const Gap(12),
                       Row(
                         children: [
-                          Icon(Icons.add_box_rounded, color: cs.primary, size: 18),
+                          Icon(Icons.add_box_rounded,
+                              color: cs.primary, size: 18),
                           const Gap(6),
                           Expanded(
                             child: Text(
@@ -665,9 +699,11 @@ class ProfilePage extends ConsumerWidget {
                     onPressed: () => Navigator.pop(ctx),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text('Entendi, vou adicionar', style: TextStyle(fontWeight: FontWeight.w700)),
+                    child: const Text('Entendi, vou adicionar',
+                        style: TextStyle(fontWeight: FontWeight.w700)),
                   ),
                 ),
               ],
@@ -715,11 +751,13 @@ class _InstallStep extends StatelessWidget {
         Expanded(
           child: RichText(
             text: TextSpan(
-              style: theme.textTheme.bodyMedium?.copyWith(height: 1.4, color: cs.onSurface),
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(height: 1.4, color: cs.onSurface),
               children: [
                 TextSpan(
                   text: '$label: ',
-                  style: TextStyle(fontWeight: FontWeight.w700, color: cs.onSurface),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700, color: cs.onSurface),
                 ),
                 TextSpan(text: instruction),
               ],
@@ -749,7 +787,7 @@ class _PremiumInfoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -774,16 +812,16 @@ class _PremiumInfoTile extends StatelessWidget {
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
               const Spacer(),
               Text(
                 value,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: cs.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
-                ),
+                      color: cs.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                    ),
               ),
             ],
           ),
@@ -837,8 +875,8 @@ class _ThemeToggleTile extends StatelessWidget {
               Text(
                 'Tema Escuro',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
               const Spacer(),
               Switch(
@@ -872,7 +910,7 @@ class _PremiumActionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -898,8 +936,8 @@ class _PremiumActionTile extends StatelessWidget {
                 child: Text(
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
               ),
               Icon(Icons.chevron_right_rounded, color: cs.onSurfaceVariant),

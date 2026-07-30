@@ -105281,7 +105281,7 @@ m=A.fq(A.dH(A.da(A.y_(!0,B.LM,"btn-logout",!1,"Sair da Conta",a4 instanceof A.ud
 r=r.ax
 if(r==null)r=a0
 else{i=a6.rx
-r=r.dL((i==null?a6.k3:i).ao(0.7),B.aj)}return A.ip(q,s,A.aog(A.b([o,B.fw,l,B.bN,k,B.d2,p,B.bN,j,B.fw,m,B.d3,A.dH(A.da(A.dO(A.aE("Compry v1.1.0",a0,a0,a0,r,a0,a0),a0,a0),a0,a0,a0),a0,A.bc(8e5,0),a0)],n),B.q0,a0,!1),a0,!1,a0,a0)},
+r=r.dL((i==null?a6.k3:i).ao(0.7),B.aj)}return A.ip(q,s,A.aog(A.b([o,B.fw,l,B.bN,k,B.d2,p,B.bN,j,B.fw,m,B.d3,A.dH(A.da(A.dO(A.aE("Compry v1.1.1",a0,a0,a0,r,a0,a0),a0,a0),a0,a0,a0),a0,A.bc(8e5,0),a0)],n),B.q0,a0,!1),a0,!1,a0,a0)},
 aq2(a){var s,r,q,p,o,n,m,l,k,j,i=null,h=A.F(a),g=h.ax,f=A.dZ(a,!1)
 A.hr(a,B.ba,t.F).toString
 s=f.c
