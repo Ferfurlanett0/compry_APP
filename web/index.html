@@ -26,7 +26,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Compry">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
@@ -38,7 +38,8 @@
   <style>
     html, body {
       width: 100%;
-      height: 100%;
+      height: 100vh;
+      height: 100dvh;
       margin: 0;
       padding: 0;
       overflow: hidden;
@@ -123,9 +124,6 @@
       window.compryPwaDiagnostic('first-frame-ready');
       document.documentElement.dataset.compryReady = 'true';
       window.compryHideAppLoading();
-      requestAnimationFrame(function() {
-        window.dispatchEvent(new Event('resize'));
-      });
     };
 
     window.compryAppLoadingFailed = function(error) {
@@ -188,18 +186,10 @@
 
     window.addEventListener('pageshow', function(event) {
       window.compryPwaDiagnostic('pageshow', { persisted: event.persisted });
-      requestAnimationFrame(function() {
-        window.dispatchEvent(new Event('resize'));
-      });
     });
 
     document.addEventListener('visibilitychange', function() {
       window.compryPwaDiagnostic('visibilitychange');
-      if (document.visibilityState === 'visible') {
-        requestAnimationFrame(function() {
-          window.dispatchEvent(new Event('resize'));
-        });
-      }
     });
 
     window.addEventListener('pointerdown', function(event) {
