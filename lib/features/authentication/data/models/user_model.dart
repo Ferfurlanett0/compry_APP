@@ -37,12 +37,17 @@ class UserModel extends HiveObject {
   @HiveField(7)
   final String? avatar;
 
+  /// Stored in Firestore for Firebase Authentication operations. Older Hive
+  /// records do not contain it, so the field intentionally remains optional.
+  final String? email;
+
   UserModel({
     required this.id,
     required this.name,
     required this.username,
     required this.role,
     this.avatar,
+    this.email,
     required this.active,
     required this.createdAt,
     required this.updatedAt,
@@ -58,6 +63,7 @@ class UserModel extends HiveObject {
       username: data['username'] as String? ?? '',
       role: data['role'] as String? ?? AppRoles.employee,
       avatar: data['avatar'] as String?,
+      email: data['email'] as String?,
       active: data['active'] as bool? ?? true,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
@@ -71,6 +77,7 @@ class UserModel extends HiveObject {
       username: data['username'] as String? ?? '',
       role: data['role'] as String? ?? AppRoles.employee,
       avatar: data['avatar'] as String?,
+      email: data['email'] as String?,
       active: data['active'] as bool? ?? true,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
@@ -82,6 +89,7 @@ class UserModel extends HiveObject {
         'username': username,
         'role': role,
         if (avatar != null) 'avatar': avatar,
+        if (email != null) 'email': email,
         'active': active,
         'createdAt': Timestamp.fromDate(createdAt),
         'updatedAt': Timestamp.fromDate(updatedAt),
@@ -115,7 +123,8 @@ class UserModel extends HiveObject {
     if (avatar != null && avatar!.isNotEmpty) {
       return 'assets/images/$avatar.png';
     }
-    if (role == AppRoles.admin || role == 'ADMIN') return 'assets/images/Perfil administrador.png';
+    if (role == AppRoles.admin || role == 'ADMIN')
+      return 'assets/images/Perfil administrador.png';
     return 'assets/images/Perfil churrasqueiro.png';
   }
 
@@ -129,15 +138,23 @@ class UserModel extends HiveObject {
     bool? active,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? avatar,
+    String? email,
   }) {
     return UserModel(
       id: id ?? this.id,
       name: name ?? this.name,
       username: username ?? this.username,
       role: role ?? this.role,
+      avatar: avatar ?? this.avatar,
+      email: email ?? this.email,
       active: active ?? this.active,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
+
+  String get authEmail => email?.trim().isNotEmpty == true
+      ? email!.trim()
+      : '$username@compry.com.br';
 }

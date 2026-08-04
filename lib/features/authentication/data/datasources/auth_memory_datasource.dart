@@ -133,7 +133,17 @@ class AuthMemoryDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> updateAvatar({required String userId, required String avatar}) async {
+  Future<void> deleteEmployee({
+    required String userId,
+    required String email,
+    required String password,
+  }) async {
+    _logger.i('[DEMO] deleteEmployee($userId, $email)');
+  }
+
+  @override
+  Future<void> updateAvatar(
+      {required String userId, required String avatar}) async {
     _logger.i('[DEMO] updateAvatar($userId, $avatar)');
   }
 

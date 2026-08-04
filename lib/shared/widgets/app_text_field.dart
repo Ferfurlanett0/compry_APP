@@ -21,6 +21,7 @@ class AppTextField extends StatefulWidget {
   final bool enabled;
   final bool readOnly;
   final bool autocorrect;
+  final Iterable<String>? autofillHints;
   final int? maxLines;
   final int? maxLength;
   final List<TextInputFormatter>? inputFormatters;
@@ -45,6 +46,7 @@ class AppTextField extends StatefulWidget {
     this.enabled = true,
     this.readOnly = false,
     this.autocorrect = true,
+    this.autofillHints,
     this.maxLines = 1,
     this.maxLength,
     this.inputFormatters,
@@ -117,6 +119,7 @@ class _AppTextFieldState extends State<AppTextField> {
         enabled: widget.enabled,
         readOnly: widget.readOnly,
         autocorrect: widget.autocorrect,
+        autofillHints: widget.autofillHints,
         maxLines: widget.maxLines,
         maxLength: widget.maxLength,
         inputFormatters: widget.inputFormatters,
@@ -128,7 +131,9 @@ class _AppTextFieldState extends State<AppTextField> {
         decoration: InputDecoration(
           labelText: widget.label,
           labelStyle: theme.textTheme.bodyMedium?.copyWith(
-            color: _isFocused ? cs.primary : cs.onSurfaceVariant.withValues(alpha: 0.8),
+            color: _isFocused
+                ? cs.primary
+                : cs.onSurfaceVariant.withValues(alpha: 0.8),
             fontWeight: _isFocused ? FontWeight.w600 : FontWeight.w400,
           ),
           hintText: widget.hint,
@@ -139,7 +144,9 @@ class _AppTextFieldState extends State<AppTextField> {
                   child: Icon(
                     widget.prefixIcon,
                     size: AppDimensions.iconMD,
-                    color: _isFocused ? cs.primary : cs.onSurfaceVariant.withValues(alpha: 0.7),
+                    color: _isFocused
+                        ? cs.primary
+                        : cs.onSurfaceVariant.withValues(alpha: 0.7),
                   ),
                 )
               : null,
@@ -147,14 +154,18 @@ class _AppTextFieldState extends State<AppTextField> {
           counterText: '',
           filled: true,
           fillColor: Colors.transparent,
-          contentPadding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceMD, vertical: AppDimensions.spaceMD),
+          contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spaceMD,
+              vertical: AppDimensions.spaceMD),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-            borderSide: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.5)),
+            borderSide:
+                BorderSide(color: cs.outlineVariant.withValues(alpha: 0.5)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-            borderSide: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.5)),
+            borderSide:
+                BorderSide(color: cs.outlineVariant.withValues(alpha: 0.5)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
@@ -256,21 +267,27 @@ class _AppTextAreaState extends State<AppTextArea> {
         decoration: InputDecoration(
           labelText: widget.label,
           labelStyle: theme.textTheme.bodyMedium?.copyWith(
-            color: _isFocused ? cs.primary : cs.onSurfaceVariant.withValues(alpha: 0.8),
+            color: _isFocused
+                ? cs.primary
+                : cs.onSurfaceVariant.withValues(alpha: 0.8),
             fontWeight: _isFocused ? FontWeight.w600 : FontWeight.w400,
           ),
           hintText: widget.hint,
           alignLabelWithHint: true,
           filled: true,
           fillColor: Colors.transparent,
-          contentPadding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceMD, vertical: AppDimensions.spaceMD),
+          contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spaceMD,
+              vertical: AppDimensions.spaceMD),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-            borderSide: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.5)),
+            borderSide:
+                BorderSide(color: cs.outlineVariant.withValues(alpha: 0.5)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-            borderSide: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.5)),
+            borderSide:
+                BorderSide(color: cs.outlineVariant.withValues(alpha: 0.5)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusMD),

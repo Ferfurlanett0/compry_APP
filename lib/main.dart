@@ -17,6 +17,7 @@ import 'core/config/app_router.dart';
 import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/fcm_service.dart';
+import 'core/services/autofill_service.dart';
 import 'core/services/web_app_lifecycle_service.dart';
 import 'features/authentication/data/models/user_model.dart';
 import 'features/shopping_lists/data/models/shopping_item_model.dart';
@@ -70,6 +71,8 @@ void main() async {
   await Hive.openBox<ShoppingItemModel>(AppConstants.hiveBoxItems);
   await Hive.openBox<OfflineOperationModel>(AppConstants.hiveBoxOfflineQueue);
   await Hive.openBox(AppConstants.hiveBoxSettings);
+
+  await AutofillService.configurePlatform();
 
   await _resetRestoredAndroidSession();
 

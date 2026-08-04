@@ -3,11 +3,13 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 
+import '../../../../core/services/autofill_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../viewmodels/auth_viewmodel.dart';
@@ -25,9 +27,34 @@ class LoginPage extends ConsumerStatefulWidget {
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController(text: 'edemar');
-  final _passwordController = TextEditingController(text: 'admin123');
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  late final bool _allowAutofill;
+  bool _usernameTouched = false;
+  bool _passwordTouched = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _allowAutofill = AutofillService.hasCompletedManualLogin;
+    if (!_allowAutofill) {
+      _usernameController.addListener(_discardRestoredUsername);
+      _passwordController.addListener(_discardRestoredPassword);
+    }
+  }
+
+  void _discardRestoredUsername() {
+    if (!_usernameTouched && _usernameController.text.isNotEmpty) {
+      _usernameController.clear();
+    }
+  }
+
+  void _discardRestoredPassword() {
+    if (!_passwordTouched && _passwordController.text.isNotEmpty) {
+      _passwordController.clear();
+    }
+  }
 
   @override
   void dispose() {
@@ -65,6 +92,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ),
           );
         ref.read(authViewModelProvider.notifier).clearError();
+      } else if (next is AuthAuthenticated ||
+          next is AuthRequiresPasswordChange) {
+        if (!_allowAutofill) {
+          AutofillService.markManualLoginCompleted();
+          TextInput.finishAutofillContext(shouldSave: true);
+        }
       }
     });
 
@@ -192,97 +225,106 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ],
       ),
       padding: const EdgeInsets.all(AppDimensions.spaceXL),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Entrar',
-              style: theme.textTheme.headlineMedium,
-            ),
-            const Gap(AppDimensions.spaceXS),
-            Text(
-              'Acesse sua conta para continuar',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+      child: AutofillGroup(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Entrar',
+                style: theme.textTheme.headlineMedium,
               ),
-            ),
-            const Gap(AppDimensions.spaceXL),
-
-            // Username field
-            AppTextField(
-              id: 'login-username',
-              controller: _usernameController,
-              label: 'Usuário',
-              hint: 'Digite seu nome de usuário',
-              prefixIcon: Icons.person_outline_rounded,
-              textInputAction: TextInputAction.next,
-              keyboardType: TextInputType.text,
-              autocorrect: false,
-              enabled: !isLoading,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Usuário é obrigatório';
-                }
-                return null;
-              },
-            ),
-
-            const Gap(AppDimensions.spaceMD),
-
-            // Password field
-            AppTextField(
-              id: 'login-password',
-              controller: _passwordController,
-              label: 'Senha',
-              hint: 'Digite sua senha',
-              prefixIcon: Icons.lock_outline_rounded,
-              obscureText: _obscurePassword,
-              textInputAction: TextInputAction.done,
-              enabled: !isLoading,
-              onSubmitted: (_) => _handleLogin(),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePassword
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                ),
-                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Senha é obrigatória';
-                }
-                return null;
-              },
-            ),
-
-            const Gap(AppDimensions.spaceXL),
-
-            // Login button
-            AppButton(
-              id: 'btn-login',
-              label: 'Entrar',
-              onPressed: isLoading ? null : _handleLogin,
-              isLoading: isLoading,
-              icon: Icons.login_rounded,
-            ),
-
-            const Gap(AppDimensions.spaceMD),
-
-            // Info text  no sign up button (RG-001)
-            Center(
-              child: Text(
-                'Acesso restrito a usuários cadastrados',
-                style: theme.textTheme.bodySmall?.copyWith(
+              const Gap(AppDimensions.spaceXS),
+              Text(
+                'Acesse sua conta para continuar',
+                style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
-                textAlign: TextAlign.center,
               ),
-            ),
-          ],
+              const Gap(AppDimensions.spaceXL),
+
+              // Username field
+              AppTextField(
+                id: 'login-username',
+                controller: _usernameController,
+                label: 'Usuário',
+                hint: 'Digite seu nome de usuário',
+                prefixIcon: Icons.person_outline_rounded,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.text,
+                autocorrect: false,
+                onTap: () => _usernameTouched = true,
+                autofillHints:
+                    _allowAutofill ? const [AutofillHints.username] : const [],
+                enabled: !isLoading,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Usuário é obrigatório';
+                  }
+                  return null;
+                },
+              ),
+
+              const Gap(AppDimensions.spaceMD),
+
+              // Password field
+              AppTextField(
+                id: 'login-password',
+                controller: _passwordController,
+                label: 'Senha',
+                hint: 'Digite sua senha',
+                prefixIcon: Icons.lock_outline_rounded,
+                obscureText: _obscurePassword,
+                autofillHints:
+                    _allowAutofill ? const [AutofillHints.password] : const [],
+                textInputAction: TextInputAction.done,
+                enabled: !isLoading,
+                onTap: () => _passwordTouched = true,
+                onSubmitted: (_) => _handleLogin(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                  ),
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Senha é obrigatória';
+                  }
+                  return null;
+                },
+              ),
+
+              const Gap(AppDimensions.spaceXL),
+
+              // Login button
+              AppButton(
+                id: 'btn-login',
+                label: 'Entrar',
+                onPressed: isLoading ? null : _handleLogin,
+                isLoading: isLoading,
+                icon: Icons.login_rounded,
+              ),
+
+              const Gap(AppDimensions.spaceMD),
+
+              // Info text  no sign up button (RG-001)
+              Center(
+                child: Text(
+                  'Acesso restrito a usuários cadastrados',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

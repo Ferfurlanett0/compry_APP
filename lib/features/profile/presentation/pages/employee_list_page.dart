@@ -1,11 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import '../../../../core/theme/app_dimensions.dart';
-import '../../../../core/theme/app_dimensions.dart';
+import '../../../../core/errors/failures.dart';
 import '../../../authentication/data/models/user_model.dart';
 import '../../../../core/config/providers.dart';
 
@@ -13,17 +12,15 @@ import '../../../authentication/presentation/viewmodels/auth_viewmodel.dart';
 import '../widgets/create_user_dialog.dart';
 
 // 1. Definição do StreamProvider que busca os usuários que não são admin
-final employeesStreamProvider = StreamProvider.autoDispose<List<UserModel>>((ref) {
+final employeesStreamProvider =
+    StreamProvider.autoDispose<List<UserModel>>((ref) {
   final firestore = ref.watch(firestoreProvider);
-  return firestore
-      .collection('users')
-      .snapshots()
-      .map((snapshot) {
-        return snapshot.docs
-            .map((doc) => UserModel.fromMap(doc.data(), doc.id))
-            .where((user) => user.role != 'ADMIN' && user.role != 'admin')
-            .toList();
-      });
+  return firestore.collection('users').snapshots().map((snapshot) {
+    return snapshot.docs
+        .map((doc) => UserModel.fromMap(doc.data(), doc.id))
+        .where((user) => user.role != 'ADMIN' && user.role != 'admin')
+        .toList();
+  });
 });
 
 class EmployeeListPage extends ConsumerWidget {
@@ -40,16 +37,18 @@ class EmployeeListPage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Funcionários'),
       ),
-      floatingActionButton: currentUser?.isAdmin == true ? FloatingActionButton.extended(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (_) => const CreateUserDialog(),
-          );
-        },
-        icon: const Icon(Icons.person_add),
-        label: const Text('Novo Usuário'),
-      ) : null,
+      floatingActionButton: currentUser?.isAdmin == true
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => const CreateUserDialog(),
+                );
+              },
+              icon: const Icon(Icons.person_add),
+              label: const Text('Novo Usuário'),
+            )
+          : null,
       body: employeesAsync.when(
         data: (employees) {
           if (employees.isEmpty) {
@@ -57,11 +56,14 @@ class EmployeeListPage extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.people_outline_rounded, size: 64, color: cs.onSurfaceVariant.withValues(alpha: 0.5)),
+                  Icon(Icons.people_outline_rounded,
+                      size: 64,
+                      color: cs.onSurfaceVariant.withValues(alpha: 0.5)),
                   const Gap(AppDimensions.spaceMD),
                   Text(
                     'Nenhum funcionário cadastrado.',
-                    style: theme.textTheme.bodyLarge?.copyWith(color: cs.onSurfaceVariant),
+                    style: theme.textTheme.bodyLarge
+                        ?.copyWith(color: cs.onSurfaceVariant),
                   ),
                 ],
               ),
@@ -80,14 +82,15 @@ class EmployeeListPage extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(
-          child: Text('Erro ao carregar funcionários', style: TextStyle(color: cs.error)),
+          child: Text('Erro ao carregar funcionários',
+              style: TextStyle(color: cs.error)),
         ),
       ),
     );
   }
 }
 
-class _EmployeeCard extends StatelessWidget {
+class _EmployeeCard extends ConsumerWidget {
   final UserModel employee;
 
   const _EmployeeCard({required this.employee});
@@ -97,7 +100,7 @@ class _EmployeeCard extends StatelessWidget {
       // Find the email for this employee. Typically we try the compry.app domain
       final email = '${employee.username}@compry.app'.toLowerCase();
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      
+
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -117,7 +120,7 @@ class _EmployeeCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
@@ -150,12 +153,13 @@ class _EmployeeCard extends StatelessWidget {
               child: Image.asset(
                 employee.avatarPath,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Icon(Icons.person, color: cs.primary),
+                errorBuilder: (_, __, ___) =>
+                    Icon(Icons.person, color: cs.primary),
               ),
             ),
           ),
           const Gap(AppDimensions.spaceMD),
-          
+
           // Info
           Expanded(
             child: Column(
@@ -178,7 +182,7 @@ class _EmployeeCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Action Buttons
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -212,7 +216,7 @@ class _EmployeeCard extends StatelessWidget {
                   color: Colors.transparent,
                   child: InkWell(
                     borderRadius: BorderRadius.circular(8),
-                    onTap: () => _deleteEmployee(context),
+                    onTap: () => _deleteEmployee(context, ref),
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -235,15 +239,33 @@ class _EmployeeCard extends StatelessWidget {
     );
   }
 
-  Future<void> _deleteEmployee(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
+  Future<void> _deleteEmployee(BuildContext context, WidgetRef ref) async {
+    final passwordController = TextEditingController();
+    final password = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Excluir Usuário'),
-        content: Text('Tem certeza que deseja excluir o perfil de ${employee.name} (@${employee.username})?\n\nEsta ação removerá o usuário do gerenciamento.'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+                'Tem certeza que deseja excluir ${employee.name} (@${employee.username})? A conta será removida permanentemente.'),
+            const Gap(AppDimensions.spaceMD),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: 'Senha do funcionário',
+                hintText: 'Confirme a senha para excluir',
+              ),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
@@ -251,26 +273,47 @@ class _EmployeeCard extends StatelessWidget {
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.of(context).pop(passwordController.text),
             child: const Text('Excluir'),
           ),
         ],
       ),
     );
+    passwordController.dispose();
 
-    if (confirmed == true && context.mounted) {
+    if (password != null && context.mounted) {
+      if (password.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Informe a senha do funcionário.')),
+        );
+        return;
+      }
       try {
-        await FirebaseFirestore.instance.collection('users').doc(employee.id).delete();
+        await ref.read(authRepositoryProvider).deleteEmployee(
+              userId: employee.id,
+              email: employee.authEmail,
+              password: password,
+            );
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Usuário ${employee.name} excluído com sucesso.'),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
-      } catch (e) {
+      } on Failure catch (e) {
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao excluir usuário: $e'),
+            content: Text(e.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      } catch (e) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Erro inesperado ao excluir o usuário.'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

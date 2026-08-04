@@ -112,7 +112,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     final hasConnection = await _connectivity.hasConnection;
     if (!hasConnection) {
-      throw const NetworkFailure(message: 'Sem conexão. Conecte-se à internet para criar um usuário.');
+      throw const NetworkFailure(
+          message: 'Sem conexão. Conecte-se à internet para criar um usuário.');
     }
     await _remote.createUserAsAdmin(
       username: username,
@@ -124,7 +125,27 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> updateAvatar({required String userId, required String avatar}) async {
+  Future<void> deleteEmployee({
+    required String userId,
+    required String email,
+    required String password,
+  }) async {
+    final hasConnection = await _connectivity.hasConnection;
+    if (!hasConnection) {
+      throw const NetworkFailure(
+          message:
+              'Sem conexão. Conecte-se à internet para excluir o usuário.');
+    }
+    await _remote.deleteEmployee(
+      userId: userId,
+      email: email,
+      password: password,
+    );
+  }
+
+  @override
+  Future<void> updateAvatar(
+      {required String userId, required String avatar}) async {
     return await _remote.updateAvatar(userId: userId, avatar: avatar);
   }
 }

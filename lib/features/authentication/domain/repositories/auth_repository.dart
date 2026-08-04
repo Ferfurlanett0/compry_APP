@@ -35,5 +35,10 @@ abstract interface class AuthRepository {
     required String role,
     String? avatar,
   });
+  Future<void> deleteEmployee({
+    required String userId,
+    required String email,
+    required String password,
+  });
   Future<void> updateAvatar({required String userId, required String avatar});
 }

@@ -26,6 +26,11 @@ abstract interface class AuthRemoteDataSource {
     required String role,
     String? avatar,
   });
+  Future<void> deleteEmployee({
+    required String userId,
+    required String email,
+    required String password,
+  });
   Future<void> updateAvatar({required String userId, required String avatar});
 }
 
@@ -160,6 +165,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (!doc.exists) return null;
       return UserModel.fromFirestore(doc);
+    } on AuthFailure {
+      rethrow;
     } catch (e) {
       _logger.e('Erro ao buscar usuário atual: $e');
       return null;
@@ -198,28 +205,46 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String role,
     String? avatar,
   }) async {
+    final cleanUsername = username.trim().toLowerCase();
+    final email = '$cleanUsername@compry.com.br';
+
     try {
-      final email = '$username@compry.com.br'.toLowerCase();
+      String uid;
+      try {
+        uid = await _createAuthAccount(email: email, password: password);
+      } on DioException catch (e) {
+        final message = _firebaseRestError(e);
+        if (!message.contains('EMAIL_EXISTS')) rethrow;
 
-      // Uses Firebase REST API to create user without signing out the current Admin
-      final apiKey = Firebase.app().options.apiKey;
-      final url =
-          'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey';
+        // A previous app version deleted only Firestore. If no profile exists,
+        // remove that orphaned Auth identity with the password supplied by the
+        // administrator and then create a clean account.
+        final existingProfile = await _firestore
+            .collection(AppConstants.colUsers)
+            .where('username', isEqualTo: cleanUsername)
+            .limit(1)
+            .get();
+        if (existingProfile.docs.isNotEmpty) {
+          throw const AuthFailure(
+              message: 'Este nome de usuário já está em uso.');
+        }
 
-      final response = await Dio().post(
-        url,
-        data: {
-          'email': email,
-          'password': password,
-          'returnSecureToken': false,
-        },
-      );
-
-      final uid = response.data['localId'] as String;
+        try {
+          await _deleteAuthAccount(email: email, password: password);
+          uid = await _createAuthAccount(email: email, password: password);
+        } on DioException catch (cleanupError) {
+          _logger
+              .e('Falha ao remover conta órfã: ${cleanupError.response?.data}');
+          throw const AuthFailure(
+            message:
+                'Este usuário pertence a um cadastro antigo. Informe a mesma senha anterior para recriá-lo.',
+          );
+        }
+      }
 
       // Adiciona ao Firestore
       await _firestore.collection(AppConstants.colUsers).doc(uid).set({
-        'username': username.toLowerCase(),
+        'username': cleanUsername,
         'name': name,
         'email': email,
         'role': role,
@@ -231,9 +256,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       _logger.i(
           'Usuário $username criado com sucesso pelo Administrador via REST API.');
+    } on AuthFailure {
+      rethrow;
     } on DioException catch (e) {
       _logger.e('Erro ao criar usuário (REST API): ${e.response?.data}');
-      final message = e.response?.data?['error']?['message'] ?? '';
+      final message = _firebaseRestError(e);
       if (message.contains('EMAIL_EXISTS')) {
         throw AuthFailure(message: 'Este nome de usuário já está em uso.');
       } else if (message.contains('WEAK_PASSWORD')) {
@@ -247,6 +274,83 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw AuthFailure(
           message: 'Ocorreu um erro inesperado ao criar o usuário.');
     }
+  }
+
+  Future<String> _createAuthAccount({
+    required String email,
+    required String password,
+  }) async {
+    final apiKey = Firebase.app().options.apiKey;
+    final response = await Dio().post(
+      'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey',
+      data: {
+        'email': email,
+        'password': password,
+        'returnSecureToken': false,
+      },
+    );
+    return response.data['localId'] as String;
+  }
+
+  Future<String> _deleteAuthAccount({
+    required String email,
+    required String password,
+    String? expectedUserId,
+  }) async {
+    final apiKey = Firebase.app().options.apiKey;
+    final signInResponse = await Dio().post(
+      'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=$apiKey',
+      data: {
+        'email': email,
+        'password': password,
+        'returnSecureToken': true,
+      },
+    );
+    final idToken = signInResponse.data['idToken'] as String;
+    final localId = signInResponse.data['localId'] as String;
+    if (expectedUserId != null && localId != expectedUserId) {
+      throw const AuthFailure(
+          message: 'A conta autenticada não corresponde ao funcionário.');
+    }
+    await Dio().post(
+      'https://identitytoolkit.googleapis.com/v1/accounts:delete?key=$apiKey',
+      data: {'idToken': idToken},
+    );
+    return localId;
+  }
+
+  String _firebaseRestError(DioException error) =>
+      error.response?.data?['error']?['message']?.toString() ?? '';
+
+  @override
+  Future<void> deleteEmployee({
+    required String userId,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _deleteAuthAccount(
+        email: email,
+        password: password,
+        expectedUserId: userId,
+      );
+    } on DioException catch (e) {
+      final message = _firebaseRestError(e);
+      if (!message.contains('EMAIL_NOT_FOUND') &&
+          !message.contains('USER_NOT_FOUND')) {
+        if (message.contains('INVALID_LOGIN_CREDENTIALS') ||
+            message.contains('INVALID_PASSWORD')) {
+          throw const AuthFailure(message: 'Senha do funcionário incorreta.');
+        }
+        _logger
+            .e('Erro ao excluir conta do Firebase Auth: ${e.response?.data}');
+        throw const AuthFailure(
+            message: 'Não foi possível excluir a conta do funcionário.');
+      }
+    }
+
+    await _firestore.collection(AppConstants.colUsers).doc(userId).delete();
+    _logger.i('Funcionário $userId excluído do Auth e do Firestore.');
   }
 
   @override
