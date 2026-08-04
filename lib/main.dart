@@ -5,9 +5,12 @@ library;
 
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/config/app_router.dart';
@@ -48,13 +51,18 @@ void main() async {
   await Hive.initFlutter();
 
   // Register Hive adapters
-  if (!Hive.isAdapterRegistered(0)) Hive.registerAdapter(UserModelAdapter());
-  if (!Hive.isAdapterRegistered(1))
+  if (!Hive.isAdapterRegistered(0)) {
+    Hive.registerAdapter(UserModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(1)) {
     Hive.registerAdapter(ShoppingListModelAdapter());
-  if (!Hive.isAdapterRegistered(2))
+  }
+  if (!Hive.isAdapterRegistered(2)) {
     Hive.registerAdapter(ShoppingItemModelAdapter());
-  if (!Hive.isAdapterRegistered(3))
+  }
+  if (!Hive.isAdapterRegistered(3)) {
     Hive.registerAdapter(OfflineOperationModelAdapter());
+  }
 
   // Open Hive boxes
   await Hive.openBox<UserModel>(AppConstants.hiveBoxUsers);
@@ -62,6 +70,8 @@ void main() async {
   await Hive.openBox<ShoppingItemModel>(AppConstants.hiveBoxItems);
   await Hive.openBox<OfflineOperationModel>(AppConstants.hiveBoxOfflineQueue);
   await Hive.openBox(AppConstants.hiveBoxSettings);
+
+  await _resetRestoredAndroidSession();
 
   // ─── Sistema de UI ───────────────────────────────────────────────────────────
   SystemChrome.setSystemUIOverlayStyle(
@@ -88,6 +98,23 @@ void main() async {
     WebAppLifecycleService.markAppReady();
     unawaited(_initializeBackgroundServices(container));
   });
+}
+
+Future<void> _resetRestoredAndroidSession() async {
+  if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
+
+  const migrationKey = 'android_session_reset_v4';
+  final settings = Hive.box(AppConstants.hiveBoxSettings);
+  if (settings.get(migrationKey, defaultValue: false) == true) return;
+
+  try {
+    await FirebaseAuth.instance.signOut();
+    await const FlutterSecureStorage().deleteAll();
+    await Hive.box<UserModel>(AppConstants.hiveBoxUsers).clear();
+    await settings.put(migrationKey, true);
+  } catch (error) {
+    debugPrint('Não foi possível limpar a sessão Android restaurada: $error');
+  }
 }
 
 Future<void> _initializeBackgroundServices(ProviderContainer container) async {
