@@ -45,5 +45,14 @@ void main() {
       expect(storedEmailEmployee.authEmail, 'conta@dominio.com');
       expect(legacyEmployee.authEmail, 'legado@compry.com.br');
     });
+
+    test('orphaned authentication account does not block username reuse', () {
+      final source = File(
+        'lib/features/authentication/data/datasources/auth_remote_datasource.dart',
+      ).readAsStringSync();
+
+      expect(source, contains('+active@compry.com.br'));
+      expect(source, isNot(contains('Informe a mesma senha anterior')));
+    });
   });
 }
