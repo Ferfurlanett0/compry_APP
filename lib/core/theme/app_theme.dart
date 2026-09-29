@@ -4,7 +4,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 import 'app_dimensions.dart';
@@ -16,6 +15,7 @@ final class AppTheme {
   // ─── Light Theme ───────────────────────────────────────────────────────────
   static ThemeData get light => ThemeData(
         useMaterial3: true,
+        fontFamily: 'Roboto',
         brightness: Brightness.light,
         colorScheme: _lightColorScheme,
         textTheme: _buildTextTheme(AppColorsLight.textPrimary),
@@ -63,6 +63,7 @@ final class AppTheme {
   // ─── Dark Theme ────────────────────────────────────────────────────────────
   static ThemeData get dark => ThemeData(
         useMaterial3: true,
+        fontFamily: 'Roboto',
         brightness: Brightness.dark,
         colorScheme: _darkColorScheme,
         textTheme: _buildTextTheme(AppColorsDark.textPrimary),
@@ -181,10 +182,10 @@ final class AppTheme {
   // ─── Component Themes ──────────────────────────────────────────────────────
 
   static TextTheme _buildTextTheme(Color defaultColor) {
-    final base = GoogleFonts.interTextTheme().apply(
-      bodyColor: defaultColor,
-      displayColor: defaultColor,
-    );
+    final base = ThemeData(fontFamily: 'Roboto').textTheme.apply(
+          bodyColor: defaultColor,
+          displayColor: defaultColor,
+        );
     return base.copyWith(
       displayLarge: AppTextStyles.displayLarge.copyWith(color: defaultColor),
       displayMedium: AppTextStyles.displayMedium.copyWith(color: defaultColor),

@@ -13,11 +13,11 @@ abstract final class AppColorsLight {
   static const Color tertiary = Color(0xFFA85F00);
 
   // Surface hierarchy (5 levels for depth)
-  static const Color background = Color(0xFFF4F5F0);
+  static const Color background = Color(0xFFF5F7F2);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceContainer = Color(0xFFEEF1E9);
-  static const Color surfaceContainerLow = Color(0xFFF8F9F5);
-  static const Color surfaceContainerHigh = Color(0xFFE5E9E0);
+  static const Color surfaceContainer = Color(0xFFE9EEE6);
+  static const Color surfaceContainerLow = Color(0xFFFAFBF8);
+  static const Color surfaceContainerHigh = Color(0xFFDCE4DA);
   static const Color surfaceVariant = Color(0xFFE4F2E8);
 
   // Semantic
@@ -27,10 +27,10 @@ abstract final class AppColorsLight {
   static const Color info = Color(0xFF1565C0);
 
   // Text hierarchy
-  static const Color textPrimary = Color(0xFF182018);
-  static const Color textSecondary = Color(0xFF667066);
-  static const Color textTertiary = Color(0xFF899288);
-  static const Color textDisabled = Color(0xFFD1D5DB);
+  static const Color textPrimary = Color(0xFF131B14);
+  static const Color textSecondary = Color(0xFF4C584E);
+  static const Color textTertiary = Color(0xFF626E64);
+  static const Color textDisabled = Color(0xFFAEB7AC);
   static const Color textOnPrimary = Color(0xFFFFFFFF);
 
   // Priority colors — more saturated, distinct
@@ -51,9 +51,9 @@ abstract final class AppColorsLight {
   static const Color offlineText = Color(0xFF111827);
 
   // Borders & dividers
-  static const Color divider = Color(0xFFDDE2D9);
-  static const Color outline = Color(0xFFC8CFC4);
-  static const Color outlineVariant = Color(0xFFDDE2D9);
+  static const Color divider = Color(0xFFCBD4C8);
+  static const Color outline = Color(0xFFAEB9AC);
+  static const Color outlineVariant = Color(0xFFC5CFC2);
 
   // Shadows
   static const Color shadow = Color(0x0F000000);

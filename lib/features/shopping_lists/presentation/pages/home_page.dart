@@ -6,6 +6,7 @@ import '../../../../core/config/app_routes.dart';
 import '../../../../shared/widgets/compry_components.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/skeleton_loaders.dart';
+import '../../../authentication/domain/entities/user_entity.dart';
 import '../../../authentication/presentation/viewmodels/auth_viewmodel.dart';
 import '../viewmodels/home_viewmodel.dart';
 import '../widgets/list_card.dart';
@@ -27,16 +28,7 @@ class HomePage extends ConsumerWidget {
         title: CompryPageHeader(
           label: isAdmin ? 'Visão do responsável' : _todayLabel(),
           title: isAdmin ? 'Central de compras' : 'Minhas listas',
-          trailing: CircleAvatar(
-            radius: 21,
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-            child: Text(
-              _initials(user?.name ?? 'Compry'),
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-            ),
-          ),
+          trailing: _HomeAvatar(user: user),
         ),
       ),
       body: switch (state) {
@@ -52,11 +44,6 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  static String _initials(String value) {
-    final words = value.trim().split(RegExp(r'\s+'));
-    return words.take(2).map((word) => word[0]).join().toUpperCase();
-  }
-
   static String _todayLabel() {
     const weekdays = [
       'Segunda-feira',
@@ -69,6 +56,59 @@ class HomePage extends ConsumerWidget {
     ];
     final now = DateTime.now();
     return '${weekdays[now.weekday - 1]}, ${now.day}';
+  }
+}
+
+class _HomeAvatar extends StatelessWidget {
+  final UserEntity? user;
+
+  const _HomeAvatar({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final avatarPath = user?.avatarPath;
+    final initials = user?.initials ?? 'C';
+
+    Widget fallback() => ColoredBox(
+          color: cs.primaryContainer,
+          child: Center(
+            child: Text(
+              initials,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: cs.onPrimaryContainer,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+          ),
+        );
+
+    return Semantics(
+      image: true,
+      label: 'Foto de perfil de ${user?.name ?? 'Compry'}',
+      child: Container(
+        width: 48,
+        height: 48,
+        padding: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: cs.surface,
+          border: Border.all(
+            color: cs.primary.withValues(alpha: 0.28),
+            width: 1.5,
+          ),
+        ),
+        child: ClipOval(
+          child: avatarPath == null
+              ? fallback()
+              : Image.asset(
+                  avatarPath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => fallback(),
+                ),
+        ),
+      ),
+    );
   }
 }
 

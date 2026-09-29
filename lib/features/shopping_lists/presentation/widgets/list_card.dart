@@ -27,6 +27,8 @@ class ListCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Material(
         color: cs.surface,
+        elevation: isDark ? 0 : 1,
+        shadowColor: const Color(0x24163E26),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
           side: BorderSide(color: cs.outlineVariant),

@@ -54,5 +54,15 @@ void main() {
       expect(source, contains('+active@compry.com.br'));
       expect(source, isNot(contains('Informe a mesma senha anterior')));
     });
+
+    test('home header renders the saved user avatar', () {
+      final source = File(
+        'lib/features/shopping_lists/presentation/pages/home_page.dart',
+      ).readAsStringSync();
+
+      expect(source, contains('user?.avatarPath'));
+      expect(source, contains('Image.asset('));
+      expect(source, contains('errorBuilder:'));
+    });
   });
 }
