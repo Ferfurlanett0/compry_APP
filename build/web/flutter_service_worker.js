@@ -23,7 +23,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "f56941647ca9c8baa41a3d23094eb12a
 "assets/assets/images/Perfil%2520garconete.png": "d0c5b942ff8fbb0928e2a751c53ba8a8",
 "assets/FontManifest.json": "e83983dce1b86afb382d68dd3d139de5",
 "assets/fonts/MaterialIcons-Regular.otf": "e7069dfd19b331be16bed984668fe080",
-"assets/NOTICES": "2b13b9958cede1af0082c7b8895e14cf",
+"assets/NOTICES": "a341887b3ff227b67429b757646832af",
 "assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8cb9b6ce",
 "canvaskit/canvaskit.js": "728b2d477d9b8c14593d4f9b82b484f3",
 "canvaskit/canvaskit.js.symbols": "bdcd3835edf8586b6d6edfce8749fb77",
@@ -47,7 +47,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "f56941647ca9c8baa41a3d23094eb12a
 "icons/icone_compry.svg": "91ea918914c70fd5254e77fdbf4eea53",
 "index.html": "1ebbb271d701e65956a6c9e85d741214",
 "/": "1ebbb271d701e65956a6c9e85d741214",
-"main.dart.js": "8707904030ab6f8401ef50288270853b",
+"main.dart.js": "8ef3c5385fe6ab7579e15e80be9fbda3",
 "manifest.json": "c6c1ee245d7201f2789c92ac9813ba02",
 "vercel.json": "d6b75ff95ef7100f9ff75e47eb367f2c",
 "version.json": "a00b2a99a7c6c86e5620f7be4294ec85"};
