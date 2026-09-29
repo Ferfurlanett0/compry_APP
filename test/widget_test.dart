@@ -2,6 +2,8 @@
 // Para executar: flutter test
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lista_pro/core/theme/app_colors.dart';
+import 'package:lista_pro/core/theme/app_theme.dart';
 import 'package:lista_pro/features/authentication/data/models/user_model.dart';
 
 import 'dart:io';
@@ -63,6 +65,25 @@ void main() {
       expect(source, contains('user?.avatarPath'));
       expect(source, contains('Image.asset('));
       expect(source, contains('errorBuilder:'));
+    });
+
+    test('confirmation dialogs keep readable colors in both themes', () {
+      expect(
+        AppTheme.light.dialogTheme.titleTextStyle?.color,
+        AppColorsLight.textPrimary,
+      );
+      expect(
+        AppTheme.light.dialogTheme.contentTextStyle?.color,
+        AppColorsLight.textSecondary,
+      );
+      expect(
+        AppTheme.dark.dialogTheme.titleTextStyle?.color,
+        AppColorsDark.textPrimary,
+      );
+      expect(
+        AppTheme.dark.dialogTheme.contentTextStyle?.color,
+        AppColorsDark.textSecondary,
+      );
     });
   });
 }

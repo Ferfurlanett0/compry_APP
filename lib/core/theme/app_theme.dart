@@ -44,7 +44,11 @@ final class AppTheme {
         listTileTheme:
             _listTileTheme(AppColorsLight.textPrimary, _lightColorScheme),
         snackBarTheme: _snackBarTheme(),
-        dialogTheme: _dialogTheme(AppColorsLight.surface),
+        dialogTheme: _dialogTheme(
+          backgroundColor: AppColorsLight.surface,
+          titleColor: AppColorsLight.textPrimary,
+          contentColor: AppColorsLight.textSecondary,
+        ),
         progressIndicatorTheme: ProgressIndicatorThemeData(
           color: AppColorsLight.primary,
           linearTrackColor: AppColorsLight.surfaceContainerHigh,
@@ -92,7 +96,11 @@ final class AppTheme {
         listTileTheme:
             _listTileTheme(AppColorsDark.textPrimary, _darkColorScheme),
         snackBarTheme: _snackBarTheme(),
-        dialogTheme: _dialogTheme(AppColorsDark.surfaceContainer),
+        dialogTheme: _dialogTheme(
+          backgroundColor: AppColorsDark.surfaceContainer,
+          titleColor: AppColorsDark.textPrimary,
+          contentColor: AppColorsDark.textSecondary,
+        ),
         progressIndicatorTheme: ProgressIndicatorThemeData(
           color: AppColorsDark.primary,
           linearTrackColor: AppColorsDark.surfaceContainerHigh,
@@ -448,15 +456,21 @@ final class AppTheme {
         ),
       );
 
-  static DialogThemeData _dialogTheme(Color backgroundColor) => DialogThemeData(
+  static DialogThemeData _dialogTheme({
+    required Color backgroundColor,
+    required Color titleColor,
+    required Color contentColor,
+  }) =>
+      DialogThemeData(
         backgroundColor: backgroundColor,
         elevation: 8,
         shadowColor: Colors.black26,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXXL),
         ),
-        titleTextStyle: AppTextStyles.titleLarge,
-        contentTextStyle: AppTextStyles.bodyMedium,
+        titleTextStyle: AppTextStyles.titleLarge.copyWith(color: titleColor),
+        contentTextStyle:
+            AppTextStyles.bodyMedium.copyWith(color: contentColor),
         surfaceTintColor: Colors.transparent,
       );
 
