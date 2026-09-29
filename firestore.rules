@@ -44,9 +44,20 @@ service cloud.firestore {
 
     match /users/{userId} {
       // Usuário pode ler seu próprio perfil; admin lê todos
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-      // Somente admin pode criar/editar usuários (RG-002)
-      allow create, update: if isAdmin();
+      allow read: if isAuthenticated() && (
+        request.auth.uid == userId ||
+        isAdmin() ||
+        (resource.data.role == 'ADMIN' && resource.data.active == true)
+      );
+      // Admin gerencia perfis. Cada usuário pode atualizar apenas os próprios
+      // tokens de notificação, sem alterar nome, função ou permissões.
+      allow create: if isAdmin();
+      allow update: if isAdmin() || (
+        isAuthenticated() && request.auth.uid == userId &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'fcmToken', 'fcmTokens', 'fcmTokenUpdatedAt'
+        ])
+      );
       // Nunca deletar usuários
       allow delete: if false;
     }
@@ -113,8 +124,32 @@ service cloud.firestore {
     match /notifications/{notificationId} {
       // Usuário lê apenas suas notificações
       allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      // Sistema cria notificações (via Cloud Functions ou admin)
-      allow create: if isAuthenticated();
+      // Enquanto Cloud Functions não está disponível no plano do projeto,
+      // clientes autenticados podem criar somente os dois avisos derivados de
+      // uma transição já confirmada na própria lista.
+      allow create: if isAuthenticated() &&
+        request.resource.data.keys().hasOnly([
+          'userId', 'title', 'body', 'type', 'listId', 'route', 'read',
+          'createdAt'
+        ]) &&
+        request.resource.data.read == false &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.route == '/lists/' + request.resource.data.listId &&
+        (
+          (
+            request.resource.data.type == 'LIST_SENT' &&
+            get(/databases/$(database)/documents/users/$(request.resource.data.userId)).data.role == 'ADMIN' &&
+            get(/databases/$(database)/documents/users/$(request.resource.data.userId)).data.active == true &&
+            get(/databases/$(database)/documents/shopping_lists/$(request.resource.data.listId)).data.createdBy == request.auth.uid &&
+            get(/databases/$(database)/documents/shopping_lists/$(request.resource.data.listId)).data.status == 'PENDING'
+          ) ||
+          (
+            request.resource.data.type == 'LIST_FINISHED' &&
+            isAdmin() &&
+            request.resource.data.userId == get(/databases/$(database)/documents/shopping_lists/$(request.resource.data.listId)).data.createdBy &&
+            get(/databases/$(database)/documents/shopping_lists/$(request.resource.data.listId)).data.status == 'FINISHED'
+          )
+        );
       // Usuário pode marcar como lida
       allow update: if isAuthenticated() &&
         resource.data.userId == request.auth.uid &&

@@ -35,7 +35,7 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
     if (!_formKey.currentState!.validate()) return;
 
     final newPassword = _passwordController.text;
-    
+
     if (newPassword.trim() == 'senha123' || newPassword.trim() == '123456') {
       setState(() {
         _errorMessage = 'A nova senha não pode ser a senha padrão.';
@@ -114,7 +114,8 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
                       padding: const EdgeInsets.all(AppDimensions.spaceSM),
                       decoration: BoxDecoration(
                         color: cs.errorContainer,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusSM),
                       ),
                       child: Row(
                         children: [
@@ -171,7 +172,7 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
                   const Gap(AppDimensions.spaceMD),
                   TextButton(
                     onPressed: () {
-                       ref.read(authViewModelProvider.notifier).logout();
+                      ref.read(authViewModelProvider.notifier).logout();
                     },
                     child: Text(
                       'Sair e trocar depois',

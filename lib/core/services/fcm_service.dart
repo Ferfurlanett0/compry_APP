@@ -4,6 +4,8 @@ library;
 
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -26,6 +28,7 @@ class FcmService {
   final FirebaseMessaging _messaging;
   final Logger _logger;
   bool _listenersInitialized = false;
+  bool _authListenerInitialized = false;
 
   FcmService({
     required FirebaseMessaging messaging,
@@ -36,6 +39,7 @@ class FcmService {
   /// Initializes passive listeners without opening a permission prompt.
   Future<void> initialize() async {
     _setupListeners();
+    _setupAuthListener();
     final settings = await _messaging.getNotificationSettings();
     await _configureAuthorizedState(settings);
   }
@@ -61,7 +65,7 @@ class FcmService {
       try {
         final token = await _messaging.getToken();
         if (token != null) {
-          _logger.i('FCM Token: $token');
+          await _saveToken(token);
         }
       } catch (e) {
         _logger.e('Failed to get FCM token: $e');
@@ -74,7 +78,7 @@ class FcmService {
     _listenersInitialized = true;
 
     _messaging.onTokenRefresh.listen((newToken) {
-      _logger.i('FCM Token Refreshed: $newToken');
+      _saveToken(newToken);
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -82,5 +86,33 @@ class FcmService {
     });
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  }
+
+  void _setupAuthListener() {
+    if (_authListenerInitialized) return;
+    _authListenerInitialized = true;
+    FirebaseAuth.instance.authStateChanges().listen((user) async {
+      if (user == null) return;
+      final settings = await _messaging.getNotificationSettings();
+      await _configureAuthorizedState(settings);
+    });
+  }
+
+  Future<void> _saveToken(String token) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({
+        'fcmToken': token,
+        'fcmTokens': FieldValue.arrayUnion([token]),
+        'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
+      });
+      _logger.i('Token de notificação atualizado para ${user.uid}.');
+    } catch (error) {
+      _logger.w('Não foi possível salvar o token de notificação: $error');
+    }
   }
 }

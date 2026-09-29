@@ -99,7 +99,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
       final user = await _loginUseCase.call(
         LoginParams(username: username, password: password),
       );
-      
+
       if (password.trim() == 'senha123' || password.trim() == '123456') {
         state = AuthRequiresPasswordChange(user);
         _logger.i('Login requer troca de senha: ${user.username}');

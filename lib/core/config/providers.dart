@@ -146,7 +146,8 @@ final shoppingListRepositoryProvider = Provider<ShoppingListRepository>((ref) {
 
 // ─── Notifications Repository ────────────────────────────────────────────────
 
-final notificationsRepositoryProvider = Provider<NotificationsRepository>((ref) {
+final notificationsRepositoryProvider =
+    Provider<NotificationsRepository>((ref) {
   return NotificationsRepositoryImpl(
     firestore: ref.watch(firestoreProvider),
     logger: ref.watch(loggerProvider),
@@ -159,10 +160,10 @@ final themeModeProvider = StateProvider<ThemeMode>((ref) {
   final box = Hive.box(AppConstants.hiveBoxSettings);
   final saved = box.get('themeMode', defaultValue: 'light');
   switch (saved) {
-    case 'dark': return ThemeMode.dark;
+    case 'dark':
+      return ThemeMode.dark;
     case 'light':
-    default: return ThemeMode.light;
+    default:
+      return ThemeMode.light;
   }
 });
-
-

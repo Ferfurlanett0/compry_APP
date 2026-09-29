@@ -42,7 +42,8 @@ class EmptyState extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: cs.surface,
-                border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+                border:
+                    Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
                 boxShadow: [
                   BoxShadow(
                     color: cs.primary.withValues(alpha: isDark ? 0.2 : 0.1),
@@ -72,7 +73,8 @@ class EmptyState extends StatelessWidget {
             const Gap(AppDimensions.spaceSM),
 
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceXL),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: AppDimensions.spaceXL),
               child: Text(
                 message,
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -117,7 +119,8 @@ class NoListsEmptyState extends StatelessWidget {
     return EmptyState(
       icon: Icons.assignment_rounded,
       title: 'Nenhuma lista ainda',
-      message: 'Crie sua primeira lista de compras para começar a se organizar.',
+      message:
+          'Crie sua primeira lista de compras para começar a se organizar.',
       actionLabel: onCreateList != null ? 'Nova Lista' : null,
       onAction: onCreateList,
     );
@@ -134,7 +137,8 @@ class NoItemsEmptyState extends StatelessWidget {
     return EmptyState(
       icon: Icons.shopping_basket_rounded,
       title: 'Lista Vazia',
-      message: 'Esta lista ainda não possui itens. Adicione os produtos que deseja comprar.',
+      message:
+          'Esta lista ainda não possui itens. Adicione os produtos que deseja comprar.',
       actionLabel: onAddItem != null ? 'Adicionar Item' : null,
       onAction: onAddItem,
     );

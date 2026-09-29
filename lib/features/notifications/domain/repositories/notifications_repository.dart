@@ -10,7 +10,9 @@ abstract interface class NotificationsRepository {
 
   /// Mark a notification as read
   Future<void> markAsRead(String notificationId);
-  
+
+  Future<void> markAllAsRead(String userId);
+
   /// Get unread count
   Stream<int> watchUnreadCount(String userId);
 }

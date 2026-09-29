@@ -50,16 +50,16 @@ class ShoppingItemEntity extends Equatable {
   final String id;
   final String listId;
   final String name;
-  final double quantity;       // RF-011: inteiros e decimais
+  final double quantity; // RF-011: inteiros e decimais
   final ItemUnit unit;
-  final String? brand;         // RF-012: opcional
+  final String? brand; // RF-012: opcional
   final String? category;
   final double? expectedPrice; // RF-013: opcional, em R$
-  final String? notes;         // RF-014: campo livre
+  final String? notes; // RF-014: campo livre
   final bool checked;
-  final String? checkedBy;     // userId
+  final String? checkedBy; // userId
   final DateTime? checkedAt;
-  final int position;          // RF-016: ordenação
+  final int position; // RF-016: ordenação
   final int version;
 
   const ShoppingItemEntity({

@@ -71,6 +71,7 @@ class ShoppingListMemoryDataSource implements ShoppingListRemoteDataSource {
       updatedAt: now,
       finishedAt: null,
       sentAt: null,
+      receivedAt: null,
       startedAt: null,
       version: 1,
       offlineChanges: false,
@@ -102,6 +103,7 @@ class ShoppingListMemoryDataSource implements ShoppingListRemoteDataSource {
       updatedAt: DateTime.now(),
       finishedAt: list.finishedAt,
       sentAt: list.sentAt,
+      receivedAt: list.receivedAt,
       startedAt: list.startedAt,
       version: list.version + 1,
       offlineChanges: false,
@@ -134,6 +136,7 @@ class ShoppingListMemoryDataSource implements ShoppingListRemoteDataSource {
       updatedAt: DateTime.now(),
       finishedAt: null,
       sentAt: DateTime.now(),
+      receivedAt: DateTime.now(),
       startedAt: list.startedAt,
       version: list.version + 1,
       offlineChanges: false,
@@ -166,6 +169,7 @@ class ShoppingListMemoryDataSource implements ShoppingListRemoteDataSource {
       updatedAt: DateTime.now(),
       finishedAt: null,
       sentAt: list.sentAt,
+      receivedAt: list.receivedAt,
       startedAt: list.startedAt,
       version: list.version + 1,
       offlineChanges: false,
@@ -199,6 +203,7 @@ class ShoppingListMemoryDataSource implements ShoppingListRemoteDataSource {
       updatedAt: DateTime.now(),
       finishedAt: DateTime.now(),
       sentAt: list.sentAt,
+      receivedAt: list.receivedAt,
       startedAt: list.startedAt,
       version: list.version + 1,
       offlineChanges: false,
@@ -222,9 +227,7 @@ class ShoppingListMemoryDataSource implements ShoppingListRemoteDataSource {
   Stream<List<ShoppingListModel>> watchEmployeeLists(String userId) {
     // Emit current state first, then stream updates filtered by userId
     Future.microtask(() {
-      final current = _lists.values
-          .where((l) => l.createdBy == userId)
-          .toList()
+      final current = _lists.values.where((l) => l.createdBy == userId).toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       _allListsController.add(current);
     });
@@ -268,14 +271,20 @@ class ShoppingListMemoryDataSource implements ShoppingListRemoteDataSource {
   }) async {
     var results = _lists.values.toList();
 
-    if (userId != null) results = results.where((l) => l.createdBy == userId).toList();
-    if (category != null) results = results.where((l) => l.category == category).toList();
-    if (status != null) results = results.where((l) => l.status == status).toList();
-    if (from != null) results = results.where((l) => l.createdAt.isAfter(from)).toList();
-    if (to != null) results = results.where((l) => l.createdAt.isBefore(to)).toList();
+    if (userId != null)
+      results = results.where((l) => l.createdBy == userId).toList();
+    if (category != null)
+      results = results.where((l) => l.category == category).toList();
+    if (status != null)
+      results = results.where((l) => l.status == status).toList();
+    if (from != null)
+      results = results.where((l) => l.createdAt.isAfter(from)).toList();
+    if (to != null)
+      results = results.where((l) => l.createdAt.isBefore(to)).toList();
     if (searchQuery != null && searchQuery.isNotEmpty) {
       final q = searchQuery.toLowerCase();
-      results = results.where((l) => l.title.toLowerCase().contains(q)).toList();
+      results =
+          results.where((l) => l.title.toLowerCase().contains(q)).toList();
     }
 
     results.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -332,6 +341,7 @@ class ShoppingListMemoryDataSource implements ShoppingListRemoteDataSource {
         updatedAt: DateTime.now(),
         finishedAt: list.finishedAt,
         sentAt: list.sentAt,
+        receivedAt: list.receivedAt,
         startedAt: list.startedAt,
         version: list.version + 1,
         offlineChanges: false,
@@ -376,6 +386,7 @@ class ShoppingListMemoryDataSource implements ShoppingListRemoteDataSource {
         updatedAt: DateTime.now(),
         finishedAt: list.finishedAt,
         sentAt: list.sentAt,
+        receivedAt: list.receivedAt,
         startedAt: list.startedAt,
         version: list.version + 1,
         offlineChanges: false,
@@ -434,6 +445,7 @@ class ShoppingListMemoryDataSource implements ShoppingListRemoteDataSource {
         updatedAt: DateTime.now(),
         finishedAt: list.finishedAt,
         sentAt: list.sentAt,
+        receivedAt: list.receivedAt,
         startedAt: list.startedAt,
         version: list.version,
         offlineChanges: false,
@@ -449,8 +461,7 @@ class ShoppingListMemoryDataSource implements ShoppingListRemoteDataSource {
   }
 
   @override
-  Future<ShoppingItemModel> uncheckItem(
-      String listId, String itemId) async {
+  Future<ShoppingItemModel> uncheckItem(String listId, String itemId) async {
     final item = _items[listId]?[itemId];
     if (item == null) throw Exception('Item não encontrado: $itemId');
 
@@ -492,6 +503,7 @@ class ShoppingListMemoryDataSource implements ShoppingListRemoteDataSource {
         updatedAt: DateTime.now(),
         finishedAt: list.finishedAt,
         sentAt: list.sentAt,
+        receivedAt: list.receivedAt,
         startedAt: list.startedAt,
         version: list.version,
         offlineChanges: false,

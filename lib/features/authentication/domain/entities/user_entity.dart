@@ -94,7 +94,8 @@ class UserEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, username, role, avatar, active, createdAt, updatedAt];
+  List<Object?> get props =>
+      [id, name, username, role, avatar, active, createdAt, updatedAt];
 
   @override
   String toString() => 'UserEntity(id: $id, name: $name, role: $role)';

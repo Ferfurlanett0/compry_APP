@@ -6,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
-
 import '../models/shopping_list_model.dart';
 import '../models/shopping_item_model.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -16,7 +15,8 @@ abstract interface class ShoppingListRemoteDataSource {
   Future<ShoppingListModel> updateList(ShoppingListModel list);
   Future<ShoppingListModel> sendList(String listId, String sentAt);
   Future<ShoppingListModel> cancelList(String listId);
-  Future<ShoppingListModel> finalizeList(String listId, String adminId, String finishedAt);
+  Future<ShoppingListModel> finalizeList(
+      String listId, String adminId, String finishedAt);
   Future<ShoppingListModel> getListById(String listId);
   Stream<List<ShoppingListModel>> watchEmployeeLists(String userId);
   Stream<List<ShoppingListModel>> watchAllLists();
@@ -35,7 +35,8 @@ abstract interface class ShoppingListRemoteDataSource {
   Future<ShoppingItemModel> addItem(ShoppingItemModel item);
   Future<ShoppingItemModel> updateItem(ShoppingItemModel item);
   Future<void> deleteItem(String listId, String itemId);
-  Future<ShoppingItemModel> checkItem(String listId, String itemId, String checkedBy);
+  Future<ShoppingItemModel> checkItem(
+      String listId, String itemId, String checkedBy);
   Future<ShoppingItemModel> uncheckItem(String listId, String itemId);
   Future<void> reorderItems(String listId, List<String> orderedIds);
   Stream<List<ShoppingItemModel>> watchItems(String listId);
@@ -91,10 +92,12 @@ class ShoppingListRemoteDataSourceImpl implements ShoppingListRemoteDataSource {
     await _listsRef.doc(listId).update({
       'status': AppStatus.pending,
       'sentAt': FieldValue.serverTimestamp(),
+      'receivedAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
       'version': FieldValue.increment(1),
     });
     final doc = await _listsRef.doc(listId).get();
+    await _createListSentNotifications(doc);
     return ShoppingListModel.fromFirestore(doc);
   }
 
@@ -106,7 +109,74 @@ class ShoppingListRemoteDataSourceImpl implements ShoppingListRemoteDataSource {
       'version': FieldValue.increment(1),
     });
     final doc = await _listsRef.doc(listId).get();
+    await _createListFinishedNotification(doc);
     return ShoppingListModel.fromFirestore(doc);
+  }
+
+  Future<void> _createListSentNotifications(
+    DocumentSnapshot<Map<String, dynamic>> list,
+  ) async {
+    try {
+      final data = list.data();
+      if (data == null) return;
+      final admins = await _firestore
+          .collection(AppConstants.colUsers)
+          .where('role', isEqualTo: AppRoles.admin)
+          .where('active', isEqualTo: true)
+          .get();
+      if (admins.docs.isEmpty) return;
+
+      final batch = _firestore.batch();
+      for (final admin in admins.docs) {
+        final notification = _firestore
+            .collection(AppConstants.colNotifications)
+            .doc('LIST_SENT_${list.id}_${admin.id}');
+        batch.set(
+            notification,
+            {
+              'userId': admin.id,
+              'title': 'Nova lista pronta para compra',
+              'body':
+                  '${data['createdByName'] ?? 'Um funcionário'} enviou “${data['title'] ?? 'Lista'}”.',
+              'type': 'LIST_SENT',
+              'listId': list.id,
+              'route': '/lists/${list.id}',
+              'read': false,
+              'createdAt': FieldValue.serverTimestamp(),
+            },
+            SetOptions(merge: true));
+      }
+      await batch.commit();
+    } catch (error) {
+      // The list was already sent successfully. Notification delivery is
+      // best-effort and must never roll back the user's main action.
+      _logger.w('Não foi possível criar o aviso de lista enviada: $error');
+    }
+  }
+
+  Future<void> _createListFinishedNotification(
+    DocumentSnapshot<Map<String, dynamic>> list,
+  ) async {
+    try {
+      final data = list.data();
+      final creatorId = data?['createdBy'] as String?;
+      if (data == null || creatorId == null || creatorId.isEmpty) return;
+      await _firestore
+          .collection(AppConstants.colNotifications)
+          .doc('LIST_FINISHED_${list.id}_$creatorId')
+          .set({
+        'userId': creatorId,
+        'title': 'Compra concluída',
+        'body': 'A lista “${data['title'] ?? 'Lista'}” foi concluída.',
+        'type': 'LIST_FINISHED',
+        'listId': list.id,
+        'route': '/lists/${list.id}',
+        'read': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (error) {
+      _logger.w('Não foi possível criar o aviso de lista concluída: $error');
+    }
   }
 
   @override
@@ -139,8 +209,7 @@ class ShoppingListRemoteDataSourceImpl implements ShoppingListRemoteDataSource {
         .where('createdBy', isEqualTo: userId)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) =>
-            snap.docs.map(ShoppingListModel.fromFirestore).toList());
+        .map((snap) => snap.docs.map(ShoppingListModel.fromFirestore).toList());
   }
 
   @override
@@ -148,8 +217,7 @@ class ShoppingListRemoteDataSourceImpl implements ShoppingListRemoteDataSource {
     return _listsRef
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) =>
-            snap.docs.map(ShoppingListModel.fromFirestore).toList());
+        .map((snap) => snap.docs.map(ShoppingListModel.fromFirestore).toList());
   }
 
   @override
@@ -176,10 +244,12 @@ class ShoppingListRemoteDataSourceImpl implements ShoppingListRemoteDataSource {
     if (category != null) query = query.where('category', isEqualTo: category);
     if (status != null) query = query.where('status', isEqualTo: status);
     if (from != null) {
-      query = query.where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(from));
+      query = query.where('createdAt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(from));
     }
     if (to != null) {
-      query = query.where('createdAt', isLessThanOrEqualTo: Timestamp.fromDate(to));
+      query =
+          query.where('createdAt', isLessThanOrEqualTo: Timestamp.fromDate(to));
     }
 
     final snap = await query.get();
@@ -188,7 +258,8 @@ class ShoppingListRemoteDataSourceImpl implements ShoppingListRemoteDataSource {
     // Client-side filtering for search query
     if (searchQuery != null && searchQuery.isNotEmpty) {
       final q = searchQuery.toLowerCase();
-      results = results.where((l) => l.title.toLowerCase().contains(q)).toList();
+      results =
+          results.where((l) => l.title.toLowerCase().contains(q)).toList();
     }
 
     return results;

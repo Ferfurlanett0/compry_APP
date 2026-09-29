@@ -16,13 +16,13 @@ final syncServiceProvider = Provider<SyncService>((ref) {
   final connectivity = ref.watch(connectivityServiceProvider);
   final logger = ref.watch(loggerProvider);
   final firestore = ref.watch(firestoreProvider);
-  
+
   final service = SyncService(
     connectivity: connectivity,
     logger: logger,
     firestore: firestore,
   );
-  
+
   // Initialize the listener
   connectivity.onConnectivityChanged.listen((isConnected) {
     if (isConnected) {
@@ -53,14 +53,16 @@ class SyncService {
     if (!isConnected) {
       return;
     }
-    
+
     if (_isSyncing) return;
 
-    final box = Hive.box<OfflineOperationModel>(AppConstants.hiveBoxOfflineQueue);
+    final box =
+        Hive.box<OfflineOperationModel>(AppConstants.hiveBoxOfflineQueue);
     if (box.isEmpty) return;
 
     _isSyncing = true;
-    _logger.i('Starting offline queue synchronization. Pending items: ${box.length}');
+    _logger.i(
+        'Starting offline queue synchronization. Pending items: ${box.length}');
 
     final operations = box.values.toList();
     // Sort by timestamp to ensure chronological execution
@@ -75,14 +77,16 @@ class SyncService {
         await op.delete(); // Remove from queue after success
         successCount++;
       } catch (e) {
-        _logger.e('Failed to sync operation ${op.id} (${op.operationType} on ${op.collection}): $e');
+        _logger.e(
+            'Failed to sync operation ${op.id} (${op.operationType} on ${op.collection}): $e');
         errorCount++;
         // Stop syncing to preserve chronological order for the remaining items on this document
         break;
       }
     }
 
-    _logger.i('Sync completed. Success: $successCount, Errors: $errorCount. Remaining in queue: ${box.length}');
+    _logger.i(
+        'Sync completed. Success: $successCount, Errors: $errorCount. Remaining in queue: ${box.length}');
     _isSyncing = false;
   }
 
@@ -96,10 +100,12 @@ class SyncService {
         if (docSnap.exists) {
           final remoteData = docSnap.data();
           if (remoteData != null && remoteData.containsKey('updatedAt')) {
-            final remoteTimestamp = (remoteData['updatedAt'] as Timestamp).toDate();
+            final remoteTimestamp =
+                (remoteData['updatedAt'] as Timestamp).toDate();
             // If the remote version is newer than the local operation's timestamp, server wins
             if (remoteTimestamp.isAfter(op.timestamp)) {
-              _logger.w('Conflict detected on ${op.documentId}. Server wins. Operation ignored.');
+              _logger.w(
+                  'Conflict detected on ${op.documentId}. Server wins. Operation ignored.');
               // Log the conflict resolution for auditing
               await _firestore.collection(AppConstants.colAuditLogs).add({
                 'action': 'CONFLICT_RESOLVED',
@@ -112,7 +118,8 @@ class SyncService {
           }
         }
       } catch (e) {
-        _logger.w('Could not fetch remote doc for conflict check: $e. Proceeding with operation.');
+        _logger.w(
+            'Could not fetch remote doc for conflict check: $e. Proceeding with operation.');
       }
     }
 
@@ -136,11 +143,13 @@ class SyncService {
     required String operationType,
     required Map<String, dynamic> payload,
   }) async {
-    final box = Hive.box<OfflineOperationModel>(AppConstants.hiveBoxOfflineQueue);
-    
+    final box =
+        Hive.box<OfflineOperationModel>(AppConstants.hiveBoxOfflineQueue);
+
     // Prevent queue overflow
     if (box.length >= AppConstants.maxOfflineQueueSize) {
-      _logger.w('Offline queue size limit reached. Discarding oldest operation.');
+      _logger
+          .w('Offline queue size limit reached. Discarding oldest operation.');
       // Find oldest and delete
       final oldestKey = box.keys.first;
       await box.delete(oldestKey);
@@ -157,6 +166,7 @@ class SyncService {
     );
 
     await box.put(id, op);
-    _logger.i('Operation queued for offline sync: $operationType on $collection/$documentId');
+    _logger.i(
+        'Operation queued for offline sync: $operationType on $collection/$documentId');
   }
 }

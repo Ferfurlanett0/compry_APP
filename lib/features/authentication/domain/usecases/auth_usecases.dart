@@ -117,14 +117,16 @@ class CreateUserAsAdminParams {
 }
 
 /// Cria um novo usuário pelo Administrador
-class CreateUserAsAdminUseCase implements UseCase<void, CreateUserAsAdminParams> {
+class CreateUserAsAdminUseCase
+    implements UseCase<void, CreateUserAsAdminParams> {
   final AuthRepository _repository;
 
   const CreateUserAsAdminUseCase(this._repository);
 
   @override
   Future<void> call(CreateUserAsAdminParams params) async {
-    if (params.username.trim().isEmpty) throw ArgumentError('Usuário é obrigatório.');
+    if (params.username.trim().isEmpty)
+      throw ArgumentError('Usuário é obrigatório.');
     if (params.password.isEmpty) throw ArgumentError('Senha é obrigatória.');
     if (params.name.trim().isEmpty) throw ArgumentError('Nome é obrigatório.');
 

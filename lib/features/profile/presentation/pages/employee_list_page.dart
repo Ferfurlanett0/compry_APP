@@ -10,6 +10,8 @@ import '../../../../core/config/providers.dart';
 
 import '../../../authentication/presentation/viewmodels/auth_viewmodel.dart';
 import '../widgets/create_user_dialog.dart';
+import '../../../../shared/widgets/compry_components.dart';
+import '../../../../shared/widgets/empty_state.dart';
 
 // 1. Definição do StreamProvider que busca os usuários que não são admin
 final employeesStreamProvider =
@@ -35,49 +37,82 @@ class EmployeeListPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Funcionários'),
+        titleSpacing: 0,
+        toolbarHeight: 78,
+        title: const CompryPageHeader(
+          label: 'Administração',
+          title: 'Funcionários',
+        ),
       ),
-      floatingActionButton: currentUser?.isAdmin == true
-          ? FloatingActionButton.extended(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (_) => const CreateUserDialog(),
-                );
-              },
-              icon: const Icon(Icons.person_add),
-              label: const Text('Novo Usuário'),
-            )
-          : null,
       body: employeesAsync.when(
         data: (employees) {
           if (employees.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.people_outline_rounded,
-                      size: 64,
-                      color: cs.onSurfaceVariant.withValues(alpha: 0.5)),
-                  const Gap(AppDimensions.spaceMD),
-                  Text(
-                    'Nenhum funcionário cadastrado.',
-                    style: theme.textTheme.bodyLarge
-                        ?.copyWith(color: cs.onSurfaceVariant),
-                  ),
-                ],
-              ),
+            return EmptyState(
+              icon: Icons.people_outline_rounded,
+              title: 'Nenhum funcionário',
+              message:
+                  'Adicione a primeira pessoa para começar a criar listas.',
+              actionLabel:
+                  currentUser?.isAdmin == true ? 'Novo funcionário' : null,
+              onAction: currentUser?.isAdmin == true
+                  ? () => showDialog(
+                        context: context,
+                        builder: (_) => const CreateUserDialog(),
+                      )
+                  : null,
             );
           }
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(AppDimensions.pagePadding),
-            itemCount: employees.length,
-            separatorBuilder: (_, __) => const Gap(AppDimensions.spaceMD),
-            itemBuilder: (context, index) {
-              final employee = employees[index];
-              return _EmployeeCard(employee: employee);
-            },
+          return CompryResponsiveBody(
+            child: ListView(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.paddingOf(context).bottom + 16,
+              ),
+              children: [
+                if (currentUser?.isAdmin == true) ...[
+                  FilledButton.icon(
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (_) => const CreateUserDialog(),
+                    ),
+                    icon: const Icon(Icons.person_add_alt_1_rounded),
+                    label: const Text('Novo funcionário'),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+                ComprySectionHeader(
+                  title: 'Equipe ativa',
+                  count: '${employees.length} pessoas',
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: cs.surface,
+                    border: Border.symmetric(
+                      horizontal: BorderSide(color: cs.outlineVariant),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      for (var index = 0;
+                          index < employees.length;
+                          index++) ...[
+                        _EmployeeCard(employee: employees[index]),
+                        if (index != employees.length - 1)
+                          Divider(
+                              height: 1, indent: 66, color: cs.outlineVariant),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Ao excluir um acesso, o mesmo usuário poderá ser criado novamente.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: cs.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -124,26 +159,15 @@ class _EmployeeCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.spaceMD),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-        border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
-        boxShadow: [
-          BoxShadow(
-            color: cs.shadow.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 72),
       child: Row(
         children: [
+          const SizedBox(width: 12),
           // Avatar
           Container(
-            width: 48,
-            height: 48,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: cs.primaryContainer,
@@ -167,9 +191,7 @@ class _EmployeeCard extends ConsumerWidget {
               children: [
                 Text(
                   employee.name,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: theme.textTheme.titleSmall,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -184,56 +206,18 @@ class _EmployeeCard extends ConsumerWidget {
           ),
 
           // Action Buttons
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Tooltip(
-                message: 'Resetar Senha',
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: () => _sendResetEmail(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: cs.primaryContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.vpn_key_rounded,
-                        color: cs.onPrimaryContainer,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const Gap(AppDimensions.spaceXS),
-              Tooltip(
-                message: 'Excluir Usuário',
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: () => _deleteEmployee(context, ref),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: cs.errorContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.delete_outline_rounded,
-                        color: cs.onErrorContainer,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+          PopupMenuButton<String>(
+            tooltip: 'Opções de ${employee.name}',
+            onSelected: (value) {
+              if (value == 'reset') _sendResetEmail(context);
+              if (value == 'delete') _deleteEmployee(context, ref);
+            },
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'reset', child: Text('Redefinir senha')),
+              PopupMenuItem(value: 'delete', child: Text('Excluir acesso')),
             ],
           ),
+          const SizedBox(width: 4),
         ],
       ),
     );

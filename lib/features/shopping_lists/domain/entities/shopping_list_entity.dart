@@ -53,7 +53,8 @@ enum ListStatus {
   bool get isEditable => this == ListStatus.draft;
 
   /// Lista pode ser cancelada pelo funcionário (RF-019)
-  bool get isCancellable => this == ListStatus.draft || this == ListStatus.pending;
+  bool get isCancellable =>
+      this == ListStatus.draft || this == ListStatus.pending;
 
   /// Lista está ativa (não finalizada nem cancelada)
   bool get isActive => !isFinished && !isCancelled;
@@ -67,9 +68,9 @@ class ShoppingListEntity extends Equatable {
   final String? notes;
   final ListPriority priority;
   final ListStatus status;
-  final String createdBy;       // userId
-  final String? createdByName;  // para exibição
-  final String? assignedTo;     // adminId
+  final String createdBy; // userId
+  final String? createdByName; // para exibição
+  final String? assignedTo; // adminId
   final String? category;
   final List<String> tags;
   final DateTime? dueDate;
@@ -77,6 +78,7 @@ class ShoppingListEntity extends Equatable {
   final DateTime updatedAt;
   final DateTime? finishedAt;
   final DateTime? sentAt;
+  final DateTime? receivedAt;
   final DateTime? startedAt;
   final int version;
   final bool offlineChanges;
@@ -102,6 +104,7 @@ class ShoppingListEntity extends Equatable {
     required this.updatedAt,
     this.finishedAt,
     this.sentAt,
+    this.receivedAt,
     this.startedAt,
     this.version = 1,
     this.offlineChanges = false,
@@ -144,6 +147,7 @@ class ShoppingListEntity extends Equatable {
     DateTime? updatedAt,
     DateTime? finishedAt,
     DateTime? sentAt,
+    DateTime? receivedAt,
     DateTime? startedAt,
     int? version,
     bool? offlineChanges,
@@ -167,6 +171,7 @@ class ShoppingListEntity extends Equatable {
       updatedAt: updatedAt ?? this.updatedAt,
       finishedAt: finishedAt ?? this.finishedAt,
       sentAt: sentAt ?? this.sentAt,
+      receivedAt: receivedAt ?? this.receivedAt,
       startedAt: startedAt ?? this.startedAt,
       version: version ?? this.version,
       offlineChanges: offlineChanges ?? this.offlineChanges,
@@ -190,6 +195,9 @@ class ShoppingListEntity extends Equatable {
         createdAt,
         updatedAt,
         finishedAt,
+        sentAt,
+        receivedAt,
+        startedAt,
         version,
         offlineChanges,
         totalItems,

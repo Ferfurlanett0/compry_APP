@@ -41,7 +41,8 @@ final class AppTheme {
           space: 0,
         ),
         scaffoldBackgroundColor: AppColorsLight.background,
-        listTileTheme: _listTileTheme(AppColorsLight.textPrimary, _lightColorScheme),
+        listTileTheme:
+            _listTileTheme(AppColorsLight.textPrimary, _lightColorScheme),
         snackBarTheme: _snackBarTheme(),
         dialogTheme: _dialogTheme(AppColorsLight.surface),
         progressIndicatorTheme: ProgressIndicatorThemeData(
@@ -53,7 +54,8 @@ final class AppTheme {
         chipTheme: _chipTheme(_lightColorScheme),
         floatingActionButtonTheme: _fabTheme(_lightColorScheme),
         bottomSheetTheme: _bottomSheetTheme(AppColorsLight.surface),
-        iconTheme: const IconThemeData(color: AppColorsLight.textPrimary, size: AppDimensions.iconLG),
+        iconTheme: const IconThemeData(
+            color: AppColorsLight.textPrimary, size: AppDimensions.iconLG),
         splashColor: AppColorsLight.primary.withValues(alpha: 0.08),
         highlightColor: AppColorsLight.primary.withValues(alpha: 0.05),
       );
@@ -86,7 +88,8 @@ final class AppTheme {
           space: 0,
         ),
         scaffoldBackgroundColor: AppColorsDark.background,
-        listTileTheme: _listTileTheme(AppColorsDark.textPrimary, _darkColorScheme),
+        listTileTheme:
+            _listTileTheme(AppColorsDark.textPrimary, _darkColorScheme),
         snackBarTheme: _snackBarTheme(),
         dialogTheme: _dialogTheme(AppColorsDark.surfaceContainer),
         progressIndicatorTheme: ProgressIndicatorThemeData(
@@ -98,7 +101,8 @@ final class AppTheme {
         chipTheme: _chipTheme(_darkColorScheme),
         floatingActionButtonTheme: _fabTheme(_darkColorScheme),
         bottomSheetTheme: _bottomSheetTheme(AppColorsDark.surfaceContainer),
-        iconTheme: const IconThemeData(color: AppColorsDark.textPrimary, size: AppDimensions.iconLG),
+        iconTheme: const IconThemeData(
+            color: AppColorsDark.textPrimary, size: AppDimensions.iconLG),
         splashColor: AppColorsDark.primary.withValues(alpha: 0.12),
         highlightColor: AppColorsDark.primary.withValues(alpha: 0.06),
       );
@@ -185,7 +189,8 @@ final class AppTheme {
       displayLarge: AppTextStyles.displayLarge.copyWith(color: defaultColor),
       displayMedium: AppTextStyles.displayMedium.copyWith(color: defaultColor),
       headlineLarge: AppTextStyles.headlineLarge.copyWith(color: defaultColor),
-      headlineMedium: AppTextStyles.headlineMedium.copyWith(color: defaultColor),
+      headlineMedium:
+          AppTextStyles.headlineMedium.copyWith(color: defaultColor),
       headlineSmall: AppTextStyles.headlineSmall.copyWith(color: defaultColor),
       titleLarge: AppTextStyles.titleLarge.copyWith(color: defaultColor),
       titleMedium: AppTextStyles.titleMedium.copyWith(color: defaultColor),
@@ -250,7 +255,8 @@ final class AppTheme {
           ),
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppDimensions.buttonBorderRadius),
+              borderRadius:
+                  BorderRadius.circular(AppDimensions.buttonBorderRadius),
             ),
           ),
           elevation: const WidgetStatePropertyAll(0),
@@ -282,10 +288,13 @@ final class AppTheme {
           foregroundColor: cs.primary,
           minimumSize: const Size(double.infinity, AppDimensions.buttonHeight),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.buttonBorderRadius),
+            borderRadius:
+                BorderRadius.circular(AppDimensions.buttonBorderRadius),
           ),
-          side: BorderSide(color: cs.primary.withValues(alpha: 0.5), width: 1.5),
-          textStyle: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w600),
+          side:
+              BorderSide(color: cs.primary.withValues(alpha: 0.5), width: 1.5),
+          textStyle:
+              AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w600),
         ),
       );
 
@@ -297,7 +306,8 @@ final class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
           ),
-          textStyle: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w600),
+          textStyle:
+              AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w600),
         ),
       );
 
@@ -390,7 +400,8 @@ final class AppTheme {
           if (states.contains(WidgetState.selected)) {
             return IconThemeData(color: cs.primary, size: AppDimensions.iconLG);
           }
-          return IconThemeData(color: cs.onSurfaceVariant, size: AppDimensions.iconLG);
+          return IconThemeData(
+              color: cs.onSurfaceVariant, size: AppDimensions.iconLG);
         }),
         height: AppDimensions.bottomNavHeight,
         elevation: 0,
@@ -452,7 +463,8 @@ final class AppTheme {
         backgroundColor: cs.surfaceContainerHighest,
         selectedColor: cs.primaryContainer,
         disabledColor: cs.surfaceContainerHighest,
-        labelStyle: AppTextStyles.labelMedium.copyWith(color: cs.onSurfaceVariant),
+        labelStyle:
+            AppTextStyles.labelMedium.copyWith(color: cs.onSurfaceVariant),
         secondaryLabelStyle: AppTextStyles.labelMedium.copyWith(
           color: cs.onPrimaryContainer,
           fontWeight: FontWeight.w600,

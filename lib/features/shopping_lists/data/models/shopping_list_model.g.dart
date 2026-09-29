@@ -38,13 +38,14 @@ class ShoppingListModelAdapter extends TypeAdapter<ShoppingListModel> {
       offlineChanges: fields[18] as bool,
       totalItems: fields[19] as int,
       checkedItems: fields[20] as int,
+      receivedAt: fields[21] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ShoppingListModel obj) {
     writer
-      ..writeByte(21)
+      ..writeByte(22)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -86,7 +87,9 @@ class ShoppingListModelAdapter extends TypeAdapter<ShoppingListModel> {
       ..writeByte(19)
       ..write(obj.totalItems)
       ..writeByte(20)
-      ..write(obj.checkedItems);
+      ..write(obj.checkedItems)
+      ..writeByte(21)
+      ..write(obj.receivedAt);
   }
 
   @override

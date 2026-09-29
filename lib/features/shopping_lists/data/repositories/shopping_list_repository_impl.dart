@@ -11,7 +11,6 @@ import '../datasources/shopping_list_remote_datasource.dart';
 import '../models/shopping_item_model.dart';
 import '../models/shopping_list_model.dart';
 
-
 import '../../../../core/sync/services/sync_service.dart';
 import '../../../../core/services/connectivity_service.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -44,9 +43,12 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
         collection: AppConstants.colShoppingLists,
         documentId: model.id,
         operationType: 'CREATE',
-        payload: model.toFirestore()..['createdAt'] = DateTime.now().toIso8601String()..['updatedAt'] = DateTime.now().toIso8601String(),
+        payload: model.toFirestore()
+          ..['createdAt'] = DateTime.now().toIso8601String()
+          ..['updatedAt'] = DateTime.now().toIso8601String(),
       );
-      _logger.w('Offline: Lista ${model.id} adicionada à fila de sincronização.');
+      _logger
+          .w('Offline: Lista ${model.id} adicionada à fila de sincronização.');
       return list; // Retorna com o ID gerado localmente
     }
 
@@ -65,7 +67,8 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
         collection: AppConstants.colShoppingLists,
         documentId: model.id,
         operationType: 'UPDATE',
-        payload: model.toFirestore()..['updatedAt'] = DateTime.now().toIso8601String(),
+        payload: model.toFirestore()
+          ..['updatedAt'] = DateTime.now().toIso8601String(),
       );
       _logger.w('Offline: Atualização da lista ${model.id} na fila.');
       return list;
@@ -77,7 +80,8 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
 
   @override
   Future<ShoppingListEntity> sendList(String listId) async {
-    final result = await _remote.sendList(listId, DateTime.now().toIso8601String());
+    final result =
+        await _remote.sendList(listId, DateTime.now().toIso8601String());
     _logger.i('Lista enviada: $listId');
     return result.toEntity();
   }
@@ -158,17 +162,21 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
 
     if (!isOnline) {
       await _syncService.enqueueOperation(
-        collection: '${AppConstants.colShoppingLists}/${model.listId}/${AppConstants.colShoppingItems}',
+        collection:
+            '${AppConstants.colShoppingLists}/${model.listId}/${AppConstants.colShoppingItems}',
         documentId: model.id,
         operationType: 'CREATE',
-        payload: model.toFirestore()..['createdAt'] = DateTime.now().toIso8601String(),
+        payload: model.toFirestore()
+          ..['createdAt'] = DateTime.now().toIso8601String(),
       );
       // Fila pra atualizar o totalItems da lista
       await _syncService.enqueueOperation(
         collection: AppConstants.colShoppingLists,
         documentId: model.listId,
         operationType: 'UPDATE',
-        payload: {'updatedAt': DateTime.now().toIso8601String()}, // simplified offline count
+        payload: {
+          'updatedAt': DateTime.now().toIso8601String()
+        }, // simplified offline count
       );
       return item;
     }
@@ -184,7 +192,8 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
 
     if (!isOnline) {
       await _syncService.enqueueOperation(
-        collection: '${AppConstants.colShoppingLists}/${model.listId}/${AppConstants.colShoppingItems}',
+        collection:
+            '${AppConstants.colShoppingLists}/${model.listId}/${AppConstants.colShoppingItems}',
         documentId: model.id,
         operationType: 'UPDATE',
         payload: model.toFirestore(),
@@ -211,7 +220,8 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
 
     if (!isOnline) {
       await _syncService.enqueueOperation(
-        collection: '${AppConstants.colShoppingLists}/$listId/${AppConstants.colShoppingItems}',
+        collection:
+            '${AppConstants.colShoppingLists}/$listId/${AppConstants.colShoppingItems}',
         documentId: itemId,
         operationType: 'UPDATE',
         payload: {
@@ -243,7 +253,8 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
 
     if (!isOnline) {
       await _syncService.enqueueOperation(
-        collection: '${AppConstants.colShoppingLists}/$listId/${AppConstants.colShoppingItems}',
+        collection:
+            '${AppConstants.colShoppingLists}/$listId/${AppConstants.colShoppingItems}',
         documentId: itemId,
         operationType: 'UPDATE',
         payload: {

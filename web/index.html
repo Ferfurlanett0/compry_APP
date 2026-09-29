@@ -144,9 +144,16 @@
       const wasControlled = Boolean(navigator.serviceWorker.controller);
       Promise.all([
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          return Promise.all(registrations.map(function(registration) {
-            return registration.unregister();
-          }));
+          return Promise.all(registrations
+            .filter(function(registration) {
+              const worker = registration.active ||
+                registration.waiting || registration.installing;
+              return worker &&
+                worker.scriptURL.includes('flutter_service_worker.js');
+            })
+            .map(function(registration) {
+              return registration.unregister();
+            }));
         }),
         'caches' in window
           ? caches.keys().then(function(keys) {

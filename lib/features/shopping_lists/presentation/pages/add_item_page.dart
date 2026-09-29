@@ -108,11 +108,17 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
     return Scaffold(
       backgroundColor: cs.surface,
       appBar: AppBar(
-        title: Text(
-          'Adicionar Item',
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Etapa 2 de 2',
+              style: theme.textTheme.labelMedium?.copyWith(color: cs.primary),
+            ),
+            Text('Adicionar item', style: theme.textTheme.titleLarge),
+          ],
         ),
-        centerTitle: true,
+        centerTitle: false,
         leading: IconButton(
           icon: const Icon(Icons.close_rounded),
           onPressed: () => context.pop(),
@@ -122,123 +128,161 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
         surfaceTintColor: Colors.transparent,
       ),
       body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.pagePadding,
-              vertical: AppDimensions.spaceXL,
-            ),
-            children: [
-              // Name Section
-              _SectionTitle(title: 'O que você precisa?', icon: Icons.shopping_basket_rounded)
-                  .animate().fadeIn(duration: 400.ms),
-              const Gap(AppDimensions.spaceMD),
-              AppTextField(
-                id: 'item-name',
-                controller: _nameController,
-                label: 'Nome do Produto *',
-                hint: 'Ex: Arroz, Leite, Café...',
-                textInputAction: TextInputAction.next,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Obrigatório';
-                  }
-                  return null;
-                },
-              ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
-
-              const Gap(AppDimensions.spaceXXL),
-
-              // Quantity and Unit Section
-              _SectionTitle(title: 'Quantidade', icon: Icons.straighten_rounded)
-                  .animate().fadeIn(delay: 100.ms, duration: 400.ms),
-              const Gap(AppDimensions.spaceMD),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.pagePadding,
+                  vertical: AppDimensions.spaceXL,
+                ),
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: AppTextField(
-                      id: 'item-quantity',
-                      controller: _quantityController,
-                      label: 'Qtd *',
-                      hint: '1',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      textInputAction: TextInputAction.next,
-                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) return 'Obrigatório';
-                        final q = double.tryParse(value.replaceAll(',', '.'));
-                        if (q == null || q <= 0) return 'Inválido';
-                        return null;
-                      },
-                    ),
-                  ),
+                  // Name Section
+                  _SectionTitle(
+                          title: 'O que você precisa?',
+                          icon: Icons.shopping_basket_rounded)
+                      .animate()
+                      .fadeIn(duration: 400.ms),
                   const Gap(AppDimensions.spaceMD),
-                  Expanded(
-                    flex: 2,
-                    child: _PremiumUnitSelector(
-                      value: _unit,
-                      onChanged: (u) => setState(() => _unit = u),
-                    ),
+                  AppTextField(
+                    id: 'item-name',
+                    controller: _nameController,
+                    label: 'Nome do Produto *',
+                    hint: 'Ex: Arroz, Leite, Café...',
+                    textInputAction: TextInputAction.next,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Obrigatório';
+                      }
+                      return null;
+                    },
+                  ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
+
+                  const Gap(AppDimensions.spaceXXL),
+
+                  // Quantity and Unit Section
+                  _SectionTitle(
+                          title: 'Quantidade', icon: Icons.straighten_rounded)
+                      .animate()
+                      .fadeIn(delay: 100.ms, duration: 400.ms),
+                  const Gap(AppDimensions.spaceMD),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: AppTextField(
+                          id: 'item-quantity',
+                          controller: _quantityController,
+                          label: 'Qtd *',
+                          hint: '1',
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          textInputAction: TextInputAction.next,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))
+                          ],
+                          validator: (value) {
+                            if (value == null || value.isEmpty)
+                              return 'Obrigatório';
+                            final q =
+                                double.tryParse(value.replaceAll(',', '.'));
+                            if (q == null || q <= 0) return 'Inválido';
+                            return null;
+                          },
+                        ),
+                      ),
+                      const Gap(AppDimensions.spaceMD),
+                      Expanded(
+                        flex: 2,
+                        child: _PremiumUnitSelector(
+                          value: _unit,
+                          onChanged: (u) => setState(() => _unit = u),
+                        ),
+                      ),
+                    ]
+                        .animate(interval: 50.ms)
+                        .fadeIn(delay: 100.ms, duration: 400.ms)
+                        .slideY(begin: 0.1),
                   ),
-                ].animate(interval: 50.ms).fadeIn(delay: 100.ms, duration: 400.ms).slideY(begin: 0.1),
+
+                  const Gap(AppDimensions.spaceXXL),
+
+                  // Details Section
+                  _SectionTitle(
+                          title: 'Detalhes Adicionais',
+                          icon: Icons.tune_rounded)
+                      .animate()
+                      .fadeIn(delay: 200.ms, duration: 400.ms),
+                  const Gap(AppDimensions.spaceMD),
+
+                  AppTextField(
+                    id: 'item-brand',
+                    controller: _brandController,
+                    label: 'Marca (opcional)',
+                    hint: 'Ex: Nestlé, Qualitá...',
+                    prefixIcon: Icons.store_mall_directory_outlined,
+                    textInputAction: TextInputAction.next,
+                  )
+                      .animate()
+                      .fadeIn(delay: 250.ms, duration: 400.ms)
+                      .slideY(begin: 0.1),
+                  const Gap(AppDimensions.spaceMD),
+
+                  _PremiumCategorySelector(
+                    value: _category,
+                    onChanged: (c) => setState(() => _category = c),
+                  )
+                      .animate()
+                      .fadeIn(delay: 300.ms, duration: 400.ms)
+                      .slideY(begin: 0.1),
+                  const Gap(AppDimensions.spaceMD),
+
+                  AppTextArea(
+                    id: 'item-notes',
+                    controller: _notesController,
+                    label: 'Observações (opcional)',
+                    hint: 'Ex: Sem lactose, Integral...',
+                    minLines: 2,
+                    maxLines: 4,
+                  )
+                      .animate()
+                      .fadeIn(delay: 350.ms, duration: 400.ms)
+                      .slideY(begin: 0.1),
+
+                  const Gap(AppDimensions.spaceXXXL),
+
+                  // Action Buttons
+                  AppButton(
+                    id: 'btn-add-another',
+                    label: 'Adicionar e Continuar',
+                    onPressed:
+                        _isLoading ? null : () => _addItem(addAnother: true),
+                    outlined: true,
+                    icon: Icons.add_circle_outline_rounded,
+                  )
+                      .animate()
+                      .fadeIn(delay: 400.ms, duration: 400.ms)
+                      .slideY(begin: 0.1),
+
+                  const Gap(AppDimensions.spaceSM),
+
+                  AppButton(
+                    id: 'btn-add-item',
+                    label: 'Concluir',
+                    onPressed: _isLoading ? null : () => _addItem(),
+                    isLoading: _isLoading,
+                    icon: Icons.check_circle_rounded,
+                  )
+                      .animate()
+                      .fadeIn(delay: 450.ms, duration: 400.ms)
+                      .slideY(begin: 0.1),
+                ],
               ),
-
-              const Gap(AppDimensions.spaceXXL),
-
-              // Details Section
-              _SectionTitle(title: 'Detalhes Adicionais', icon: Icons.tune_rounded)
-                  .animate().fadeIn(delay: 200.ms, duration: 400.ms),
-              const Gap(AppDimensions.spaceMD),
-
-              AppTextField(
-                id: 'item-brand',
-                controller: _brandController,
-                label: 'Marca (opcional)',
-                hint: 'Ex: Nestlé, Qualitá...',
-                prefixIcon: Icons.store_mall_directory_outlined,
-                textInputAction: TextInputAction.next,
-              ).animate().fadeIn(delay: 250.ms, duration: 400.ms).slideY(begin: 0.1),
-              const Gap(AppDimensions.spaceMD),
-
-              _PremiumCategorySelector(
-                value: _category,
-                onChanged: (c) => setState(() => _category = c),
-              ).animate().fadeIn(delay: 300.ms, duration: 400.ms).slideY(begin: 0.1),
-              const Gap(AppDimensions.spaceMD),
-
-              AppTextArea(
-                id: 'item-notes',
-                controller: _notesController,
-                label: 'Observações (opcional)',
-                hint: 'Ex: Sem lactose, Integral...',
-                minLines: 2,
-                maxLines: 4,
-              ).animate().fadeIn(delay: 350.ms, duration: 400.ms).slideY(begin: 0.1),
-
-              const Gap(AppDimensions.spaceXXXL),
-
-              // Action Buttons
-              AppButton(
-                id: 'btn-add-another',
-                label: 'Adicionar e Continuar',
-                onPressed: _isLoading ? null : () => _addItem(addAnother: true),
-                outlined: true,
-                icon: Icons.add_circle_outline_rounded,
-              ).animate().fadeIn(delay: 400.ms, duration: 400.ms).slideY(begin: 0.1),
-
-              const Gap(AppDimensions.spaceSM),
-
-              AppButton(
-                id: 'btn-add-item',
-                label: 'Concluir',
-                onPressed: _isLoading ? null : () => _addItem(),
-                isLoading: _isLoading,
-                icon: Icons.check_circle_rounded,
-              ).animate().fadeIn(delay: 450.ms, duration: 400.ms).slideY(begin: 0.1),
-            ],
+            ),
           ),
         ),
       ),
@@ -264,9 +308,9 @@ class _SectionTitle extends StatelessWidget {
         Text(
           title,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: cs.onSurface,
-          ),
+                fontWeight: FontWeight.w700,
+                color: cs.onSurface,
+              ),
         ),
       ],
     );
@@ -297,10 +341,13 @@ class _PremiumUnitSelector extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOut,
-              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceMD),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: AppDimensions.spaceMD),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: isSelected ? cs.primary : cs.surfaceContainerHighest.withValues(alpha: 0.5),
+                color: isSelected
+                    ? cs.primary
+                    : cs.surfaceContainerHighest.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
                 border: Border.all(
                   color: isSelected ? cs.primary : Colors.transparent,
@@ -310,9 +357,10 @@ class _PremiumUnitSelector extends StatelessWidget {
               child: Text(
                 unit.label,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                ),
+                      color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                    ),
               ),
             ),
           );
@@ -326,7 +374,8 @@ class _PremiumCategorySelector extends StatelessWidget {
   final String? value;
   final ValueChanged<String?> onChanged;
 
-  const _PremiumCategorySelector({required this.value, required this.onChanged});
+  const _PremiumCategorySelector(
+      {required this.value, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -352,8 +401,8 @@ class _PremiumCategorySelector extends StatelessWidget {
             child: Text(
               'Categoria',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: cs.onSurfaceVariant.withValues(alpha: 0.5),
-              ),
+                    color: cs.onSurfaceVariant.withValues(alpha: 0.5),
+                  ),
             ),
           ),
           items: options.map((cat) {
@@ -364,8 +413,9 @@ class _PremiumCategorySelector extends StatelessWidget {
                 child: Text(
                   cat ?? 'Sem Categoria',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: cat == value ? FontWeight.w600 : FontWeight.w400,
-                  ),
+                        fontWeight:
+                            cat == value ? FontWeight.w600 : FontWeight.w400,
+                      ),
                 ),
               ),
             );

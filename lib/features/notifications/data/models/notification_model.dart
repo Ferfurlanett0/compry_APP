@@ -12,6 +12,7 @@ class NotificationModel {
   final String type;
   final bool read;
   final DateTime createdAt;
+  final String? listId;
 
   const NotificationModel({
     required this.id,
@@ -20,6 +21,7 @@ class NotificationModel {
     required this.type,
     required this.read,
     required this.createdAt,
+    this.listId,
   });
 
   factory NotificationModel.fromFirestore(DocumentSnapshot doc) {
@@ -31,6 +33,7 @@ class NotificationModel {
       type: data['type'] as String? ?? '',
       read: data['read'] as bool? ?? false,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      listId: data['listId'] as String?,
     );
   }
 
@@ -41,5 +44,6 @@ class NotificationModel {
         type: type,
         read: read,
         createdAt: createdAt,
+        listId: listId,
       );
 }

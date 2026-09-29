@@ -193,8 +193,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> updateFcmToken(String userId, String token) async {
     try {
-      await _firestore.collection(AppConstants.colUsers).doc(userId).update(
-          {'fcmToken': token, 'updatedAt': FieldValue.serverTimestamp()});
+      await _firestore.collection(AppConstants.colUsers).doc(userId).update({
+        'fcmToken': token,
+        'fcmTokens': FieldValue.arrayUnion([token]),
+        'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
+      });
     } catch (e) {
       _logger.w('Falha ao atualizar FCM token: $e');
     }

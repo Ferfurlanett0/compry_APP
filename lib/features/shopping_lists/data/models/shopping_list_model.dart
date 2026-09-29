@@ -54,6 +54,8 @@ class ShoppingListModel extends HiveObject {
   final int totalItems;
   @HiveField(20)
   final int checkedItems;
+  @HiveField(21)
+  final DateTime? receivedAt;
 
   ShoppingListModel({
     required this.id,
@@ -77,6 +79,7 @@ class ShoppingListModel extends HiveObject {
     this.offlineChanges = false,
     this.totalItems = 0,
     this.checkedItems = 0,
+    this.receivedAt,
   });
 
   // ─── Firestore ─────────────────────────────────────────────────────────────
@@ -104,6 +107,7 @@ class ShoppingListModel extends HiveObject {
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       finishedAt: (data['finishedAt'] as Timestamp?)?.toDate(),
       sentAt: (data['sentAt'] as Timestamp?)?.toDate(),
+      receivedAt: (data['receivedAt'] as Timestamp?)?.toDate(),
       startedAt: (data['startedAt'] as Timestamp?)?.toDate(),
       version: data['version'] as int? ?? 1,
       offlineChanges: data['offlineChanges'] as bool? ?? false,
@@ -126,8 +130,11 @@ class ShoppingListModel extends HiveObject {
         'dueDate': dueDate != null ? Timestamp.fromDate(dueDate!) : null,
         'createdAt': Timestamp.fromDate(createdAt),
         'updatedAt': Timestamp.fromDate(updatedAt),
-        'finishedAt': finishedAt != null ? Timestamp.fromDate(finishedAt!) : null,
+        'finishedAt':
+            finishedAt != null ? Timestamp.fromDate(finishedAt!) : null,
         'sentAt': sentAt != null ? Timestamp.fromDate(sentAt!) : null,
+        'receivedAt':
+            receivedAt != null ? Timestamp.fromDate(receivedAt!) : null,
         'startedAt': startedAt != null ? Timestamp.fromDate(startedAt!) : null,
         'version': version,
         'offlineChanges': offlineChanges,
@@ -154,6 +161,7 @@ class ShoppingListModel extends HiveObject {
         updatedAt: updatedAt,
         finishedAt: finishedAt,
         sentAt: sentAt,
+        receivedAt: receivedAt,
         startedAt: startedAt,
         version: version,
         offlineChanges: offlineChanges,
@@ -179,6 +187,7 @@ class ShoppingListModel extends HiveObject {
         updatedAt: entity.updatedAt,
         finishedAt: entity.finishedAt,
         sentAt: entity.sentAt,
+        receivedAt: entity.receivedAt,
         startedAt: entity.startedAt,
         version: entity.version,
         offlineChanges: entity.offlineChanges,

@@ -7,18 +7,18 @@ import 'package:flutter/material.dart';
 /// Light theme colors — refined greens + warm neutrals
 abstract final class AppColorsLight {
   // Brand — sophisticated forest green
-  static const Color primary = Color(0xFF1B7A3C);
-  static const Color primaryVariant = Color(0xFF145E2E);
-  static const Color secondary = Color(0xFF2D9E5F);
-  static const Color tertiary = Color(0xFF0A5C28);
+  static const Color primary = Color(0xFF176B3A);
+  static const Color primaryVariant = Color(0xFF0D4125);
+  static const Color secondary = Color(0xFF287C4A);
+  static const Color tertiary = Color(0xFFA85F00);
 
   // Surface hierarchy (5 levels for depth)
-  static const Color background = Color(0xFFF4F6F8);
+  static const Color background = Color(0xFFF4F5F0);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceContainer = Color(0xFFF0F2F5);
-  static const Color surfaceContainerLow = Color(0xFFF8FAFB);
-  static const Color surfaceContainerHigh = Color(0xFFE8EAED);
-  static const Color surfaceVariant = Color(0xFFE3EBE5);
+  static const Color surfaceContainer = Color(0xFFEEF1E9);
+  static const Color surfaceContainerLow = Color(0xFFF8F9F5);
+  static const Color surfaceContainerHigh = Color(0xFFE5E9E0);
+  static const Color surfaceVariant = Color(0xFFE4F2E8);
 
   // Semantic
   static const Color success = Color(0xFF1B7A3C);
@@ -27,9 +27,9 @@ abstract final class AppColorsLight {
   static const Color info = Color(0xFF1565C0);
 
   // Text hierarchy
-  static const Color textPrimary = Color(0xFF111827);
-  static const Color textSecondary = Color(0xFF6B7280);
-  static const Color textTertiary = Color(0xFF9CA3AF);
+  static const Color textPrimary = Color(0xFF182018);
+  static const Color textSecondary = Color(0xFF667066);
+  static const Color textTertiary = Color(0xFF899288);
   static const Color textDisabled = Color(0xFFD1D5DB);
   static const Color textOnPrimary = Color(0xFFFFFFFF);
 
@@ -51,9 +51,9 @@ abstract final class AppColorsLight {
   static const Color offlineText = Color(0xFF111827);
 
   // Borders & dividers
-  static const Color divider = Color(0xFFE5E7EB);
-  static const Color outline = Color(0xFFD1D5DB);
-  static const Color outlineVariant = Color(0xFFE5E7EB);
+  static const Color divider = Color(0xFFDDE2D9);
+  static const Color outline = Color(0xFFC8CFC4);
+  static const Color outlineVariant = Color(0xFFDDE2D9);
 
   // Shadows
   static const Color shadow = Color(0x0F000000);
@@ -69,12 +69,12 @@ abstract final class AppColorsDark {
   static const Color tertiary = Color(0xFF6EE7B7);
 
   // Surface hierarchy (5 levels — no pure black)
-  static const Color background = Color(0xFF0F1117);
-  static const Color surface = Color(0xFF16181F);
-  static const Color surfaceContainer = Color(0xFF1C1F28);
-  static const Color surfaceContainerLow = Color(0xFF13151C);
-  static const Color surfaceContainerHigh = Color(0xFF252830);
-  static const Color surfaceVariant = Color(0xFF1E2430);
+  static const Color background = Color(0xFF101410);
+  static const Color surface = Color(0xFF191E19);
+  static const Color surfaceContainer = Color(0xFF202620);
+  static const Color surfaceContainerLow = Color(0xFF141914);
+  static const Color surfaceContainerHigh = Color(0xFF293029);
+  static const Color surfaceVariant = Color(0xFF173523);
 
   // Semantic
   static const Color success = Color(0xFF4ADE80);

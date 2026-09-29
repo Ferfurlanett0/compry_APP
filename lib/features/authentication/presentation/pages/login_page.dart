@@ -1,23 +1,13 @@
-/// Compry  Login Page
-/// Presentation layer  RF-001 (PRD Part 2 + Part 4 Wireframe Section 32)
-library;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:gap/gap.dart';
 
 import '../../../../core/services/autofill_service.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_dimensions.dart';
-import '../viewmodels/auth_viewmodel.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/offline_banner.dart';
+import '../viewmodels/auth_viewmodel.dart';
 
-/// Tela de login  apenas usuário e senha, sem criar conta (RG-001)
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
@@ -65,7 +55,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
-
     await ref.read(authViewModelProvider.notifier).login(
           username: _usernameController.text,
           password: _passwordController.text,
@@ -76,21 +65,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authViewModelProvider);
     final isLoading = authState is AuthLoading;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
-    // Show error snackbar
     ref.listen<AuthState>(authViewModelProvider, (previous, next) {
       if (next is AuthError) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(next.message),
-              backgroundColor: colorScheme.error,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          ..showSnackBar(SnackBar(content: Text(next.message)));
         ref.read(authViewModelProvider.notifier).clearError();
       } else if (next is AuthAuthenticated ||
           next is AuthRequiresPasswordChange) {
@@ -102,228 +82,193 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     return Scaffold(
-      body: Stack(
-        children: [
-          // Background gradient
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  colorScheme.primary,
-                  colorScheme.primary.withValues(alpha: 0.8),
-                  colorScheme.secondary.withValues(alpha: 0.6),
-                ],
-                stops: const [0.0, 0.5, 1.0],
+      body: SafeArea(
+        child: Column(
+          children: [
+            const OfflineBanner(),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final wide = constraints.maxWidth >= 760;
+                  final content = wide
+                      ? Row(
+                          children: [
+                            Expanded(child: _brand(context)),
+                            Expanded(child: _form(context, isLoading)),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            Flexible(
+                              flex: constraints.maxHeight < 650 ? 4 : 5,
+                              child: _brand(context),
+                            ),
+                            Flexible(
+                              flex: constraints.maxHeight < 650 ? 7 : 6,
+                              child: _form(context, isLoading),
+                            ),
+                          ],
+                        );
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1040),
+                      child: content,
+                    ),
+                  );
+                },
               ),
             ),
-          ),
-
-          // Content
-          SafeArea(
-            child: Column(
-              children: [
-                const OfflineBanner(),
-                Expanded(
-                  child: Center(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Logo / App Name
-                          _buildLogo(theme)
-                              .animate()
-                              .fadeIn(duration: 600.ms)
-                              .slideY(begin: -0.3, end: 0),
-
-                          const Gap(AppDimensions.spaceXXL),
-
-                          // Login Card
-                          _buildLoginCard(theme, isLoading)
-                              .animate()
-                              .fadeIn(
-                                delay: 200.ms,
-                                duration: 600.ms,
-                              )
-                              .slideY(begin: 0.3, end: 0),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildLogo(ThemeData theme) {
-    return Column(
-      children: [
-        // App icon
-        Container(
-          width: 90,
-          height: 90,
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Image.asset(
-              'assets/icons/icone_compry.png',
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        const Gap(AppDimensions.spaceMD),
-
-        // App name
-        Text(
-          'compry',
-          style: theme.textTheme.displaySmall?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -2,
-          ),
-        ),
-        const Gap(AppDimensions.spaceXS),
-        Text(
-          'Gestão inteligente de compras',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: Colors.white.withValues(alpha: 0.85),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLoginCard(ThemeData theme, bool isLoading) {
+  Widget _brand(BuildContext context) {
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(maxWidth: 400),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 32,
-            offset: const Offset(0, 16),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(AppDimensions.spaceXL),
-      child: AutofillGroup(
-        child: Form(
-          key: _formKey,
+      height: double.infinity,
+      color: const Color(0xFF163E26),
+      padding: const EdgeInsets.all(24),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDFF3E6),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(Icons.checklist_rounded,
+                    color: Color(0xFF163E26)),
+              ),
+              const SizedBox(height: 24),
               Text(
-                'Entrar',
-                style: theme.textTheme.headlineMedium,
+                'Listas que chegam prontas para agir.',
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                      color: Colors.white,
+                      height: 1.12,
+                    ),
               ),
-              const Gap(AppDimensions.spaceXS),
+              const SizedBox(height: 8),
               Text(
-                'Acesse sua conta para continuar',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const Gap(AppDimensions.spaceXL),
-
-              // Username field
-              AppTextField(
-                id: 'login-username',
-                controller: _usernameController,
-                label: 'Usuário',
-                hint: 'Digite seu nome de usuário',
-                prefixIcon: Icons.person_outline_rounded,
-                textInputAction: TextInputAction.next,
-                keyboardType: TextInputType.text,
-                autocorrect: false,
-                onTap: () => _usernameTouched = true,
-                autofillHints:
-                    _allowAutofill ? const [AutofillHints.username] : const [],
-                enabled: !isLoading,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Usuário é obrigatório';
-                  }
-                  return null;
-                },
-              ),
-
-              const Gap(AppDimensions.spaceMD),
-
-              // Password field
-              AppTextField(
-                id: 'login-password',
-                controller: _passwordController,
-                label: 'Senha',
-                hint: 'Digite sua senha',
-                prefixIcon: Icons.lock_outline_rounded,
-                obscureText: _obscurePassword,
-                autofillHints:
-                    _allowAutofill ? const [AutofillHints.password] : const [],
-                textInputAction: TextInputAction.done,
-                enabled: !isLoading,
-                onTap: () => _passwordTouched = true,
-                onSubmitted: (_) => _handleLogin(),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                  ),
-                  onPressed: () =>
-                      setState(() => _obscurePassword = !_obscurePassword),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Senha é obrigatória';
-                  }
-                  return null;
-                },
-              ),
-
-              const Gap(AppDimensions.spaceXL),
-
-              // Login button
-              AppButton(
-                id: 'btn-login',
-                label: 'Entrar',
-                onPressed: isLoading ? null : _handleLogin,
-                isLoading: isLoading,
-                icon: Icons.login_rounded,
-              ),
-
-              const Gap(AppDimensions.spaceMD),
-
-              // Info text  no sign up button (RG-001)
-              Center(
-                child: Text(
-                  'Acesso restrito a usuários cadastrados',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                'Monte, envie, acompanhe e conclua sem perder nenhuma etapa.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: const Color(0xFFC8DECF),
+                    ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _form(BuildContext context, bool isLoading) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: Theme.of(context).colorScheme.surface,
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          24,
+          24,
+          24,
+          24 + MediaQuery.paddingOf(context).bottom,
+        ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: AutofillGroup(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Entrar',
+                        style: Theme.of(context).textTheme.headlineMedium),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Use o acesso criado pelo administrador da empresa.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                    const SizedBox(height: 24),
+                    AppTextField(
+                      id: 'login-username',
+                      controller: _usernameController,
+                      label: 'Usuário',
+                      hint: 'Digite seu usuário',
+                      prefixIcon: Icons.person_outline_rounded,
+                      textInputAction: TextInputAction.next,
+                      autocorrect: false,
+                      onTap: () => _usernameTouched = true,
+                      autofillHints: _allowAutofill
+                          ? const [AutofillHints.username]
+                          : const [],
+                      enabled: !isLoading,
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty
+                              ? 'Digite seu usuário'
+                              : null,
+                    ),
+                    const SizedBox(height: 16),
+                    AppTextField(
+                      id: 'login-password',
+                      controller: _passwordController,
+                      label: 'Senha',
+                      hint: 'Digite sua senha',
+                      prefixIcon: Icons.lock_outline_rounded,
+                      obscureText: _obscurePassword,
+                      autofillHints: _allowAutofill
+                          ? const [AutofillHints.password]
+                          : const [],
+                      textInputAction: TextInputAction.done,
+                      enabled: !isLoading,
+                      onTap: () => _passwordTouched = true,
+                      onSubmitted: (_) => _handleLogin(),
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscurePassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined),
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
+                      ),
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Digite sua senha'
+                          : null,
+                    ),
+                    const SizedBox(height: 20),
+                    AppButton(
+                      id: 'btn-login',
+                      label: 'Entrar',
+                      onPressed: isLoading ? null : _handleLogin,
+                      isLoading: isLoading,
+                    ),
+                    const SizedBox(height: 12),
+                    Center(
+                      child: Text(
+                        'Os dados ficam vazios até o primeiro preenchimento manual.',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),

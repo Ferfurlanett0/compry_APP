@@ -17,8 +17,10 @@ class _ShimmerWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? const Color(0xFF1C1F28) : const Color(0xFFE8EAED);
-    final highlightColor = isDark ? const Color(0xFF252830) : const Color(0xFFF8FAFB);
+    final baseColor =
+        isDark ? const Color(0xFF1C1F28) : const Color(0xFFE8EAED);
+    final highlightColor =
+        isDark ? const Color(0xFF252830) : const Color(0xFFF8FAFB);
 
     return Shimmer.fromColors(
       baseColor: baseColor,
@@ -106,11 +108,17 @@ class ListCardSkeleton extends StatelessWidget {
                   ),
                 ),
                 const Gap(AppDimensions.spaceMD),
-                _ShimmerBox(width: 90, height: 24, borderRadius: AppDimensions.radiusFull),
+                _ShimmerBox(
+                    width: 90,
+                    height: 24,
+                    borderRadius: AppDimensions.radiusFull),
               ],
             ),
             const Gap(AppDimensions.spaceMD),
-            _ShimmerBox(width: double.infinity, height: AppDimensions.progressBarHeight, borderRadius: AppDimensions.radiusFull),
+            _ShimmerBox(
+                width: double.infinity,
+                height: AppDimensions.progressBarHeight,
+                borderRadius: AppDimensions.radiusFull),
             const Gap(AppDimensions.spaceSM),
             Row(
               children: [

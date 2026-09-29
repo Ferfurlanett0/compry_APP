@@ -13,9 +13,9 @@ abstract final class AppDimensions {
   static const double spaceXXXL = 48.0;
 
   // ─── Card & Layout ─────────────────────────────────────────────────────────
-  static const double cardSpacing = 10.0;
-  static const double cardPadding = 18.0;
-  static const double pagePadding = 20.0;
+  static const double cardSpacing = 8.0;
+  static const double cardPadding = 16.0;
+  static const double pagePadding = 16.0;
 
   // ─── Border Radius ─────────────────────────────────────────────────────────
   static const double radiusXS = 6.0;
@@ -27,9 +27,9 @@ abstract final class AppDimensions {
   static const double radiusFull = 100.0;
 
   // ─── Button ────────────────────────────────────────────────────────────────
-  static const double buttonHeight = 56.0;
+  static const double buttonHeight = 52.0;
   static const double buttonHeightSM = 40.0;
-  static const double buttonBorderRadius = 16.0;
+  static const double buttonBorderRadius = 14.0;
 
   // ─── Icons ─────────────────────────────────────────────────────────────────
   static const double iconXS = 14.0;

@@ -5,7 +5,7 @@ library;
 abstract final class AppConstants {
   // App info
   static const String appName = 'Compry';
-  static const String appVersion = '1.1.1';
+  static const String appVersion = '1.2.0';
   static const String appBuildNumber = '2';
 
   // Firestore collections

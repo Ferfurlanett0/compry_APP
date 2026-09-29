@@ -47,9 +47,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isAuthenticated = authState is AuthAuthenticated;
       final requiresPasswordChange = authState is AuthRequiresPasswordChange;
       final isLoading = authState is AuthLoading || authState is AuthInitial;
-      
+
       final isLoginRoute = state.matchedLocation == AppRoutes.login;
-      final isChangePasswordRoute = state.matchedLocation == AppRoutes.changePassword;
+      final isChangePasswordRoute =
+          state.matchedLocation == AppRoutes.changePassword;
 
       if (isLoading) return null;
 
@@ -179,7 +180,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final listId = state.pathParameters['listId']!;
           return CustomTransitionPage(
             child: AddItemPage(listId: listId),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               return SlideTransition(
                 position: animation.drive(
                   Tween(begin: const Offset(0, 1), end: Offset.zero)
@@ -192,7 +194,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
     ],
-
     errorBuilder: (context, state) => Scaffold(
       body: Center(
         child: Column(
@@ -200,7 +201,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           children: [
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
-            Text('Página não encontrada', style: Theme.of(context).textTheme.titleLarge),
+            Text('Página não encontrada',
+                style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => context.go(AppRoutes.home),

@@ -62,13 +62,17 @@ class CreateUserViewModel extends StateNotifier<CreateUserState> {
       state = CreateUserError(e.message);
     } catch (e) {
       _logger.e('CreateUserViewModel Error: $e');
-      state = CreateUserError(e.toString().replaceAll('Exception: ', '').replaceAll('ArgumentError: ', ''));
+      state = CreateUserError(e
+          .toString()
+          .replaceAll('Exception: ', '')
+          .replaceAll('ArgumentError: ', ''));
     }
   }
 }
 
 final createUserViewModelProvider =
-    StateNotifierProvider.autoDispose<CreateUserViewModel, CreateUserState>((ref) {
+    StateNotifierProvider.autoDispose<CreateUserViewModel, CreateUserState>(
+        (ref) {
   final repository = ref.watch(authRepositoryProvider);
   final logger = ref.watch(loggerProvider);
 

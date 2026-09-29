@@ -27,6 +27,7 @@ class CreateListPage extends ConsumerStatefulWidget {
 class _CreateListPageState extends ConsumerState<CreateListPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
+  final _notesController = TextEditingController();
 
   ListPriority _priority = ListPriority.medium;
   bool _isLoading = false;
@@ -34,6 +35,7 @@ class _CreateListPageState extends ConsumerState<CreateListPage> {
   @override
   void dispose() {
     _titleController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -52,10 +54,13 @@ class _CreateListPageState extends ConsumerState<CreateListPage> {
       final list = await useCase.call(CreateListParams(
         title: _titleController.text,
         description: null,
-        notes: null,
+        notes: _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
         priority: _priority,
         category: null,
         createdBy: user.id,
+        createdByName: user.name,
       ));
 
       if (!mounted) return;
@@ -82,11 +87,16 @@ class _CreateListPageState extends ConsumerState<CreateListPage> {
     return Scaffold(
       backgroundColor: cs.surface,
       appBar: AppBar(
-        title: Text(
-          'Nova Lista',
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Etapa 1 de 2',
+                style:
+                    theme.textTheme.labelMedium?.copyWith(color: cs.primary)),
+            Text('Nova lista', style: theme.textTheme.titleLarge),
+          ],
         ),
-        centerTitle: true,
+        centerTitle: false,
         leading: IconButton(
           icon: const Icon(Icons.close_rounded),
           onPressed: () => context.pop(),
@@ -96,49 +106,72 @@ class _CreateListPageState extends ConsumerState<CreateListPage> {
         surfaceTintColor: Colors.transparent,
       ),
       body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.pagePadding,
-              vertical: AppDimensions.spaceXL,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.pagePadding,
+                  vertical: AppDimensions.spaceXL,
+                ),
+                children: [
+                  // Title Field
+                  AppTextField(
+                    id: 'list-title',
+                    controller: _titleController,
+                    label: 'Título da Compra',
+                    hint: 'Ex: Compras do Mês',
+                    prefixIcon: Icons.shopping_bag_outlined,
+                    textInputAction: TextInputAction.done,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'O título é obrigatório';
+                      }
+                      return null;
+                    },
+                  ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
+
+                  const Gap(AppDimensions.spaceXXL),
+
+                  // Priority Selector
+                  _PremiumPrioritySelector(
+                    value: _priority,
+                    onChanged: (p) => setState(() => _priority = p),
+                  )
+                      .animate()
+                      .fadeIn(delay: 100.ms, duration: 400.ms)
+                      .slideY(begin: 0.1),
+
+                  const Gap(AppDimensions.spaceXXXL),
+
+                  AppTextArea(
+                    id: 'list-notes',
+                    controller: _notesController,
+                    label: 'Orientação para quem vai comprar (opcional)',
+                    hint: 'Ex.: priorizar marcas econômicas ou validade longa',
+                    minLines: 2,
+                    maxLines: 4,
+                  ),
+
+                  const Gap(AppDimensions.spaceXL),
+
+                  // Create Button
+                  AppButton(
+                    id: 'btn-create-list',
+                    label: 'Criar e Adicionar Itens',
+                    onPressed: _isLoading ? null : () => _createList(),
+                    isLoading: _isLoading,
+                    icon: Icons.arrow_forward_rounded,
+                  )
+                      .animate()
+                      .fadeIn(delay: 200.ms, duration: 400.ms)
+                      .slideY(begin: 0.1),
+                ],
+              ),
             ),
-            children: [
-              // Title Field
-              AppTextField(
-                id: 'list-title',
-                controller: _titleController,
-                label: 'Título da Compra',
-                hint: 'Ex: Compras do Mês',
-                prefixIcon: Icons.shopping_bag_outlined,
-                textInputAction: TextInputAction.done,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'O título é obrigatório';
-                  }
-                  return null;
-                },
-              ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
-
-              const Gap(AppDimensions.spaceXXL),
-
-              // Priority Selector
-              _PremiumPrioritySelector(
-                value: _priority,
-                onChanged: (p) => setState(() => _priority = p),
-              ).animate().fadeIn(delay: 100.ms, duration: 400.ms).slideY(begin: 0.1),
-
-              const Gap(AppDimensions.spaceXXXL),
-
-              // Create Button
-              AppButton(
-                id: 'btn-create-list',
-                label: 'Criar e Adicionar Itens',
-                onPressed: _isLoading ? null : () => _createList(),
-                isLoading: _isLoading,
-                icon: Icons.arrow_forward_rounded,
-              ).animate().fadeIn(delay: 200.ms, duration: 400.ms).slideY(begin: 0.1),
-            ],
           ),
         ),
       ),
@@ -152,10 +185,12 @@ class _PremiumPrioritySelector extends StatefulWidget {
   final ListPriority value;
   final ValueChanged<ListPriority> onChanged;
 
-  const _PremiumPrioritySelector({required this.value, required this.onChanged});
+  const _PremiumPrioritySelector(
+      {required this.value, required this.onChanged});
 
   @override
-  State<_PremiumPrioritySelector> createState() => _PremiumPrioritySelectorState();
+  State<_PremiumPrioritySelector> createState() =>
+      _PremiumPrioritySelectorState();
 }
 
 class _PremiumPrioritySelectorState extends State<_PremiumPrioritySelector> {
@@ -176,55 +211,73 @@ class _PremiumPrioritySelectorState extends State<_PremiumPrioritySelector> {
           ),
         ),
         const Gap(AppDimensions.spaceMD),
-        Row(
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          childAspectRatio: 3.1,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
           children: ListPriority.values.map((priority) {
             final isSelected = widget.value == priority;
             final color = isDark ? priority.colorDark() : priority.colorLight();
 
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: GestureDetector(
-                  onTap: () => widget.onChanged(priority),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeOutBack,
-                    padding: const EdgeInsets.symmetric(vertical: AppDimensions.spaceMD),
-                    decoration: BoxDecoration(
-                      color: isSelected ? color.withValues(alpha: isDark ? 0.2 : 0.1) : cs.surface,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
-                      border: Border.all(
-                        color: isSelected ? color : cs.outlineVariant.withValues(alpha: 0.5),
-                        width: isSelected ? 2 : 1,
-                      ),
-                      boxShadow: isSelected
-                          ? [BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))]
-                          : [BoxShadow(color: cs.shadow, blurRadius: 4, offset: const Offset(0, 1))],
-                    ),
-                    child: Column(
-                      children: [
-                        AnimatedScale(
-                          scale: isSelected ? 1.2 : 1.0,
-                          duration: const Duration(milliseconds: 200),
-                          child: Icon(
-                            priority.icon,
-                            color: isSelected ? color : cs.onSurfaceVariant.withValues(alpha: 0.6),
-                            size: 24,
-                          ),
-                        ),
-                        const Gap(6),
-                        Text(
-                          priority.label,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                            color: isSelected ? color : cs.onSurfaceVariant.withValues(alpha: 0.7),
-                            letterSpacing: 0.2,
-                          ),
-                        ),
-                      ],
-                    ),
+            return GestureDetector(
+              onTap: () => widget.onChanged(priority),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutBack,
+                padding:
+                    const EdgeInsets.symmetric(vertical: AppDimensions.spaceMD),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? color.withValues(alpha: isDark ? 0.2 : 0.1)
+                      : cs.surface,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
+                  border: Border.all(
+                    color: isSelected
+                        ? color
+                        : cs.outlineVariant.withValues(alpha: 0.5),
+                    width: isSelected ? 2 : 1,
                   ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                              color: color.withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2))
+                        ]
+                      : [
+                          BoxShadow(
+                              color: cs.shadow,
+                              blurRadius: 4,
+                              offset: const Offset(0, 1))
+                        ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      priority.icon,
+                      color: isSelected
+                          ? color
+                          : cs.onSurfaceVariant.withValues(alpha: 0.6),
+                      size: 24,
+                    ),
+                    const Gap(8),
+                    Text(
+                      priority.label,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight:
+                            isSelected ? FontWeight.w800 : FontWeight.w600,
+                        color: isSelected
+                            ? color
+                            : cs.onSurfaceVariant.withValues(alpha: 0.7),
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );

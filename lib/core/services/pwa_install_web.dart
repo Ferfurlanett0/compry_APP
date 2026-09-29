@@ -5,12 +5,11 @@ import 'dart:js_util' as js_util;
 /// os navegadores iOS (Safari, Chrome, Firefox, Edge, etc.)
 bool _isIOSDevice() {
   try {
-    final navigator = js_util.getProperty<Object>(js_util.globalThis, 'navigator');
+    final navigator =
+        js_util.getProperty<Object>(js_util.globalThis, 'navigator');
     final rawUA = js_util.getProperty<Object>(navigator, 'userAgent');
     final ua = rawUA.toString().toLowerCase();
-    return ua.contains('iphone') ||
-        ua.contains('ipad') ||
-        ua.contains('ipod');
+    return ua.contains('iphone') || ua.contains('ipad') || ua.contains('ipod');
   } catch (_) {
     return false;
   }
@@ -24,7 +23,8 @@ bool tryInstallImpl() {
 
   try {
     if (js_util.hasProperty(js_util.globalThis, 'triggerPwaInstall')) {
-      final result = js_util.callMethod(js_util.globalThis, 'triggerPwaInstall', []);
+      final result =
+          js_util.callMethod(js_util.globalThis, 'triggerPwaInstall', []);
       return result == true;
     }
   } catch (e) {

@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/config/providers.dart';
@@ -15,7 +14,10 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../authentication/domain/entities/user_entity.dart';
 import '../../../authentication/presentation/viewmodels/auth_viewmodel.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/compry_components.dart';
 import '../../../../core/services/pwa_install_service.dart';
+import '../../../../core/services/fcm_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -270,297 +272,234 @@ class ProfilePage extends ConsumerWidget {
     final authState = ref.watch(authViewModelProvider);
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
 
     if (currentUser == null) return const SizedBox.shrink();
 
     return Scaffold(
       backgroundColor: cs.surface,
-      appBar: AppBar(
-        title: Text(
-          'Perfil',
-          style:
-              theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-        ),
-        centerTitle: false,
-        backgroundColor: cs.surface,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.pagePadding,
-          vertical: AppDimensions.spaceMD,
-        ),
+      body: Column(
         children: [
-          // ─── Premium Avatar Section ───────────────────────────────────────────
-          Center(
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: () => _showAvatarPicker(context, ref, currentUser),
-                  child: Stack(
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: cs.primaryContainer,
-                          gradient: LinearGradient(
-                            colors: [
-                              cs.primary.withValues(alpha: 0.25),
-                              cs.primary.withValues(alpha: 0.1),
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                          border: Border.all(
-                            color: cs.primary.withValues(alpha: 0.4),
-                            width: 2.0,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            currentUser.avatarPath,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                              color: cs.primary.withValues(alpha: 0.1),
-                              child: Center(
-                                child: Icon(
-                                  currentUser.isAdmin
-                                      ? Icons.admin_panel_settings_rounded
-                                      : Icons.person_rounded,
-                                  color: cs.primary,
-                                  size: 60,
+          const CompryPageHeader(
+            label: 'CONTA E PREFERÊNCIAS',
+            title: 'Perfil',
+          ),
+          Expanded(
+            child: CompryResponsiveBody(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
+              child: ListView(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF17251B),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusLG),
+                    ),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () =>
+                              _showAvatarPicker(context, ref, currentUser),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Container(
+                                width: 68,
+                                height: 68,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: cs.primaryContainer,
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: .35),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: ClipOval(
+                                  child: Image.asset(
+                                    currentUser.avatarPath,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Icon(
+                                      currentUser.isAdmin
+                                          ? Icons.admin_panel_settings_rounded
+                                          : Icons.person_rounded,
+                                      color: cs.primary,
+                                      size: 38,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                              Positioned(
+                                right: -2,
+                                bottom: -2,
+                                child: CircleAvatar(
+                                  radius: 13,
+                                  backgroundColor: cs.primary,
+                                  child: Icon(
+                                    Icons.edit_rounded,
+                                    size: 13,
+                                    color: cs.onPrimary,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: cs.primary,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: cs.surface, width: 2),
-                          ),
-                          child: Icon(
-                            Icons.camera_alt_rounded,
-                            size: 16,
-                            color: cs.onPrimary,
+                        const Gap(16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                currentUser.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const Gap(4),
+                              Text(
+                                currentUser.isAdmin
+                                    ? 'Administrador'
+                                    : 'Funcionário',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              const Gap(4),
+                              Text(
+                                'Toque na foto para trocar o avatar',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: Colors.white60,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
-                const Gap(AppDimensions.spaceLG),
-                Text(
-                  currentUser.name,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
-                  ),
-                ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.2),
-                const Gap(AppDimensions.spaceXXS),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: cs.primaryContainer,
-                    borderRadius:
-                        BorderRadius.circular(AppDimensions.radiusFull),
-                    border:
-                        Border.all(color: cs.primary.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  const Gap(24),
+                  const ComprySectionHeader(title: 'Informações'),
+                  _ProfileGroup(
                     children: [
-                      Icon(
-                        currentUser.isAdmin
-                            ? Icons.admin_panel_settings_rounded
-                            : Icons.badge_rounded,
-                        size: 14,
-                        color: cs.onPrimaryContainer,
+                      _PremiumInfoTile(
+                        icon: Icons.person_outline_rounded,
+                        title: 'Usuário',
+                        value: currentUser.username,
                       ),
-                      const Gap(6),
-                      Text(
-                        currentUser.isAdmin ? 'Administrador' : 'Funcionário',
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: cs.onPrimaryContainer,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      _ProfileDivider(color: cs.outlineVariant),
+                      _PremiumInfoTile(
+                        icon: Icons.badge_outlined,
+                        title: 'Perfil',
+                        value: currentUser.isAdmin
+                            ? 'Administrador'
+                            : 'Funcionário',
                       ),
                     ],
                   ),
-                ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2),
-              ],
-            ),
-          ),
-
-          const Gap(AppDimensions.spaceXXXL),
-
-          // ─── Info Section ───────────────────────────────────────────────────
-          Text(
-            'Informações',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: cs.onSurfaceVariant,
-            ),
-          ).animate().fadeIn(delay: 300.ms),
-          const Gap(AppDimensions.spaceSM),
-
-          Container(
-            decoration: BoxDecoration(
-              color: cs.surface,
-              borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-              border:
-                  Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
-              boxShadow: [
-                BoxShadow(
-                  color: cs.shadow,
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                )
-              ],
-            ),
-            child: Column(
-              children: [
-                _PremiumInfoTile(
-                  icon: Icons.person_outline_rounded,
-                  title: 'Usuário',
-                  value: currentUser.username,
-                ),
-                Divider(
-                    height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
-                _PremiumInfoTile(
-                  icon: Icons.badge_outlined,
-                  title: 'Perfil',
-                  value: currentUser.isAdmin ? 'Administrador' : 'Funcionário',
-                ),
-              ],
-            ),
-          ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1),
-
-          const Gap(AppDimensions.spaceXL),
-
-          // ─── Settings Section ───────────────────────────────────────────────
-          Text(
-            'Configurações',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: cs.onSurfaceVariant,
-            ),
-          ).animate().fadeIn(delay: 500.ms),
-          const Gap(AppDimensions.spaceSM),
-
-          Container(
-            decoration: BoxDecoration(
-              color: cs.surface,
-              borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-              border:
-                  Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
-              boxShadow: [
-                BoxShadow(
-                  color: cs.shadow,
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                )
-              ],
-            ),
-            child: Column(
-              children: [
-                if (currentUser.isAdmin) ...[
-                  _PremiumActionTile(
-                    icon: Icons.people_outline_rounded,
-                    title: 'Gerenciar Funcionários',
-                    onTap: () => context.push('/employees'),
-                  ),
-                  Divider(
-                      height: 1,
-                      color: cs.outlineVariant.withValues(alpha: 0.5)),
-                ],
-                _PremiumActionTile(
-                  icon: Icons.add_to_home_screen_rounded,
-                  title: 'Instalar App',
-                  onTap: () {
-                    final installed = PwaInstallService.tryInstall();
-                    if (!installed) {
-                      _showQuickInstallGuide(context);
-                    }
-                  },
-                ),
-                Divider(
-                    height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
-                _ThemeToggleTile(ref: ref),
-              ],
-            ),
-          ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.1),
-
-          const Gap(AppDimensions.spaceXXXL),
-
-          // ─── Logout ─────────────────────────────────────────────────────────
-          AppButton(
-            id: 'btn-logout',
-            label: 'Sair da Conta',
-            onPressed: authState is AuthLoading
-                ? null
-                : () async {
-                    final confirmed = await showDialog<bool>(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Sair da conta'),
-                        content:
-                            const Text('Deseja realmente sair do aplicativo?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx, false),
-                            child: const Text('Cancelar'),
-                          ),
-                          FilledButton(
-                            onPressed: () => Navigator.pop(ctx, true),
-                            style: FilledButton.styleFrom(
-                              backgroundColor: cs.error,
-                              foregroundColor: cs.onError,
+                  const Gap(24),
+                  const ComprySectionHeader(title: 'Configurações'),
+                  _ProfileGroup(
+                    children: [
+                      if (currentUser.isAdmin) ...[
+                        _PremiumActionTile(
+                          icon: Icons.people_outline_rounded,
+                          title: 'Gerenciar funcionários',
+                          onTap: () => context.push('/employees'),
+                        ),
+                        _ProfileDivider(color: cs.outlineVariant),
+                      ],
+                      _PremiumActionTile(
+                        icon: Icons.notifications_active_outlined,
+                        title: 'Ativar notificações',
+                        onTap: () async {
+                          final settings = await ref
+                              .read(fcmServiceProvider)
+                              .requestPermission();
+                          if (!context.mounted) return;
+                          final enabled = settings.authorizationStatus ==
+                                  AuthorizationStatus.authorized ||
+                              settings.authorizationStatus ==
+                                  AuthorizationStatus.provisional;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                enabled
+                                    ? 'Notificações ativadas neste aparelho.'
+                                    : 'A permissão de notificações não foi concedida.',
+                              ),
                             ),
-                            child: const Text('Sair'),
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    );
-                    if (confirmed == true) {
-                      await ref.read(authViewModelProvider.notifier).logout();
-                    }
-                  },
-            outlined: true,
-            danger: true,
-            icon: Icons.logout_rounded,
-          ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.1),
-
-          const Gap(AppDimensions.spaceXXL),
-
-          Center(
-            child: Text(
-              'Compry v${AppConstants.appVersion}',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: cs.onSurfaceVariant.withValues(alpha: 0.7),
-                fontWeight: FontWeight.w600,
+                      _ProfileDivider(color: cs.outlineVariant),
+                      _PremiumActionTile(
+                        icon: Icons.add_to_home_screen_rounded,
+                        title: 'Instalar app',
+                        onTap: () {
+                          final installed = PwaInstallService.tryInstall();
+                          if (!installed) _showQuickInstallGuide(context);
+                        },
+                      ),
+                      _ProfileDivider(color: cs.outlineVariant),
+                      _ThemeToggleTile(ref: ref),
+                    ],
+                  ),
+                  const Gap(28),
+                  AppButton(
+                    id: 'btn-logout',
+                    label: 'Sair da conta',
+                    onPressed: authState is AuthLoading
+                        ? null
+                        : () async {
+                            final confirmed = await showDialog<bool>(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text('Sair da conta'),
+                                content: const Text(
+                                  'Deseja realmente sair do aplicativo?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, false),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  FilledButton(
+                                    onPressed: () => Navigator.pop(ctx, true),
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: cs.error,
+                                      foregroundColor: cs.onError,
+                                    ),
+                                    child: const Text('Sair'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirmed == true) {
+                              await ref
+                                  .read(authViewModelProvider.notifier)
+                                  .logout();
+                            }
+                          },
+                    outlined: true,
+                    danger: true,
+                    icon: Icons.logout_rounded,
+                  ),
+                  const Gap(20),
+                  Center(
+                    child: Text(
+                      'Compry v${AppConstants.appVersion}',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ).animate().fadeIn(delay: 800.ms),
+          ),
         ],
       ),
     );
@@ -769,19 +708,52 @@ class _InstallStep extends StatelessWidget {
   }
 }
 
-// ─── Premium Info Tile ────────────────────────────────────────────────────────
+// ─── Profile groups ──────────────────────────────────────────────────────────
+
+class _ProfileGroup extends StatelessWidget {
+  final List<Widget> children;
+
+  const _ProfileGroup({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
+        border: Border.all(color: cs.outlineVariant),
+      ),
+      child: Column(children: children),
+    );
+  }
+}
+
+class _ProfileDivider extends StatelessWidget {
+  final Color color;
+
+  const _ProfileDivider({required this.color});
+
+  @override
+  Widget build(BuildContext context) => Divider(
+        height: 1,
+        indent: 56,
+        color: color,
+      );
+}
+
+// ─── Profile Info Tile ────────────────────────────────────────────────────────
 
 class _PremiumInfoTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
-  final VoidCallback? onTap;
 
   const _PremiumInfoTile({
     required this.icon,
     required this.title,
     required this.value,
-    this.onTap,
   });
 
   @override
@@ -791,8 +763,6 @@ class _PremiumInfoTile extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.spaceMD,
@@ -809,19 +779,27 @@ class _PremiumInfoTile extends StatelessWidget {
                 child: Icon(icon, color: cs.primary, size: 20),
               ),
               const Gap(AppDimensions.spaceMD),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
                     ),
-              ),
-              const Spacer(),
-              Text(
-                value,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: cs.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
+                    const SizedBox(height: 2),
+                    Text(
+                      value,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
+                  ],
+                ),
               ),
             ],
           ),

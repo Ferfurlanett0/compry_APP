@@ -108,9 +108,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
     state = const HomeLoading();
     _subscription?.cancel();
 
-    final stream = isAdmin
-        ? _watchAllLists()
-        : _watchEmployeeLists(userId!);
+    final stream = isAdmin ? _watchAllLists() : _watchEmployeeLists(userId!);
 
     _subscription = stream.listen(
       (lists) {

@@ -20,6 +20,7 @@ class CreateListParams {
   final List<String> tags;
   final DateTime? dueDate;
   final String createdBy;
+  final String? createdByName;
 
   const CreateListParams({
     required this.title,
@@ -30,6 +31,7 @@ class CreateListParams {
     this.tags = const [],
     this.dueDate,
     required this.createdBy,
+    this.createdByName,
   });
 }
 
@@ -37,7 +39,8 @@ class CreateListParams {
 /// Regras:
 /// - Título obrigatório (RG-003)
 /// - Somente funcionários podem criar (RF-006)
-class CreateListUseCase implements UseCase<ShoppingListEntity, CreateListParams> {
+class CreateListUseCase
+    implements UseCase<ShoppingListEntity, CreateListParams> {
   final ShoppingListRepository _repository;
 
   const CreateListUseCase(this._repository);
@@ -60,6 +63,7 @@ class CreateListUseCase implements UseCase<ShoppingListEntity, CreateListParams>
       priority: params.priority,
       status: ListStatus.draft,
       createdBy: params.createdBy,
+      createdByName: params.createdByName,
       category: params.category,
       tags: params.tags,
       dueDate: params.dueDate,
@@ -126,7 +130,7 @@ class CancelListUseCase implements UseCase<ShoppingListEntity, String> {
 class DeleteListParams {
   final String listId;
   final bool isAdmin;
-  
+
   const DeleteListParams({
     required this.listId,
     required this.isAdmin,
@@ -276,8 +280,7 @@ class WatchAllListsUseCase
 }
 
 /// Stream de uma lista específica — tempo real (RF-026)
-class WatchListUseCase
-    implements StreamUseCase<ShoppingListEntity, String> {
+class WatchListUseCase implements StreamUseCase<ShoppingListEntity, String> {
   final ShoppingListRepository _repository;
 
   const WatchListUseCase(this._repository);

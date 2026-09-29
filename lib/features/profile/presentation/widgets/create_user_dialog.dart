@@ -21,7 +21,7 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
   final _nameController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  
+
   UserRole _selectedRole = UserRole.employee;
   String _selectedAvatar = 'Perfil churrasqueiro';
   bool _obscurePassword = true;
@@ -43,14 +43,14 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
 
   void _handleSubmit() {
     if (!_formKey.currentState!.validate()) return;
-    
+
     ref.read(createUserViewModelProvider.notifier).createUser(
-      name: _nameController.text.trim(),
-      username: _usernameController.text.trim().toLowerCase(),
-      password: _passwordController.text,
-      role: _selectedRole.value,
-      avatar: _selectedAvatar,
-    );
+          name: _nameController.text.trim(),
+          username: _usernameController.text.trim().toLowerCase(),
+          password: _passwordController.text,
+          role: _selectedRole.value,
+          avatar: _selectedAvatar,
+        );
   }
 
   @override
@@ -80,7 +80,8 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
     });
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLG)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLG)),
       child: Container(
         padding: const EdgeInsets.all(AppDimensions.spaceLG),
         constraints: const BoxConstraints(maxWidth: 400),
@@ -96,7 +97,8 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                   children: [
                     Text(
                       'Novo Usuário',
-                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style: theme.textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close),
@@ -105,14 +107,15 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                   ],
                 ),
                 const Gap(AppDimensions.spaceLG),
-                
+
                 // Avatar Picker
                 SizedBox(
                   height: 80,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: _availableAvatars.length,
-                    separatorBuilder: (_, __) => const Gap(AppDimensions.spaceMD),
+                    separatorBuilder: (_, __) =>
+                        const Gap(AppDimensions.spaceMD),
                     itemBuilder: (context, index) {
                       final avatar = _availableAvatars[index];
                       final isSelected = avatar == _selectedAvatar;
@@ -126,7 +129,8 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                             shape: BoxShape.circle,
                             color: cs.primaryContainer,
                             border: Border.all(
-                              color: isSelected ? cs.primary : Colors.transparent,
+                              color:
+                                  isSelected ? cs.primary : Colors.transparent,
                               width: 3,
                             ),
                           ),
@@ -134,7 +138,8 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                             child: Image.asset(
                               'assets/images/$avatar.png',
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Icon(Icons.person, size: 40, color: cs.primary),
+                              errorBuilder: (_, __, ___) => Icon(Icons.person,
+                                  size: 40, color: cs.primary),
                             ),
                           ),
                         ),
@@ -152,7 +157,8 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                   enabled: !isLoading,
                   textInputAction: TextInputAction.next,
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) return 'Campo obrigatório';
+                    if (value == null || value.trim().isEmpty)
+                      return 'Campo obrigatório';
                     return null;
                   },
                 ),
@@ -169,11 +175,15 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [Text('@compry.com.br', style: TextStyle(color: cs.onSurfaceVariant))],
+                      children: [
+                        Text('@compry.com.br',
+                            style: TextStyle(color: cs.onSurfaceVariant))
+                      ],
                     ),
                   ),
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) return 'Campo obrigatório';
+                    if (value == null || value.trim().isEmpty)
+                      return 'Campo obrigatório';
                     if (value.contains(' ')) return 'Não pode conter espaços';
                     return null;
                   },
@@ -189,11 +199,15 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                   obscureText: _obscurePassword,
                   textInputAction: TextInputAction.done,
                   suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    icon: Icon(_obscurePassword
+                        ? Icons.visibility_off
+                        : Icons.visibility),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) return 'Campo obrigatório';
+                    if (value == null || value.isEmpty)
+                      return 'Campo obrigatório';
                     if (value.length < 6) return 'No mínimo 6 caracteres';
                     return null;
                   },
@@ -206,16 +220,22 @@ class _CreateUserDialogState extends ConsumerState<CreateUserDialog> {
                     labelText: 'Função',
                     prefixIcon: const Icon(Icons.badge_outlined),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusMD),
                     ),
                   ),
                   items: const [
-                    DropdownMenuItem(value: UserRole.employee, child: Text('Funcionário')),
-                    DropdownMenuItem(value: UserRole.admin, child: Text('Administrador')),
+                    DropdownMenuItem(
+                        value: UserRole.employee, child: Text('Funcionário')),
+                    DropdownMenuItem(
+                        value: UserRole.admin, child: Text('Administrador')),
                   ],
-                  onChanged: isLoading ? null : (role) {
-                    if (role != null) setState(() => _selectedRole = role);
-                  },
+                  onChanged: isLoading
+                      ? null
+                      : (role) {
+                          if (role != null)
+                            setState(() => _selectedRole = role);
+                        },
                 ),
                 const Gap(AppDimensions.spaceXL),
 

@@ -15,6 +15,7 @@ import '../../../shopping_lists/domain/usecases/shopping_list_usecases.dart';
 import '../../../shopping_lists/presentation/widgets/list_card.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/skeleton_loaders.dart';
+import '../../../../shared/widgets/compry_components.dart';
 
 final historyProvider =
     StreamProvider.autoDispose<List<ShoppingListEntity>>((ref) {
@@ -52,16 +53,13 @@ class HistoryPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Histórico'),
-        centerTitle: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list_rounded),
-            onPressed: () {
-              // TODO: implement filter bottom sheet
-            },
-          ),
-        ],
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        toolbarHeight: 78,
+        title: const CompryPageHeader(
+          label: 'Consulta',
+          title: 'Histórico',
+        ),
       ),
       body: historyAsync.when(
         loading: () =>
@@ -73,90 +71,93 @@ class HistoryPage extends ConsumerWidget {
                 title: 'Sem histórico',
                 message: 'Listas finalizadas aparecerão aqui.',
               )
-            : ListView.builder(
+            : CompryResponsiveBody(
                 padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).padding.bottom + 76 + 12,
+                  top: 12,
+                  bottom: MediaQuery.paddingOf(context).bottom + 88,
                 ),
-                itemCount: lists.length,
-                itemBuilder: (context, index) {
-                  final list = lists[index];
-                  final currentUser = ref.read(currentUserProvider);
-                  final isAdmin = currentUser?.isAdmin ?? false;
+                child: ListView.builder(
+                  itemCount: lists.length,
+                  itemBuilder: (context, index) {
+                    final list = lists[index];
+                    final currentUser = ref.read(currentUserProvider);
+                    final isAdmin = currentUser?.isAdmin ?? false;
 
-                  return isAdmin
-                      ? Dismissible(
-                          key: ValueKey(list.id),
-                          direction: DismissDirection.endToStart,
-                          background: Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.error,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.only(right: 24),
-                            child: const Icon(Icons.delete_outline_rounded,
-                                color: Colors.white, size: 28),
-                          ),
-                          confirmDismiss: (_) async {
-                            return await showDialog<bool>(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                title: const Text('Excluir Lista'),
-                                content: const Text(
-                                    'Tem certeza que deseja excluir esta lista? Esta ação não pode ser desfeita.'),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(ctx, false),
-                                      child: const Text('Cancelar')),
-                                  FilledButton(
-                                    onPressed: () => Navigator.pop(ctx, true),
-                                    style: FilledButton.styleFrom(
-                                        backgroundColor:
-                                            Theme.of(ctx).colorScheme.error),
-                                    child: const Text('Excluir'),
-                                  ),
-                                ],
+                    return isAdmin
+                        ? Dismissible(
+                            key: ValueKey(list.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.error,
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                            );
-                          },
-                          onDismissed: (_) async {
-                            try {
-                              final repository =
-                                  ref.read(shoppingListRepositoryProvider);
-                              await DeleteListUseCase(repository).call(
-                                DeleteListParams(
-                                    listId: list.id, isAdmin: isAdmin),
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 24),
+                              child: const Icon(Icons.delete_outline_rounded,
+                                  color: Colors.white, size: 28),
+                            ),
+                            confirmDismiss: (_) async {
+                              return await showDialog<bool>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('Excluir Lista'),
+                                  content: const Text(
+                                      'Tem certeza que deseja excluir esta lista? Esta ação não pode ser desfeita.'),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(ctx, false),
+                                        child: const Text('Cancelar')),
+                                    FilledButton(
+                                      onPressed: () => Navigator.pop(ctx, true),
+                                      style: FilledButton.styleFrom(
+                                          backgroundColor:
+                                              Theme.of(ctx).colorScheme.error),
+                                      child: const Text('Excluir'),
+                                    ),
+                                  ],
+                                ),
                               );
-                              if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        '🗑️ Lista excluída com sucesso!')),
-                              );
-                            } catch (e) {
-                              if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Erro: $e')),
-                              );
-                            }
-                          },
-                          child: ListCard(
+                            },
+                            onDismissed: (_) async {
+                              try {
+                                final repository =
+                                    ref.read(shoppingListRepositoryProvider);
+                                await DeleteListUseCase(repository).call(
+                                  DeleteListParams(
+                                      listId: list.id, isAdmin: isAdmin),
+                                );
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          '🗑️ Lista excluída com sucesso!')),
+                                );
+                              } catch (e) {
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Erro: $e')),
+                                );
+                              }
+                            },
+                            child: ListCard(
+                              list: list,
+                              index: index,
+                              onTap: () => context
+                                  .push(AppRoutes.listDetailPath(list.id)),
+                            ),
+                          )
+                        : ListCard(
                             list: list,
                             index: index,
                             onTap: () =>
                                 context.push(AppRoutes.listDetailPath(list.id)),
-                          ),
-                        )
-                      : ListCard(
-                          list: list,
-                          index: index,
-                          onTap: () =>
-                              context.push(AppRoutes.listDetailPath(list.id)),
-                        );
-                },
+                          );
+                  },
+                ),
               ),
       ),
     );

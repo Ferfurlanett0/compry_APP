@@ -9,6 +9,7 @@ class NotificationEntity {
   final String type; // e.g., 'LIST_FINISHED', 'LIST_SENT'
   final bool read;
   final DateTime createdAt;
+  final String? listId;
 
   const NotificationEntity({
     required this.id,
@@ -17,6 +18,7 @@ class NotificationEntity {
     required this.type,
     required this.read,
     required this.createdAt,
+    this.listId,
   });
 
   NotificationEntity copyWith({
@@ -26,6 +28,7 @@ class NotificationEntity {
     String? type,
     bool? read,
     DateTime? createdAt,
+    String? listId,
   }) {
     return NotificationEntity(
       id: id ?? this.id,
@@ -34,6 +37,7 @@ class NotificationEntity {
       type: type ?? this.type,
       read: read ?? this.read,
       createdAt: createdAt ?? this.createdAt,
+      listId: listId ?? this.listId,
     );
   }
 }
