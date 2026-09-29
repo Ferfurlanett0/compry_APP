@@ -16,8 +16,6 @@ import '../../../authentication/presentation/viewmodels/auth_viewmodel.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/compry_components.dart';
 import '../../../../core/services/pwa_install_service.dart';
-import '../../../../core/services/fcm_service.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -413,23 +411,29 @@ class ProfilePage extends ConsumerWidget {
                       ],
                       _PremiumActionTile(
                         icon: Icons.notifications_active_outlined,
-                        title: 'Ativar notificações',
-                        onTap: () async {
-                          final settings = await ref
-                              .read(fcmServiceProvider)
-                              .requestPermission();
-                          if (!context.mounted) return;
-                          final enabled = settings.authorizationStatus ==
-                                  AuthorizationStatus.authorized ||
-                              settings.authorizationStatus ==
-                                  AuthorizationStatus.provisional;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                enabled
-                                    ? 'Notificações ativadas neste aparelho.'
-                                    : 'A permissão de notificações não foi concedida.',
+                        title: 'Avisos em tempo real',
+                        subtitle: 'Ativos no Compry, sem mensalidade',
+                        onTap: () {
+                          showDialog<void>(
+                            context: context,
+                            builder: (dialogContext) => AlertDialog(
+                              icon: const Icon(
+                                Icons.notifications_active_outlined,
                               ),
+                              title: const Text('Avisos já estão ativos'),
+                              content: const Text(
+                                'Novas listas, conclusões e alterações aparecem '
+                                'automaticamente dentro do Compry enquanto o '
+                                'aplicativo estiver aberto e conectado. No modo '
+                                'gratuito não há aviso do sistema quando o app '
+                                'está totalmente fechado.',
+                              ),
+                              actions: [
+                                FilledButton(
+                                  onPressed: () => Navigator.pop(dialogContext),
+                                  child: const Text('Entendi'),
+                                ),
+                              ],
                             ),
                           );
                         },
@@ -877,11 +881,13 @@ class _ThemeToggleTile extends StatelessWidget {
 class _PremiumActionTile extends StatelessWidget {
   final IconData icon;
   final String title;
+  final String? subtitle;
   final VoidCallback onTap;
 
   const _PremiumActionTile({
     required this.icon,
     required this.title,
+    this.subtitle,
     required this.onTap,
   });
 
@@ -911,11 +917,25 @@ class _PremiumActionTile extends StatelessWidget {
               ),
               const Gap(AppDimensions.spaceMD),
               Expanded(
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle!,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
                       ),
+                    ],
+                  ],
                 ),
               ),
               Icon(Icons.chevron_right_rounded, color: cs.onSurfaceVariant),

@@ -47,7 +47,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "f56941647ca9c8baa41a3d23094eb12a
 "icons/icone_compry.svg": "91ea918914c70fd5254e77fdbf4eea53",
 "index.html": "1ebbb271d701e65956a6c9e85d741214",
 "/": "1ebbb271d701e65956a6c9e85d741214",
-"main.dart.js": "36da076a14fdeaa8f45d5e10a7680eae",
+"main.dart.js": "8707904030ab6f8401ef50288270853b",
 "manifest.json": "c6c1ee245d7201f2789c92ac9813ba02",
 "vercel.json": "d6b75ff95ef7100f9ff75e47eb367f2c",
 "version.json": "a00b2a99a7c6c86e5620f7be4294ec85"};
