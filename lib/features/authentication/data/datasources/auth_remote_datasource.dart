@@ -168,11 +168,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (!doc.exists) return null;
       return UserModel.fromFirestore(doc);
-    } on AuthFailure {
-      rethrow;
-    } catch (e) {
+    } on FirebaseException catch (e) {
       _logger.e('Erro ao buscar usuário atual: $e');
-      return null;
+      if (e.code == 'permission-denied') {
+        throw const AuthFailure(
+          message: 'Sua sessão não tem mais acesso a este perfil.',
+          code: 'profile-permission-denied',
+        );
+      }
+      rethrow;
     }
   }
 

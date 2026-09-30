@@ -63,20 +63,39 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserEntity?> getCurrentUser() async {
-    // Tentar buscar do servidor primeiro
+    final hasConnection = await _connectivity.hasConnection;
+
+    // Com internet, o Firebase Auth é a fonte de verdade. Um usuário salvo no
+    // Hive não representa uma sessão autenticada e não pode consultar o
+    // Firestore sozinho.
     try {
       final remoteUser = await _remote.getCurrentUser();
       if (remoteUser != null) {
         await _local.saveUser(remoteUser);
         return remoteUser.toEntity();
       }
+
+      if (hasConnection) {
+        await _clearStaleLocalSession();
+        return null;
+      }
     } catch (e) {
       _logger.w('Não foi possível buscar usuário remoto: $e');
+      if (hasConnection) {
+        await _clearStaleLocalSession();
+        rethrow;
+      }
     }
 
-    // Fallback para cache local
+    // Sem conexão, mantém o suporte offline com o último usuário validado.
     final localUser = await _local.getUser();
     return localUser?.toEntity();
+  }
+
+  Future<void> _clearStaleLocalSession() async {
+    await _local.clearUser();
+    await _local.clearSession();
+    _logger.w('Sessão local inválida removida; novo login necessário.');
   }
 
   @override

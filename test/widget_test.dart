@@ -85,5 +85,18 @@ void main() {
         AppColorsDark.textSecondary,
       );
     });
+
+    test('online startup never authenticates from stale local cache', () {
+      final source = File(
+        'lib/features/authentication/data/repositories/auth_repository_impl.dart',
+      ).readAsStringSync();
+
+      expect(source, contains('if (hasConnection)'));
+      expect(source, contains('_clearStaleLocalSession()'));
+      expect(
+        source,
+        contains('Sem conexão, mantém o suporte offline'),
+      );
+    });
   });
 }
